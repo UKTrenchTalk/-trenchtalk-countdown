@@ -21,30 +21,11 @@ import { auth, db, googleProvider } from "../firebase";
 
 // USERNAMES THAT CANNOT BE REGISTERED
 const RESERVED_USERNAMES = [
-  "admin",
-  "administrator",
-  "moderator",
-  "support",
-  "staff",
-  "help",
-  "security",
-  "official",
-  "trenchtalk",
-  "system",
-  "root",
-  "null",
-  "undefined",
-  "elonmusk",
-  "mrbeast",
-  "youtube",
-  "discord",
-  "instagram",
-  "tiktok",
-  "twitter",
-  "google",
-  "facebook",
-  "microsoft",
-  "apple"
+  "admin", "administrator", "moderator", "support", "staff",
+  "help", "security", "official", "trenchtalk", "system",
+  "root", "null", "undefined", "elonmusk", "mrbeast",
+  "youtube", "discord", "instagram", "tiktok", "twitter",
+  "google", "facebook", "microsoft", "apple"
 ];
 
 function validateUsername(value) {
@@ -64,46 +45,22 @@ function validateUsername(value) {
     };
   }
 
-  return {
-    valid: true,
-    username
-  };
+  return { valid: true, username };
 }
 
 function getErrorMessage(error) {
   const errors = {
-    "auth/email-already-in-use":
-      "An account with this email already exists.",
-
-    "auth/invalid-email":
-      "Please enter a valid email address.",
-
-    "auth/weak-password":
-      "Your password must be at least 6 characters.",
-
-    "auth/user-not-found":
-      "No account was found with that email.",
-
-    "auth/wrong-password":
-      "Incorrect password. Please try again.",
-
-    "auth/invalid-credential":
-      "Your email or password is incorrect.",
-
-    "auth/popup-closed-by-user":
-      "Google sign-in was cancelled.",
-
-    "auth/popup-blocked":
-      "Your browser blocked the Google sign-in window.",
-
-    "auth/network-request-failed":
-      "Network error. Check your internet connection.",
-
-    "auth/too-many-requests":
-      "Too many attempts. Please try again later.",
-
-    "auth/unauthorized-domain":
-      "This domain isn't authorised in Firebase."
+    "auth/email-already-in-use": "An account with this email already exists.",
+    "auth/invalid-email": "Please enter a valid email address.",
+    "auth/weak-password": "Your password must be at least 6 characters.",
+    "auth/user-not-found": "No account was found with that email.",
+    "auth/wrong-password": "Incorrect password. Please try again.",
+    "auth/invalid-credential": "Your email or password is incorrect.",
+    "auth/popup-closed-by-user": "Google sign-in was cancelled.",
+    "auth/popup-blocked": "Your browser blocked the Google sign-in window.",
+    "auth/network-request-failed": "Network error. Check your internet connection.",
+    "auth/too-many-requests": "Too many attempts. Please try again later.",
+    "auth/unauthorized-domain": "This domain isn't authorised in Firebase."
   };
 
   return errors[error.code] || "Something went wrong. Please try again.";
@@ -114,7 +71,6 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [notice, setNotice] = useState("");
   const [loading, setLoading] = useState(false);
-
   const [googleUser, setGoogleUser] = useState(null);
 
   const isRegister = mode === "register";
@@ -129,7 +85,6 @@ export default function Login() {
     }
 
     const username = validation.username;
-
     const usernameRef = doc(db, "usernames", username);
     const userRef = doc(db, "users", user.uid);
 
@@ -147,12 +102,12 @@ export default function Login() {
 
       transaction.set(usernameRef, {
         uid: user.uid,
-        username: username,
+        username,
         createdAt: serverTimestamp()
       });
 
       transaction.set(userRef, {
-        username: username,
+        username,
         usernameLower: username,
         email: user.email,
         photoURL: user.photoURL || null,
@@ -180,20 +135,16 @@ export default function Login() {
 
     try {
       const form = event.currentTarget;
-
       const email = form.email.value.trim();
       const password = form.password.value;
 
       if (isRegister) {
-        const rawUsername = form.username.value;
-
-        const validation = validateUsername(rawUsername);
+        const validation = validateUsername(form.username.value);
 
         if (!validation.valid) {
           throw new Error(validation.message);
         }
 
-        // Check availability before creating the account.
         const usernameRef = doc(db, "usernames", validation.username);
         const existingUsername = await getDoc(usernameRef);
 
@@ -231,8 +182,6 @@ export default function Login() {
         }
       }
     } catch (error) {
-      // Remove a newly created Auth account if its username
-      // reservation or profile creation failed.
       if (createdUser && auth.currentUser?.uid === createdUser.uid) {
         try {
           await deleteUser(createdUser);
@@ -285,7 +234,6 @@ export default function Login() {
       await reserveUsername(googleUser, username);
 
       setNotice("Your TrenchTalk account has been created successfully.");
-
       setGoogleUser(null);
     } catch (error) {
       setNotice(error.message || getErrorMessage(error));
@@ -348,19 +296,21 @@ export default function Login() {
         }
 
         body {
-          overflow: hidden;
+          overflow-x: hidden;
+          overflow-y: auto;
+          background: #e9eddf;
         }
 
         .tt-page {
           width: 100%;
-          height: 100vh;
-          height: 100svh;
+          min-height: 100vh;
+          min-height: 100svh;
           background: #e9eddf;
           color: #142116;
           font-family: 'DM Sans', sans-serif;
           display: flex;
           flex-direction: column;
-          overflow: hidden;
+          overflow-x: hidden;
         }
 
         .tt-header {
@@ -388,12 +338,12 @@ export default function Login() {
         }
 
         .tt-brand-name {
-          color: #050604;
           font-family: 'Space Grotesk', sans-serif;
           font-size: 24px;
           font-weight: 700;
           letter-spacing: -1.3px;
           white-space: nowrap;
+          color: #080d08;
         }
 
         .tt-brand-name span {
@@ -422,13 +372,13 @@ export default function Login() {
         .tt-main {
           width: min(1240px, 86%);
           margin: auto;
-          flex: 1;
+          flex: 1 0 auto;
           min-height: 0;
           display: grid;
-          grid-template-columns: minmax(0, 1fr) 420px;
+          grid-template-columns: minmax(0, 1fr) minmax(0, 390px);
           align-items: center;
-          gap: 80px;
-          padding: 18px 0 24px;
+          gap: 65px;
+          padding: 35px 0;
         }
 
         .tt-left {
@@ -554,13 +504,13 @@ export default function Login() {
 
         .tt-login {
           width: 100%;
-          max-width: 420px;
+          max-width: 390px;
           justify-self: end;
           background: #17291c;
           color: #f0f3e8;
-          padding: 27px;
+          padding: 22px;
           position: relative;
-          box-shadow: 11px 11px 0 #c7e69a;
+          box-shadow: 9px 9px 0 #c7e69a;
         }
 
         .tt-login::before {
@@ -569,12 +519,12 @@ export default function Login() {
           width: 42px;
           height: 4px;
           top: 0;
-          left: 27px;
+          left: 22px;
           background: #c5ff4a;
         }
 
         .tt-login-heading {
-          margin-bottom: 19px;
+          margin-bottom: 14px;
         }
 
         .tt-login-eyebrow {
@@ -582,34 +532,34 @@ export default function Login() {
           font-size: 10px;
           font-weight: 800;
           letter-spacing: 2px;
-          margin-bottom: 11px;
+          margin-bottom: 9px;
         }
 
         .tt-login-heading h2 {
           font-family: 'Space Grotesk', sans-serif;
-          font-size: 30px;
+          font-size: 28px;
           font-weight: 600;
-          letter-spacing: -1.6px;
-          margin: 0 0 7px;
+          letter-spacing: -1.4px;
+          margin: 0 0 6px;
         }
 
         .tt-login-heading p {
           margin: 0;
           color: #9ca995;
           font-size: 12px;
-          line-height: 1.6;
+          line-height: 1.5;
         }
 
         .tt-form {
           display: flex;
           flex-direction: column;
-          gap: 13px;
+          gap: 10px;
         }
 
         .tt-field {
           display: flex;
           flex-direction: column;
-          gap: 7px;
+          gap: 5px;
         }
 
         .tt-field label {
@@ -621,8 +571,8 @@ export default function Login() {
 
         .tt-field input {
           width: 100%;
-          height: 44px;
-          padding: 0 13px;
+          height: 40px;
+          padding: 0 12px;
           border: 1px solid rgba(255,255,255,.16);
           background: #102015;
           color: #f1f3ed;
@@ -667,6 +617,7 @@ export default function Login() {
           display: flex;
           align-items: center;
           justify-content: space-between;
+          gap: 8px;
         }
 
         .tt-remember {
@@ -697,8 +648,8 @@ export default function Login() {
 
         .tt-submit {
           width: 100%;
-          height: 46px;
-          margin-top: 3px;
+          height: 42px;
+          margin-top: 2px;
           border: 0;
           background: #c5ff4a;
           color: #17291c;
@@ -728,7 +679,7 @@ export default function Login() {
           color: #879783;
           font-size: 10px;
           letter-spacing: 1px;
-          margin: 3px 0;
+          margin: 1px 0;
         }
 
         .tt-divider::before,
@@ -741,7 +692,7 @@ export default function Login() {
 
         .tt-google {
           width: 100%;
-          height: 43px;
+          height: 39px;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -762,7 +713,7 @@ export default function Login() {
         }
 
         .tt-notice {
-          padding: 10px;
+          padding: 9px;
           background: rgba(197,255,74,.08);
           border: 1px solid rgba(197,255,74,.2);
           color: #d2edaa;
@@ -773,8 +724,8 @@ export default function Login() {
 
         .tt-switch {
           border-top: 1px solid rgba(255,255,255,.12);
-          margin-top: 17px;
-          padding-top: 15px;
+          margin-top: 13px;
+          padding-top: 12px;
           color: #9ca995;
           font-size: 11px;
           text-align: center;
@@ -794,19 +745,19 @@ export default function Login() {
         /* COMPACT REGISTRATION */
 
         .tt-login.register-mode {
-          padding: 19px 23px;
+          padding: 17px 21px;
         }
 
         .tt-login.register-mode::before {
-          left: 23px;
+          left: 21px;
         }
 
         .tt-login.register-mode .tt-login-heading {
-          margin-bottom: 11px;
+          margin-bottom: 9px;
         }
 
         .tt-login.register-mode .tt-login-heading h2 {
-          font-size: 27px;
+          font-size: 26px;
           margin-bottom: 5px;
         }
 
@@ -815,19 +766,19 @@ export default function Login() {
         }
 
         .tt-login.register-mode .tt-form {
-          gap: 8px;
+          gap: 7px;
         }
 
         .tt-login.register-mode .tt-field {
-          gap: 5px;
+          gap: 4px;
         }
 
         .tt-login.register-mode .tt-field input {
-          height: 37px;
+          height: 36px;
         }
 
         .tt-login.register-mode .tt-submit {
-          height: 39px;
+          height: 38px;
           margin-top: 1px;
         }
 
@@ -836,11 +787,11 @@ export default function Login() {
         }
 
         .tt-login.register-mode .tt-google {
-          height: 36px;
+          height: 35px;
         }
 
         .tt-login.register-mode .tt-switch {
-          margin-top: 10px;
+          margin-top: 9px;
           padding-top: 9px;
         }
 
@@ -860,16 +811,16 @@ export default function Login() {
 
         @media (max-width: 1000px) and (min-width: 761px) {
           .tt-main {
-            gap: 40px;
-            grid-template-columns: minmax(0, 1fr) 390px;
+            gap: 35px;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 370px);
           }
 
           .tt-login {
-            padding: 24px;
+            padding: 19px;
           }
 
           .tt-login::before {
-            left: 24px;
+            left: 19px;
           }
 
           .tt-featured {
@@ -878,16 +829,6 @@ export default function Login() {
         }
 
         @media (max-width: 760px) {
-          body {
-            overflow: auto;
-          }
-
-          .tt-page {
-            height: auto;
-            min-height: 100vh;
-            overflow: visible;
-          }
-
           .tt-header {
             height: 82px;
             min-height: 82px;
@@ -945,24 +886,24 @@ export default function Login() {
           }
 
           .tt-login {
-            padding: 24px 21px;
+            padding: 22px 19px;
             box-shadow: 7px 7px 0 #c7e69a;
           }
 
           .tt-login::before {
-            left: 21px;
+            left: 19px;
           }
 
           .tt-login-heading h2 {
-            font-size: 28px;
+            font-size: 26px;
           }
 
           .tt-login.register-mode {
-            padding: 19px 21px;
+            padding: 17px 19px;
           }
 
           .tt-login.register-mode::before {
-            left: 21px;
+            left: 19px;
           }
 
           .tt-footer {
@@ -971,48 +912,47 @@ export default function Login() {
         }
 
         @media (max-height: 820px) and (min-width: 761px) {
-          .tt-header {
-            height: 100px;
-            min-height: 100px;
-          }
-
-          .tt-footer {
-            min-height: 42px;
-          }
-
           .tt-main {
-            padding-top: 8px;
-            padding-bottom: 12px;
-            gap: 65px;
+            padding-top: 20px;
+            padding-bottom: 20px;
+            gap: 45px;
           }
 
           .tt-login {
-            padding: 21px;
+            padding: 18px;
           }
 
           .tt-login::before {
-            left: 21px;
+            left: 18px;
           }
 
           .tt-login-heading {
-            margin-bottom: 13px;
+            margin-bottom: 11px;
+          }
+
+          .tt-login-heading h2 {
+            font-size: 26px;
           }
 
           .tt-form {
-            gap: 9px;
+            gap: 8px;
           }
 
           .tt-field input {
-            height: 40px;
+            height: 37px;
           }
 
           .tt-submit {
-            height: 42px;
+            height: 39px;
+          }
+
+          .tt-google {
+            height: 36px;
           }
 
           .tt-switch {
-            margin-top: 13px;
-            padding-top: 11px;
+            margin-top: 10px;
+            padding-top: 9px;
           }
 
           .tt-featured {
@@ -1026,35 +966,6 @@ export default function Login() {
           .tt-featured-bottom {
             margin-top: 18px;
             padding-top: 14px;
-          }
-
-          .tt-login.register-mode {
-            padding: 16px 21px;
-          }
-
-          .tt-login.register-mode .tt-login-heading {
-            margin-bottom: 9px;
-          }
-
-          .tt-login.register-mode .tt-form {
-            gap: 7px;
-          }
-
-          .tt-login.register-mode .tt-field input {
-            height: 35px;
-          }
-
-          .tt-login.register-mode .tt-submit {
-            height: 37px;
-          }
-
-          .tt-login.register-mode .tt-google {
-            height: 34px;
-          }
-
-          .tt-login.register-mode .tt-switch {
-            margin-top: 8px;
-            padding-top: 8px;
           }
         }
       `}</style>
