@@ -8,9 +8,9 @@ import "./App.css";
 const navigation = [
   { id: "home", icon: "⌂", label: "Home" },
   { id: "explore", icon: "⌕", label: "Explore" },
-  { id: "communities", icon: "◈", label: "Communities" },
-  { id: "messages", icon: "✉", label: "Messages", count: "2" },
   { id: "notifications", icon: "♧", label: "Notifications", count: "3" },
+  { id: "messages", icon: "✉", label: "Messages", count: "2" },
+  { id: "communities", icon: "◈", label: "Communities" },
   { id: "bookmarks", icon: "☆", label: "Saved" },
 ];
 
@@ -209,10 +209,7 @@ function App() {
     setPosts((current) =>
       current.map((post) =>
         post.id === postId
-          ? {
-              ...post,
-              bookmarked: !post.bookmarked,
-            }
+          ? { ...post, bookmarked: !post.bookmarked }
           : post
       )
     );
@@ -262,8 +259,11 @@ function App() {
 
   return (
     <div className="tt-dashboard">
-      {/* TOP HEADER */}
-      <header className="tt-topbar">
+
+      {/* LEFT NAVIGATION */}
+
+      <aside className="tt-left-sidebar">
+
         <button
           className="tt-brand"
           onClick={() => changePage("home")}
@@ -275,41 +275,60 @@ function App() {
           </span>
         </button>
 
-        <label className="tt-search">
-          <span aria-hidden="true">⌕</span>
+        <nav className="tt-sidebar-nav">
+          {navigation.map((item) => (
+            <button
+              key={item.id}
+              className={`tt-nav-item ${
+                activePage === item.id ? "active" : ""
+              }`}
+              onClick={() => changePage(item.id)}
+            >
+              <span className="tt-nav-icon">{item.icon}</span>
 
-          <input
-            type="search"
-            placeholder="Search TrenchTalk..."
-            value={search}
-            onFocus={() => setActivePage("explore")}
-            onChange={(event) => {
-              setSearch(event.target.value);
-              setActivePage("explore");
-            }}
-          />
+              <span className="tt-nav-label">
+                {item.label}
+              </span>
 
-          <kbd>⌘ K</kbd>
-        </label>
+              {item.count && (
+                <span className="tt-nav-count">
+                  {item.count}
+                </span>
+              )}
+            </button>
+          ))}
+        </nav>
 
-        <div className="tt-top-actions">
-          <div className="tt-beta">
-            <span />
-            BETA
-          </div>
+        <button
+          className="tt-compose-sidebar"
+          onClick={() => {
+            changePage("home");
+            setTimeout(() => {
+              document.querySelector(".tt-composer textarea")?.focus();
+            }, 50);
+          }}
+        >
+          <span>＋</span>
+          <span>Post</span>
+        </button>
 
+        <div className="tt-sidebar-bottom">
           <button
-            className="tt-top-avatar"
+            className="tt-user-card"
             onClick={() => setMenuOpen((open) => !open)}
-            aria-label="Account menu"
           >
-            {username[0]?.toUpperCase() || "T"}
+            <Avatar letter={username[0]?.toUpperCase()} />
+
+            <span>
+              <strong>{displayName}</strong>
+              <small>@{username}</small>
+            </span>
+
+            <b>···</b>
           </button>
 
           {menuOpen && (
             <div className="tt-account-menu">
-              <strong>@{username}</strong>
-
               <button onClick={() => changePage("profile")}>
                 View profile
               </button>
@@ -320,38 +339,27 @@ function App() {
             </div>
           )}
         </div>
-      </header>
+      </aside>
 
-      {/* HORIZONTAL NAVIGATION */}
-      <nav className="tt-navigation" aria-label="Main navigation">
-        {navigation.map((item) => (
-          <button
-            key={item.id}
-            className={`tt-nav-item ${
-              activePage === item.id ? "active" : ""
-            }`}
-            onClick={() => changePage(item.id)}
-          >
-            <span className="tt-nav-icon">{item.icon}</span>
+      {/* CENTRE AND RIGHT CONTENT */}
 
-            <span>{item.label}</span>
+      <div className="tt-content-layout">
 
-            {item.count && (
-              <span className="tt-nav-count">{item.count}</span>
-            )}
-          </button>
-        ))}
-      </nav>
-
-      {/* MAIN DASHBOARD */}
-      <div className="tt-dashboard-layout">
         <main className="tt-main-feed">
+
+          {/* MOBILE HEADER */}
+
+          <header className="tt-mobile-header">
+            <img src="/logo2.png" alt="" />
+            <strong>TRENCH<span>TALK</span></strong>
+          </header>
+
+          {/* FEED HEADER */}
+
           <div className="tt-feed-heading">
             <div>
               <div className="tt-eyebrow">YOUR COMMUNITY</div>
-
               <h1>{pageTitle}</h1>
-
               <p>
                 {activePage === "home"
                   ? "See what's happening across TrenchTalk."
@@ -363,16 +371,16 @@ function App() {
 
             <span className="tt-feed-status">
               <span />
-              LIVE COMMUNITY
+              LIVE
             </span>
           </div>
 
-          {/* HOME */}
+          {/* HOME FEED */}
+
           {activePage === "home" && (
             <>
               <div className="tt-feed-tabs">
                 <button className="selected">For you</button>
-
                 <button onClick={() => changePage("communities")}>
                   Following
                 </button>
@@ -386,7 +394,7 @@ function App() {
                   />
 
                   <textarea
-                    placeholder="What's happening in your community?"
+                    placeholder="What's happening?"
                     value={postText}
                     onChange={(event) => setPostText(event.target.value)}
                     maxLength={1000}
@@ -400,7 +408,7 @@ function App() {
                     type="submit"
                     disabled={!postText.trim() || posting}
                   >
-                    {posting ? "POSTING..." : "PUBLISH POST ↗"}
+                    {posting ? "POSTING..." : "POST"}
                   </button>
                 </div>
               </form>
@@ -408,6 +416,7 @@ function App() {
           )}
 
           {/* COMMUNITIES */}
+
           {activePage === "communities" && (
             <section className="tt-community-directory">
               <div className="tt-section-heading">
@@ -426,7 +435,6 @@ function App() {
 
                   <div>
                     <strong>{community.name}</strong>
-
                     <span>
                       {community.category} · {community.members} members
                     </span>
@@ -441,6 +449,7 @@ function App() {
           )}
 
           {/* MESSAGES */}
+
           {activePage === "messages" && (
             <div className="tt-empty-state">
               <span>✉</span>
@@ -452,6 +461,7 @@ function App() {
           )}
 
           {/* NOTIFICATIONS */}
+
           {activePage === "notifications" && (
             <div className="tt-empty-state">
               <span>♧</span>
@@ -461,6 +471,7 @@ function App() {
           )}
 
           {/* PROFILE */}
+
           {activePage === "profile" && (
             <section className="tt-profile-card">
               <Avatar
@@ -477,10 +488,12 @@ function App() {
           )}
 
           {/* POSTS */}
+
           {(activePage === "home" ||
             activePage === "explore" ||
             activePage === "bookmarks") && (
             <section className="tt-post-list">
+
               {visiblePosts.length === 0 ? (
                 <div className="tt-empty-state">
                   <span>☆</span>
@@ -503,6 +516,7 @@ function App() {
                     <Avatar letter={post.avatar} large />
 
                     <div className="tt-post-content">
+
                       <div className="tt-post-header">
                         <div className="tt-post-author">
                           <strong>{post.name}</strong>
@@ -516,10 +530,7 @@ function App() {
                           <span>{post.time}</span>
                         </div>
 
-                        <button
-                          className="tt-post-more"
-                          aria-label="More post options"
-                        >
+                        <button className="tt-post-more">
                           ···
                         </button>
                       </div>
@@ -533,10 +544,7 @@ function App() {
                       </p>
 
                       <div className="tt-post-actions">
-                        <button
-                          type="button"
-                          aria-label={`${post.comments} comments`}
-                        >
+                        <button type="button">
                           <span>▢</span>
                           {post.comments}
                         </button>
@@ -545,7 +553,6 @@ function App() {
                           type="button"
                           className={post.liked ? "liked" : ""}
                           onClick={() => toggleLike(post.id)}
-                          aria-label="Like post"
                         >
                           <span>
                             {post.liked ? "♥" : "♡"}
@@ -564,11 +571,6 @@ function App() {
                             post.bookmarked ? "saved" : ""
                           }`}
                           onClick={() => toggleBookmark(post.id)}
-                          aria-label={
-                            post.bookmarked
-                              ? "Remove bookmark"
-                              : "Bookmark post"
-                          }
                         >
                           {post.bookmarked ? "★" : "☆"}
                         </button>
@@ -577,12 +579,31 @@ function App() {
                   </article>
                 ))
               )}
+
             </section>
           )}
+
         </main>
 
         {/* RIGHT SIDEBAR */}
+
         <aside className="tt-right-sidebar">
+
+          <label className="tt-search">
+            <span>⌕</span>
+
+            <input
+              type="search"
+              placeholder="Search TrenchTalk"
+              value={search}
+              onFocus={() => setActivePage("explore")}
+              onChange={(event) => {
+                setSearch(event.target.value);
+                setActivePage("explore");
+              }}
+            />
+          </label>
+
           <section className="tt-right-section">
             <div className="tt-right-heading">
               <h3>Trending topics</h3>
@@ -633,7 +654,6 @@ function App() {
                 </div>
 
                 <button
-                  title="Explore community"
                   onClick={() => changePage("communities")}
                 >
                   +
@@ -647,6 +667,7 @@ function App() {
             <span>Community without limits.</span>
             <p>© {new Date().getFullYear()} TrenchTalk</p>
           </div>
+
         </aside>
       </div>
     </div>
