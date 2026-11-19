@@ -1,22 +1,22 @@
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap');
 
-/* =========================================
-   TRENCHTALK DESIGN SYSTEM
-========================================= */
-
 :root {
-  --bg: #e9eddf;
-  --bg-alt: #dfe6d5;
-  --panel: #17291c;
-  --panel-dark: #102015;
-  --panel-light: #203a27;
-  --lime: #c5ff4a;
-  --lime-soft: #c7e69a;
-  --text: #142116;
-  --muted: #78836f;
-  --border: rgba(20, 33, 22, .14);
-  --white: #f0f3e8;
+  font-family: 'DM Sans', sans-serif;
+  color: #e9eee3;
+  background: #050604;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
 
+  --bg: #050604;
+  --surface: #0d110b;
+  --surface-2: #121910;
+  --surface-3: #182218;
+  --lime: #d4fb0c;
+  --lime-dim: #a9c92a;
+  --text: #edf2e8;
+  --muted: #899482;
+  --border: rgba(212, 251, 12, .14);
   --display: 'Space Grotesk', sans-serif;
   --body: 'DM Sans', sans-serif;
 }
@@ -25,20 +25,24 @@
   box-sizing: border-box;
 }
 
-html, body, #root {
+html,
+body,
+#root {
   margin: 0;
   min-height: 100%;
   width: 100%;
 }
 
 body {
+  min-width: 320px;
   background: var(--bg);
   color: var(--text);
   font-family: var(--body);
-  -webkit-font-smoothing: antialiased;
 }
 
-button, input, textarea {
+button,
+input,
+textarea {
   font: inherit;
 }
 
@@ -49,13 +53,11 @@ button {
 button:focus-visible,
 input:focus-visible,
 textarea:focus-visible {
-  outline: 2px solid #91bd38;
+  outline: 2px solid var(--lime);
   outline-offset: 3px;
 }
 
-/* =========================================
-   LOADING
-========================================= */
+/* LOADING */
 
 .tt-loading {
   min-height: 100vh;
@@ -64,7 +66,7 @@ textarea:focus-visible {
   justify-content: center;
   align-items: center;
   gap: 18px;
-  background: var(--panel);
+  background: var(--bg);
   color: var(--lime);
   font-family: var(--display);
   font-size: 11px;
@@ -78,56 +80,55 @@ textarea:focus-visible {
   object-fit: contain;
 }
 
-/* =========================================
-   DASHBOARD FOUNDATION
-========================================= */
+/* DASHBOARD */
 
 .tt-dashboard {
   min-height: 100vh;
   background:
-    radial-gradient(ellipse at 50% 0%, rgba(199,230,154,.18), transparent 55%),
+    radial-gradient(
+      ellipse at 50% -15%,
+      rgba(212, 251, 12, .07),
+      transparent 42%
+    ),
     var(--bg);
 }
 
-/* =========================================
-   TOP NAVIGATION
-========================================= */
+/* TOP HEADER */
 
 .tt-topbar {
-  height: 78px;
-  padding: 0 3.5%;
+  height: 76px;
+  padding: 0 clamp(18px, 4vw, 64px);
   display: grid;
-  grid-template-columns: 245px minmax(250px, 570px) 245px;
+  grid-template-columns: 230px minmax(220px, 560px) 230px;
   justify-content: space-between;
   align-items: center;
-  gap: 30px;
-
+  gap: 28px;
   position: sticky;
   top: 0;
   z-index: 30;
-
-  background: var(--panel);
-  border-bottom: 3px solid var(--lime);
-  box-shadow: 0 5px 0 rgba(199,230,154,.75);
+  background: rgba(8, 11, 6, .94);
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(18px);
 }
 
 .tt-brand {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 11px;
   padding: 0;
   border: 0;
   background: transparent;
-  color: var(--white);
+  color: var(--text);
   font-family: var(--display);
-  font-size: 23px;
+  font-size: 22px;
   font-weight: 700;
   letter-spacing: -1px;
+  text-align: left;
 }
 
 .tt-brand img {
-  width: 43px;
-  height: 43px;
+  width: 40px;
+  height: 40px;
   object-fit: contain;
 }
 
@@ -135,26 +136,29 @@ textarea:focus-visible {
   color: var(--lime);
 }
 
+/* SEARCH */
+
 .tt-search {
-  height: 44px;
+  height: 42px;
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 0 14px;
-
-  background: rgba(255,255,255,.07);
-  border: 1px solid rgba(197,255,74,.22);
+  gap: 11px;
+  padding: 0 13px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  background: #10150d;
   color: var(--lime);
-  transition: .2s;
+  transition: border-color .2s, background .2s;
 }
 
 .tt-search:focus-within {
-  border-color: var(--lime);
-  background: rgba(255,255,255,.11);
+  border-color: rgba(212, 251, 12, .55);
+  background: #141b10;
 }
 
 .tt-search > span {
   font-size: 23px;
+  line-height: 1;
 }
 
 .tt-search input {
@@ -163,38 +167,41 @@ textarea:focus-visible {
   border: 0;
   outline: 0;
   background: transparent;
-  color: var(--white);
+  color: var(--text);
   font-size: 12px;
 }
 
 .tt-search input::placeholder {
-  color: #a5b39d;
+  color: #788371;
 }
 
 .tt-search kbd {
-  padding: 5px 7px;
-  border: 1px solid rgba(197,255,74,.2);
-  color: var(--lime);
+  padding: 4px 6px;
+  border: 1px solid rgba(212, 251, 12, .17);
+  border-radius: 4px;
+  color: #9eaa91;
   font-size: 9px;
 }
+
+/* TOP ACTIONS */
 
 .tt-top-actions {
   position: relative;
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  gap: 22px;
+  gap: 20px;
 }
 
 .tt-beta {
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #dce7d2;
+  color: #b9c4ad;
   font-family: var(--display);
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 700;
-  letter-spacing: 1.5px;
+  letter-spacing: 1.6px;
 }
 
 .tt-beta span,
@@ -203,38 +210,36 @@ textarea:focus-visible {
   height: 7px;
   border-radius: 50%;
   background: var(--lime);
-  box-shadow: 0 0 10px rgba(197,255,74,.5);
+  box-shadow: 0 0 12px rgba(212, 251, 12, .6);
 }
 
 .tt-top-avatar {
-  width: 42px;
-  height: 42px;
+  width: 39px;
+  height: 39px;
   display: grid;
   place-items: center;
-  border: 2px solid var(--lime);
+  border: 1px solid var(--lime);
   border-radius: 50%;
   background: var(--lime);
-  color: var(--panel);
+  color: #10150a;
   font-family: var(--display);
   font-weight: 800;
-  box-shadow: 3px 3px 0 rgba(255,255,255,.13);
 }
 
 .tt-account-menu {
   position: absolute;
-  top: 55px;
+  top: 51px;
   right: 0;
   z-index: 50;
-  width: 195px;
-  padding: 13px;
+  width: 190px;
+  padding: 12px;
   display: flex;
   flex-direction: column;
-  gap: 5px;
-
-  background: var(--panel);
-  border: 1px solid rgba(197,255,74,.25);
-  box-shadow: 7px 7px 0 var(--lime-soft);
-  color: var(--white);
+  gap: 4px;
+  background: #11170e;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, .45);
 }
 
 .tt-account-menu strong {
@@ -244,247 +249,126 @@ textarea:focus-visible {
 }
 
 .tt-account-menu button {
-  padding: 10px;
+  padding: 10px 8px;
   border: 0;
+  border-radius: 4px;
   background: transparent;
-  color: var(--white);
+  color: var(--text);
   text-align: left;
   font-size: 12px;
 }
 
 .tt-account-menu button:hover {
-  background: rgba(197,255,74,.1);
+  background: rgba(212, 251, 12, .08);
   color: var(--lime);
 }
 
-/* =========================================
-   THREE COLUMN LAYOUT
-========================================= */
-
-.tt-dashboard-layout {
-  min-height: calc(100vh - 78px);
-  max-width: 1800px;
-  margin: 0 auto;
-
-  display: grid;
-  grid-template-columns: 250px minmax(400px, 1fr) 310px;
-}
-
-/* =========================================
-   LEFT SIDEBAR
-========================================= */
-
-.tt-left-sidebar {
-  min-height: calc(100vh - 78px);
-  padding: 32px 19px 20px;
-
-  display: flex;
-  flex-direction: column;
-
-  background: #e3e9d9;
-  border-right: 1px solid var(--border);
-}
-
-.tt-sidebar-label,
-.tt-eyebrow {
-  color: #71835b;
-  font-family: var(--display);
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 2px;
-}
-
-.tt-sidebar-label {
-  padding: 0 10px;
-  margin-bottom: 14px;
-}
+/* HORIZONTAL NAVIGATION */
 
 .tt-navigation {
+  min-height: 58px;
+  padding: 0 clamp(18px, 4vw, 64px);
   display: flex;
-  flex-direction: column;
-  gap: 6px;
+  align-items: stretch;
+  gap: 8px;
+  position: sticky;
+  top: 76px;
+  z-index: 20;
+  overflow-x: auto;
+  background: rgba(13, 17, 11, .96);
+  border-bottom: 1px solid rgba(212, 251, 12, .09);
+  scrollbar-width: none;
+  backdrop-filter: blur(16px);
+}
+
+.tt-navigation::-webkit-scrollbar {
+  display: none;
 }
 
 .tt-nav-item {
-  width: 100%;
-  min-height: 46px;
+  flex: 0 0 auto;
   display: flex;
   align-items: center;
-  gap: 13px;
-
-  padding: 0 13px;
-  border: 1px solid transparent;
-  border-left: 3px solid transparent;
-
+  gap: 9px;
+  padding: 0 15px;
+  border: 0;
+  border-bottom: 2px solid transparent;
   background: transparent;
-  color: #53614e;
-  text-align: left;
-  font-size: 12px;
-  font-weight: 600;
-
-  transition: .2s ease;
+  color: #9ba692;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+  transition: color .2s, background .2s;
 }
 
 .tt-nav-item:hover {
-  padding-left: 18px;
-  background: rgba(23,41,28,.07);
-  color: var(--panel);
+  color: var(--text);
+  background: rgba(255, 255, 255, .025);
 }
 
 .tt-nav-item.active {
-  border: 1px solid rgba(197,255,74,.2);
-  border-left: 3px solid var(--lime);
-  background: var(--panel);
+  border-bottom-color: var(--lime);
   color: var(--lime);
-  box-shadow: 5px 5px 0 var(--lime-soft);
 }
 
 .tt-nav-icon {
-  width: 21px;
-  font-size: 19px;
-  text-align: center;
+  font-size: 17px;
 }
 
 .tt-nav-count {
-  margin-left: auto;
-  color: #84976c;
-  font-size: 10px;
+  min-width: 17px;
+  padding: 2px 5px;
+  border-radius: 10px;
+  background: rgba(212, 251, 12, .12);
+  color: var(--lime);
+  font-size: 9px;
+  text-align: center;
 }
 
-.tt-sidebar-divider {
-  height: 1px;
-  margin: 27px 3px;
-  background: var(--border);
-}
+/* MAIN CONTENT LAYOUT */
 
-.tt-sidebar-communities {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.tt-community-shortcut {
-  display: flex;
-  align-items: center;
-  gap: 11px;
-  padding: 8px;
-  border: 0;
-  background: transparent;
-  color: #53614e;
-  text-align: left;
-  font-size: 11px;
-  font-weight: 600;
-}
-
-.tt-community-shortcut:hover {
-  background: rgba(23,41,28,.07);
-}
-
-.tt-community-icon,
-.tt-suggested-icon,
-.tt-directory-icon {
+.tt-dashboard-layout {
+  width: min(1480px, 100%);
+  min-height: calc(100vh - 134px);
+  margin: 0 auto;
+  padding: 0 clamp(18px, 3vw, 42px);
   display: grid;
-  place-items: center;
-  flex-shrink: 0;
-  background: var(--panel);
-  color: var(--lime);
-  font-family: var(--display);
-  font-weight: 700;
+  grid-template-columns: minmax(0, 1fr) 290px;
+  gap: 28px;
 }
-
-.tt-community-icon {
-  width: 33px;
-  height: 33px;
-  box-shadow: 3px 3px 0 var(--lime-soft);
-}
-
-.tt-create-community {
-  margin: 13px 0 20px;
-  padding: 12px;
-  border: 1px dashed #82966b;
-  background: transparent;
-  color: #53614e;
-  font-size: 11px;
-  text-align: left;
-  transition: .2s;
-}
-
-.tt-create-community:hover {
-  background: var(--panel);
-  color: var(--lime);
-  border-color: var(--panel);
-}
-
-.tt-create-community span {
-  margin-right: 8px;
-  font-size: 16px;
-}
-
-.tt-sidebar-account {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: auto;
-  padding: 15px 4px 0;
-  border-top: 1px solid var(--border);
-}
-
-.tt-account-info {
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.tt-account-info strong {
-  overflow: hidden;
-  font-size: 11px;
-  text-overflow: ellipsis;
-}
-
-.tt-account-info span {
-  color: var(--muted);
-  font-size: 10px;
-}
-
-.tt-account-dots {
-  margin-left: auto;
-  border: 0;
-  background: transparent;
-  color: var(--muted);
-  font-size: 20px;
-}
-
-/* =========================================
-   CENTRAL FEED
-========================================= */
 
 .tt-main-feed {
   min-width: 0;
-  padding: 37px clamp(22px, 3vw, 48px) 65px;
-  background:
-    radial-gradient(ellipse at 50% 0%, rgba(199,230,154,.2), transparent 60%),
-    var(--bg);
+  padding: 34px 0 70px;
 }
+
+/* FEED HEADING */
 
 .tt-feed-heading {
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
-  gap: 15px;
-
-  padding-bottom: 24px;
+  gap: 16px;
+  padding-bottom: 22px;
   margin-bottom: 18px;
   border-bottom: 1px solid var(--border);
 }
 
-.tt-feed-heading h1 {
-  margin: 9px 0 5px;
-  color: var(--panel);
+.tt-eyebrow {
+  color: var(--lime-dim);
   font-family: var(--display);
-  font-size: clamp(29px, 3vw, 39px);
+  font-size: 9px;
   font-weight: 700;
-  letter-spacing: -2px;
+  letter-spacing: 2px;
+}
+
+.tt-feed-heading h1 {
+  margin: 8px 0 5px;
+  color: var(--text);
+  font-family: var(--display);
+  font-size: clamp(28px, 3vw, 38px);
+  font-weight: 700;
+  letter-spacing: -1.8px;
 }
 
 .tt-feed-heading p {
@@ -497,133 +381,111 @@ textarea:focus-visible {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 10px 12px;
-  border: 1px solid rgba(100,141,32,.3);
-  background: rgba(197,255,74,.1);
-  color: #648d20;
+  padding: 9px 11px;
+  border: 1px solid rgba(212, 251, 12, .2);
+  border-radius: 4px;
+  background: rgba(212, 251, 12, .05);
+  color: var(--lime-dim);
   font-family: var(--display);
-  font-size: 9px;
+  font-size: 8px;
   font-weight: 800;
   letter-spacing: 1px;
   white-space: nowrap;
 }
 
-/* =========================================
-   FEED TABS
-========================================= */
+/* FEED TABS */
 
 .tt-feed-tabs {
   display: flex;
-  gap: 27px;
-  margin-bottom: 22px;
+  gap: 24px;
+  margin-bottom: 20px;
   border-bottom: 1px solid var(--border);
 }
 
 .tt-feed-tabs button {
-  padding: 12px 4px;
+  padding: 11px 3px;
   border: 0;
-  border-bottom: 3px solid transparent;
+  border-bottom: 2px solid transparent;
   background: transparent;
   color: var(--muted);
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
 }
 
 .tt-feed-tabs button.selected {
-  border-bottom-color: var(--panel);
-  color: var(--panel);
+  border-bottom-color: var(--lime);
+  color: var(--lime);
 }
 
-/* =========================================
-   POST COMPOSER
-========================================= */
+/* POST COMPOSER */
 
 .tt-composer {
   position: relative;
   overflow: hidden;
-  margin-bottom: 27px;
-  padding: 23px;
-
-  border: 1px solid rgba(197,255,74,.3);
+  margin: 0 0 25px;
+  padding: 21px;
+  border: 1px solid rgba(212, 251, 12, .22);
+  border-radius: 9px;
   background:
-    radial-gradient(circle at 100% 0%, rgba(197,255,74,.1), transparent 42%),
-    var(--panel);
-
-  color: var(--white);
-  box-shadow: 9px 9px 0 var(--lime-soft);
-}
-
-.tt-composer::before {
-  content: "TRENCHTALK";
-  position: absolute;
-  top: -17px;
-  right: -10px;
-  pointer-events: none;
-
-  color: rgba(197,255,74,.035);
-  font-family: var(--display);
-  font-size: clamp(48px, 7vw, 82px);
-  font-weight: 700;
-  letter-spacing: -6px;
-}
-
-.tt-composer-top,
-.tt-composer-bottom {
-  position: relative;
-  z-index: 1;
+    radial-gradient(
+      circle at 100% 0,
+      rgba(212, 251, 12, .07),
+      transparent 40%
+    ),
+    #10160d;
 }
 
 .tt-composer-top {
   display: flex;
   align-items: flex-start;
-  gap: 14px;
+  gap: 13px;
 }
 
 .tt-composer textarea {
   width: 100%;
-  min-height: 85px;
+  min-height: 78px;
   resize: vertical;
   border: 0;
   outline: 0;
   background: transparent;
-  color: var(--white);
-  font-size: 14px;
+  color: var(--text);
+  font-size: 13px;
   line-height: 1.7;
 }
 
 .tt-composer textarea::placeholder {
-  color: #a5b39d;
+  color: #899482;
 }
 
 .tt-composer-bottom {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-top: 15px;
-  border-top: 1px solid rgba(197,255,74,.17);
+  padding-top: 14px;
+  border-top: 1px solid rgba(212, 251, 12, .12);
 }
 
 .tt-composer-bottom span {
-  color: #a5b39d;
+  color: var(--muted);
   font-size: 10px;
 }
 
 .tt-composer-bottom button {
-  padding: 12px 19px;
+  padding: 11px 16px;
   border: 0;
+  border-radius: 4px;
   background: var(--lime);
-  color: var(--panel);
+  color: #111609;
   font-family: var(--display);
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 800;
-  letter-spacing: .6px;
+  letter-spacing: .5px;
   transition: .2s;
 }
 
 .tt-composer-bottom button:hover:not(:disabled) {
-  background: #ddff91;
-  transform: translate(-2px,-2px);
-  box-shadow: 3px 3px 0 rgba(255,255,255,.2);
+  background: #e2ff62;
+  transform: translateY(-1px);
 }
 
 .tt-composer-bottom button:disabled {
@@ -631,49 +493,29 @@ textarea:focus-visible {
   cursor: not-allowed;
 }
 
-/* =========================================
-   POSTS
-========================================= */
+/* POSTS */
 
 .tt-post-list {
   display: flex;
   flex-direction: column;
-  gap: 17px;
+  gap: 14px;
 }
 
 .tt-post {
-  position: relative;
-  overflow: hidden;
-
   display: flex;
   align-items: flex-start;
   gap: 14px;
-
-  padding: 21px;
-  border: 1px solid rgba(23,41,28,.14);
-  background: #f2f4ec;
-
-  box-shadow: 6px 6px 0 var(--lime-soft);
-
-  transition: transform .2s, box-shadow .2s;
-}
-
-.tt-post::before {
-  content: "";
-  position: absolute;
-  inset: 0 auto 0 0;
-  width: 3px;
-  background: transparent;
-  transition: .2s;
+  padding: 19px;
+  border: 1px solid rgba(212, 251, 12, .1);
+  border-radius: 8px;
+  background: #0e130b;
+  transition: border-color .2s, transform .2s, background .2s;
 }
 
 .tt-post:hover {
-  transform: translateY(-2px);
-  box-shadow: 8px 9px 0 var(--lime-soft);
-}
-
-.tt-post:hover::before {
-  background: var(--lime);
+  border-color: rgba(212, 251, 12, .28);
+  background: #11170d;
+  transform: translateY(-1px);
 }
 
 .tt-post-content {
@@ -696,9 +538,9 @@ textarea:focus-visible {
 }
 
 .tt-post-author strong {
-  color: var(--panel);
+  color: var(--text);
   font-family: var(--display);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
 }
 
@@ -710,76 +552,75 @@ textarea:focus-visible {
 }
 
 .tt-verified {
-  width: 16px;
-  height: 16px;
+  width: 15px;
+  height: 15px;
   display: grid;
   place-items: center;
   border-radius: 50%;
-  background: #648d20;
-  color: white !important;
-  font-size: 10px !important;
+  background: var(--lime);
+  color: #111609 !important;
+  font-size: 9px !important;
+  font-weight: 900;
 }
 
 .tt-post-more {
   border: 0;
   background: transparent;
   color: var(--muted);
-  font-size: 19px;
+  font-size: 18px;
+  line-height: 1;
 }
 
 .tt-post-community {
   display: inline-block;
-  margin-top: 11px;
-  padding: 5px 8px;
-  background: rgba(197,255,74,.23);
-  color: #536d2d;
+  margin-top: 10px;
+  padding: 4px 7px;
+  border: 1px solid rgba(212, 251, 12, .15);
+  border-radius: 3px;
+  background: rgba(212, 251, 12, .06);
+  color: var(--lime-dim);
   font-family: var(--display);
-  font-size: 9px;
+  font-size: 8px;
   font-weight: 700;
-  letter-spacing: 1.2px;
+  letter-spacing: 1px;
 }
 
 .tt-post-text {
-  margin: 14px 0 20px;
-  color: #26372a;
-  font-size: 13px;
-  line-height: 1.85;
+  margin: 12px 0 17px;
+  color: #d5ddce;
+  font-size: 12px;
+  line-height: 1.8;
   overflow-wrap: anywhere;
 }
 
 .tt-post-actions {
   display: flex;
   align-items: center;
-  gap: 25px;
-  padding-top: 14px;
-  border-top: 1px solid var(--border);
+  gap: 23px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(212, 251, 12, .09);
 }
 
 .tt-post-actions button {
   display: flex;
   align-items: center;
-  gap: 7px;
+  gap: 6px;
   padding: 0;
   border: 0;
   background: transparent;
-  color: #75806e;
+  color: #899482;
   font-size: 10px;
-  transition: .15s;
+  transition: color .15s;
 }
 
-.tt-post-actions button:hover {
-  color: #648d20;
-  transform: translateY(-1px);
-}
-
+.tt-post-actions button:hover,
 .tt-post-actions button.liked,
 .tt-post-actions button.saved {
-  color: #648d20;
-  font-weight: 800;
+  color: var(--lime);
 }
 
 .tt-post-actions button span {
-  font-size: 17px;
+  font-size: 16px;
 }
 
 .tt-post-actions .tt-bookmark {
@@ -787,51 +628,41 @@ textarea:focus-visible {
   font-size: 17px;
 }
 
-/* =========================================
-   AVATARS
-========================================= */
+/* AVATARS */
 
 .tt-avatar {
-  width: 40px;
-  height: 40px;
+  width: 38px;
+  height: 38px;
   display: grid;
   place-items: center;
   flex-shrink: 0;
-
-  border: 1px solid rgba(197,255,74,.35);
-  background: var(--panel);
+  border: 1px solid rgba(212, 251, 12, .35);
+  border-radius: 50%;
+  background: #1a2413;
   color: var(--lime);
-
   font-family: var(--display);
   font-weight: 800;
-  box-shadow: 3px 3px 0 rgba(23,41,28,.13);
 }
 
 .tt-avatar-large {
-  width: 46px;
-  height: 46px;
-  font-size: 15px;
+  width: 43px;
+  height: 43px;
+  font-size: 14px;
 }
 
-/* =========================================
-   RIGHT SIDEBAR
-========================================= */
+/* RIGHT SIDEBAR */
 
 .tt-right-sidebar {
   min-width: 0;
-  padding: 34px 19px;
-
-  background: #e3e9d9;
-  border-left: 1px solid var(--border);
+  padding: 34px 0 50px;
 }
 
 .tt-right-section {
-  margin-bottom: 29px;
-  padding: 17px;
-
-  border: 1px solid rgba(23,41,28,.13);
-  background: rgba(243,245,237,.75);
-  box-shadow: 5px 5px 0 var(--lime-soft);
+  margin-bottom: 19px;
+  padding: 16px;
+  border: 1px solid rgba(212, 251, 12, .12);
+  border-radius: 8px;
+  background: #0d120a;
 }
 
 .tt-right-heading {
@@ -839,44 +670,39 @@ textarea:focus-visible {
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  margin-bottom: 14px;
+  margin-bottom: 11px;
 }
 
 .tt-right-heading h3 {
   margin: 0;
-  color: var(--panel);
+  color: var(--text);
   font-family: var(--display);
-  font-size: 14px;
-  letter-spacing: -.4px;
+  font-size: 13px;
+  letter-spacing: -.3px;
 }
 
 .tt-right-heading > span,
 .tt-right-heading > button {
   border: 0;
   background: transparent;
-  color: #648d20;
+  color: var(--lime-dim);
   font-family: var(--display);
-  font-size: 9px;
+  font-size: 8px;
   font-weight: 800;
+  letter-spacing: .7px;
 }
-
-/* =========================================
-   TRENDING
-========================================= */
 
 .tt-trend {
   width: 100%;
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 13px 0;
-
+  gap: 11px;
+  padding: 12px 0;
   border: 0;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid rgba(212, 251, 12, .08);
   background: transparent;
   text-align: left;
-
-  transition: .2s;
+  transition: padding .2s;
 }
 
 .tt-trend:last-child {
@@ -884,14 +710,13 @@ textarea:focus-visible {
 }
 
 .tt-trend:hover {
-  padding-left: 6px;
-  background: rgba(197,255,74,.1);
+  padding-left: 5px;
 }
 
 .tt-trend-rank {
-  color: #82966b;
+  color: #64705b;
   font-family: var(--display);
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
 }
 
@@ -899,13 +724,13 @@ textarea:focus-visible {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 4px;
 }
 
 .tt-trend strong {
-  color: var(--panel);
+  color: #dfe7d7;
   font-family: var(--display);
-  font-size: 12px;
+  font-size: 11px;
 }
 
 .tt-trend small {
@@ -914,37 +739,39 @@ textarea:focus-visible {
 }
 
 .tt-trend b {
-  color: #648d20;
-  font-size: 13px;
+  color: var(--lime);
+  font-size: 12px;
 }
-
-/* =========================================
-   SUGGESTED COMMUNITIES
-========================================= */
 
 .tt-suggested {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 11px 0;
-  border-bottom: 1px solid var(--border);
-  transition: .2s;
+  gap: 9px;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(212, 251, 12, .08);
 }
 
 .tt-suggested:last-child {
   border-bottom: 0;
 }
 
-.tt-suggested:hover {
-  padding-left: 4px;
+.tt-suggested-icon,
+.tt-directory-icon {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  background: #1a2413;
+  color: var(--lime);
+  font-family: var(--display);
+  font-weight: 800;
 }
 
 .tt-suggested-icon {
-  width: 38px;
-  height: 38px;
-  border: 1px solid rgba(197,255,74,.25);
-  font-size: 14px;
-  box-shadow: 3px 3px 0 var(--lime-soft);
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 13px;
 }
 
 .tt-suggested > div:nth-child(2) {
@@ -952,15 +779,16 @@ textarea:focus-visible {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 4px;
 }
 
 .tt-suggested strong {
   overflow: hidden;
-  color: var(--panel);
+  color: var(--text);
   font-family: var(--display);
-  font-size: 10px;
+  font-size: 9px;
   text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .tt-suggested span {
@@ -969,66 +797,56 @@ textarea:focus-visible {
 }
 
 .tt-suggested button {
-  width: 27px;
-  height: 27px;
-  border: 1px solid rgba(100,141,32,.35);
-  background: var(--panel);
+  width: 26px;
+  height: 26px;
+  border: 1px solid rgba(212, 251, 12, .25);
+  border-radius: 4px;
+  background: transparent;
   color: var(--lime);
-  font-size: 17px;
-  transition: .2s;
+  font-size: 16px;
 }
 
 .tt-suggested button:hover {
   background: var(--lime);
-  color: var(--panel);
+  color: #111609;
 }
 
-/* =========================================
-   RIGHT FOOTER
-========================================= */
-
 .tt-right-footer {
-  margin-top: 35px;
-  padding-top: 17px;
-  border-top: 1px solid var(--border);
-
+  margin-top: 25px;
+  padding: 16px 2px;
   display: flex;
   flex-direction: column;
   gap: 6px;
+  border-top: 1px solid var(--border);
 }
 
 .tt-right-footer strong {
-  color: var(--panel);
+  color: var(--lime);
   font-family: var(--display);
-  font-size: 11px;
+  font-size: 10px;
   letter-spacing: 1.5px;
 }
 
 .tt-right-footer span,
 .tt-right-footer p {
+  margin: 0;
   color: var(--muted);
   font-size: 9px;
 }
 
-.tt-right-footer p {
-  margin-top: 8px;
-}
-
-/* =========================================
-   COMMUNITY DIRECTORY
-========================================= */
+/* COMMUNITY DIRECTORY */
 
 .tt-section-heading {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  margin-bottom: 19px;
+  margin-bottom: 18px;
 }
 
 .tt-section-heading h2 {
   margin: 0;
-  color: var(--panel);
+  color: var(--text);
   font-family: var(--display);
   font-size: 15px;
 }
@@ -1042,26 +860,19 @@ textarea:focus-visible {
   display: flex;
   align-items: center;
   gap: 13px;
-  margin-bottom: 13px;
-  padding: 18px;
-
+  margin-bottom: 12px;
+  padding: 16px;
   border: 1px solid var(--border);
-  border-left: 3px solid transparent;
-  background: #f2f4ec;
-  box-shadow: 5px 5px 0 var(--lime-soft);
-
-  transition: .2s;
-}
-
-.tt-directory-card:hover {
-  border-left-color: var(--lime);
-  transform: translateX(3px);
+  border-radius: 7px;
+  background: #0e130b;
 }
 
 .tt-directory-icon {
-  width: 45px;
-  height: 45px;
-  font-size: 17px;
+  width: 43px;
+  height: 43px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 16px;
 }
 
 .tt-directory-card > div:nth-child(2) {
@@ -1073,7 +884,7 @@ textarea:focus-visible {
 }
 
 .tt-directory-card strong {
-  color: var(--panel);
+  color: var(--text);
   font-size: 12px;
 }
 
@@ -1083,42 +894,41 @@ textarea:focus-visible {
 }
 
 .tt-directory-card button {
-  padding: 10px 13px;
-  border: 0;
-  background: var(--panel);
+  padding: 9px 12px;
+  border: 1px solid rgba(212, 251, 12, .25);
+  border-radius: 4px;
+  background: rgba(212, 251, 12, .07);
   color: var(--lime);
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 700;
 }
 
 .tt-directory-card button:hover {
   background: var(--lime);
-  color: var(--panel);
+  color: #111609;
 }
 
-/* =========================================
-   EMPTY STATES
-========================================= */
+/* EMPTY STATES */
 
 .tt-empty-state {
-  padding: 70px 20px;
+  padding: 65px 20px;
   border: 1px solid var(--border);
-  background: #f2f4ec;
-  box-shadow: 6px 6px 0 var(--lime-soft);
+  border-radius: 8px;
+  background: #0e130b;
   text-align: center;
 }
 
 .tt-empty-state > span {
   display: inline-block;
   margin-bottom: 10px;
-  color: #648d20;
-  font-size: 34px;
+  color: var(--lime);
+  font-size: 30px;
 }
 
 .tt-empty-state h2 {
-  color: var(--panel);
+  color: var(--text);
   font-family: var(--display);
-  font-size: 17px;
+  font-size: 16px;
 }
 
 .tt-empty-state p {
@@ -1126,23 +936,21 @@ textarea:focus-visible {
   font-size: 11px;
 }
 
-/* =========================================
-   PROFILE CARD
-========================================= */
+/* PROFILE */
 
 .tt-profile-card {
   display: flex;
   align-items: center;
   gap: 18px;
-  padding: 27px;
+  padding: 25px;
   border: 1px solid var(--border);
-  background: #f2f4ec;
-  box-shadow: 6px 6px 0 var(--lime-soft);
+  border-radius: 8px;
+  background: #0e130b;
 }
 
 .tt-profile-card h2 {
   margin: 0 0 5px;
-  color: var(--panel);
+  color: var(--text);
   font-family: var(--display);
 }
 
@@ -1154,35 +962,28 @@ textarea:focus-visible {
   font-size: 11px;
 }
 
-/* =========================================
-   RESPONSIVE — TABLETS
-========================================= */
+/* TABLET */
 
-@media (max-width: 1100px) {
+@media (max-width: 1050px) {
   .tt-dashboard-layout {
-    grid-template-columns: 220px minmax(0, 1fr);
-  }
-
-  .tt-right-sidebar {
-    display: none;
+    grid-template-columns: minmax(0, 1fr) 260px;
+    gap: 20px;
   }
 
   .tt-topbar {
-    grid-template-columns: 220px minmax(200px, 1fr) 160px;
+    grid-template-columns: 190px minmax(180px, 1fr) 150px;
   }
 }
 
-/* =========================================
-   RESPONSIVE — MOBILE
-========================================= */
+/* MOBILE */
 
-@media (max-width: 700px) {
+@media (max-width: 800px) {
   .tt-topbar {
-    height: auto;
-    min-height: 70px;
     grid-template-columns: 1fr auto;
     gap: 12px;
-    padding: 12px 17px;
+    padding: 10px 16px;
+    height: auto;
+    min-height: 68px;
   }
 
   .tt-brand {
@@ -1190,8 +991,8 @@ textarea:focus-visible {
   }
 
   .tt-brand img {
-    width: 36px;
-    height: 36px;
+    width: 35px;
+    height: 35px;
   }
 
   .tt-search {
@@ -1208,94 +1009,57 @@ textarea:focus-visible {
     display: none;
   }
 
+  .tt-navigation {
+    top: 0;
+    min-height: 52px;
+    padding: 0 12px;
+  }
+
   .tt-dashboard-layout {
     display: block;
-    min-height: calc(100vh - 125px);
+    padding: 0 16px;
   }
 
-  .tt-left-sidebar {
-    position: sticky;
-    top: 125px;
-    z-index: 10;
-    min-height: auto;
-    padding: 9px 10px;
-
-    border-right: 0;
-    border-bottom: 1px solid var(--border);
-    overflow-x: auto;
+  .tt-main-feed {
+    padding-top: 25px;
   }
 
-  .tt-sidebar-label,
-  .tt-sidebar-divider,
-  .tt-sidebar-communities,
-  .tt-create-community,
-  .tt-sidebar-account {
+  .tt-right-sidebar {
+    display: none;
+  }
+}
+
+/* SMALL MOBILE */
+
+@media (max-width: 520px) {
+  .tt-feed-heading {
+    align-items: flex-start;
+  }
+
+  .tt-feed-heading h1 {
+    font-size: 27px;
+  }
+
+  .tt-feed-status {
     display: none;
   }
 
-  .tt-navigation {
-    flex-direction: row;
-    justify-content: flex-start;
-    gap: 5px;
-  }
-
   .tt-nav-item {
-    width: auto;
-    min-width: max-content;
-    min-height: 39px;
-    gap: 7px;
     padding: 0 11px;
     font-size: 10px;
   }
 
-  .tt-nav-icon {
-    width: auto;
-    font-size: 15px;
-  }
-
-  .tt-main-feed {
-    padding: 25px 16px 50px;
-  }
-
-  .tt-feed-heading h1 {
-    font-size: 28px;
-  }
-
-  .tt-feed-status {
-    font-size: 8px;
-  }
-
   .tt-composer {
-    padding: 16px;
-    box-shadow: 5px 5px 0 var(--lime-soft);
+    padding: 15px;
   }
 
   .tt-post {
-    padding: 15px;
+    padding: 14px;
     gap: 10px;
-    box-shadow: 4px 4px 0 var(--lime-soft);
   }
 
   .tt-post-actions {
-    gap: 15px;
-  }
-}
-
-/* =========================================
-   SMALL MOBILE
-========================================= */
-
-@media (max-width: 420px) {
-  .tt-feed-status {
-    display: none;
-  }
-
-  .tt-feed-heading h1 {
-    font-size: 25px;
-  }
-
-  .tt-post-actions {
-    gap: 11px;
+    gap: 14px;
   }
 
   .tt-post-author {
@@ -1305,5 +1069,14 @@ textarea:focus-visible {
   .tt-post-author > span,
   .tt-post-author i {
     font-size: 9px;
+  }
+
+  .tt-directory-card {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .tt-directory-card button {
+    margin-left: 56px;
   }
 }
