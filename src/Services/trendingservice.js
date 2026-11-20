@@ -1,19 +1,37 @@
 import tokenService from "./tokenservice.js";
-import { enrichTokens } from "./marketDataService.js";
+
+import {
+  enrichTokens,
+  discoverSolanaTokens
+} from "./marketDataService.js";
 
 const REFRESH_INTERVAL = 60_000;
-const MAX_TOKENS = 200;
+const DISCOVERY_INTERVAL = 120_000;
+
+const MAX_SOURCE_TOKENS = 1000;
 const MAX_TRENDING = 20;
+
+// Minimum requirements for Trending.
+const MIN_VOLUME_24H = 500_000;
+const MIN_MARKET_CAP = 500_000;
+const MIN_LIQUIDITY = 25_000;
 
 class TrendingService {
   constructor() {
     this.tokens = [];
     this.trending = [];
+
     this.listeners = new Set();
+
     this.started = false;
     this.refreshing = false;
+    this.refreshQueued = false;
+
     this.interval = null;
+    this.discoveryInterval = null;
+
     this.unsubscribe = null;
+    this.discoveryRunning = false;
   }
 
   start() {
@@ -21,142 +39,224 @@ class TrendingService {
 
     this.started = true;
 
-    console.log("[TrendingService] Starting...");
+    console.log(
+      "[TrendingService] Starting Solana discovery and leaderboard"
+    );
 
-    this.unsubscribe = tokenService.subscribe(({ tokens, connected }) => {
-      this.tokens = tokens.slice(0, MAX_TOKENS);
+    // Subscribe to the combined token catalogue.
+    this.unsubscribe = tokenService.subscribe(
+      ({ tokens, connected }) => {
+        this.tokens = tokens;
 
-      console.log("[TrendingService] Shrine connected:", connected);
-      console.log("[TrendingService] Tokens received:", this.tokens.length);
+        console.log(
+          "[TrendingService] Shrine connected:",
+          connected,
+          "| catalogue:",
+          tokens.length
+        );
 
-      if (this.tokens.length > 0) {
         this.refresh();
       }
-    });
+    );
 
+    // Start Shrine and Firestore.
     tokenService.connect();
 
-    this.refresh();
+    // Start independent token discovery immediately.
+    this.discover();
 
-    this.interval = setInterval(() => {
-      this.refresh();
-    }, REFRESH_INTERVAL);
+    // Refresh market data every minute.
+    this.interval = setInterval(
+      () => this.refresh(),
+      REFRESH_INTERVAL
+    );
+
+    // Discover additional tokens every two minutes.
+    this.discoveryInterval = setInterval(
+      () => this.discover(),
+      DISCOVERY_INTERVAL
+    );
   }
 
-  calculateScore(token) {
-    const market = token.market;
+  async discover() {
+    if (!this.started || this.discoveryRunning) return;
 
-    if (!market) return 0;
+    this.discoveryRunning = true;
 
-    const volume24h = Number(market.volume24h) || 0;
-    const volume1h = Number(market.volume1h) || 0;
-    const volume5m = Number(market.volume5m) || 0;
+    try {
+      console.log(
+        "[TrendingService] Running independent token discovery..."
+      );
+
+      const discovered = await discoverSolanaTokens();
+
+      if (!this.started) return;
+
+      if (!discovered.length) {
+        console.warn(
+          "[TrendingService] Discovery returned no tokens"
+        );
+
+        return;
+      }
+
+      console.log(
+        "[TrendingService] Discovered:",
+        discovered.length,
+        "Solana tokens"
+      );
+
+      // Add discovered tokens to the persistent catalogue.
+      tokenService.addDiscoveredTokens(discovered);
+
+    } catch (error) {
+      console.error(
+        "[TrendingService] Discovery failed:",
+        error
+      );
+    } finally {
+      this.discoveryRunning = false;
+    }
+  }
+
+  qualifies(token) {
+    const market = token?.market;
+
+    if (!market) return false;
+
+    const volume = Number(market.volume24h) || 0;
 
     const liquidity = Number(market.liquidity) || 0;
 
-    const change5m = Number(market.priceChange5m) || 0;
-    const change1h = Number(market.priceChange1h) || 0;
-
-    const buys5m = Number(market.buys5m) || 0;
-    const sells5m = Number(market.sells5m) || 0;
-
-    const buys24h = Number(market.buys24h) || 0;
-    const sells24h = Number(market.sells24h) || 0;
-
-    const totalTrades5m = buys5m + sells5m;
-    const totalTrades24h = buys24h + sells24h;
-
-    const buyPressure = totalTrades5m > 0
-      ? buys5m / totalTrades5m
-      : 0;
-
-    const volumeScore = Math.log10(volume24h + 1) * 8;
-    const recentVolumeScore = Math.log10(volume1h + 1) * 8;
-    const momentumVolumeScore = Math.log10(volume5m + 1) * 5;
-
-    const liquidityScore = Math.log10(liquidity + 1) * 5;
-
-    const activityScore = Math.log10(totalTrades24h + 1) * 8;
-
-    const recentActivityScore = Math.log10(totalTrades5m + 1) * 8;
-
-    const momentumScore = Math.max(
-      -30,
-      Math.min(30, change1h * 1.5)
+    const marketCap = Number(
+      market.marketCapOrFdv ??
+      market.marketCap ??
+      market.fdv ??
+      0
     );
 
-    const shortMomentumScore = Math.max(
-      -20,
-      Math.min(20, change5m)
-    );
-
-    const buyingScore = buyPressure * 20;
+    const price = Number(market.priceUsd) || 0;
 
     return (
-      volumeScore +
-      recentVolumeScore +
-      momentumVolumeScore +
-      liquidityScore +
-      activityScore +
-      recentActivityScore +
-      momentumScore +
-      shortMomentumScore +
-      buyingScore
+      volume >= MIN_VOLUME_24H &&
+      marketCap >= MIN_MARKET_CAP &&
+      liquidity >= MIN_LIQUIDITY &&
+      price > 0
     );
   }
 
+  rankTokens(tokens) {
+    const unique = new Map();
+
+    for (const token of tokens) {
+      if (!token?.mint || !this.qualifies(token)) continue;
+
+      const existing = unique.get(token.mint);
+
+      // Keep the version with the newest market data.
+      if (
+        !existing ||
+        Number(token.market?.updatedAt || 0) >=
+          Number(existing.market?.updatedAt || 0)
+      ) {
+        unique.set(token.mint, token);
+      }
+    }
+
+    return Array.from(unique.values())
+      .sort((a, b) => {
+        const volumeDifference =
+          Number(b.market.volume24h || 0) -
+          Number(a.market.volume24h || 0);
+
+        if (volumeDifference !== 0) {
+          return volumeDifference;
+        }
+
+        return (
+          Number(b.market.liquidity || 0) -
+          Number(a.market.liquidity || 0)
+        );
+      })
+      .slice(0, MAX_TRENDING);
+  }
+
   async refresh() {
-    if (this.refreshing || this.tokens.length === 0) return;
+    if (!this.started) return;
+
+    if (this.refreshing) {
+      this.refreshQueued = true;
+      return;
+    }
+
+    if (!this.tokens.length) {
+      this.trending = [];
+      this.notify();
+      return;
+    }
 
     this.refreshing = true;
 
     try {
+      // Use the combined Shrine and discovery catalogue.
+      const sourceTokens = this.tokens
+        .filter((token) => token?.mint)
+        .slice(0, MAX_SOURCE_TOKENS);
+
       console.log(
-        "[TrendingService] Updating",
-        this.tokens.length,
+        "[TrendingService] Enriching",
+        sourceTokens.length,
         "tokens"
       );
 
-      const enriched = await enrichTokens(this.tokens);
+      const enriched = await enrichTokens(
+        sourceTokens,
+        {
+          includeMetadata: false
+        }
+      );
 
-      const ranked = enriched
-        .filter((token) => {
-          const price = Number(token.market?.priceUsd);
-          const liquidity = Number(token.market?.liquidity);
+      if (!this.started) return;
 
-          return (
-            token.market !== null &&
-            Number.isFinite(price) &&
-            price > 0 &&
-            Number.isFinite(liquidity) &&
-            liquidity > 0
-          );
-        })
-        .map((token) => ({
-          ...token,
-          trendingScore: this.calculateScore(token)
-        }))
-        .sort((a, b) => b.trendingScore - a.trendingScore);
+      const ranked = this.rankTokens(enriched);
 
-      this.trending = ranked.slice(0, MAX_TRENDING);
+      this.trending = ranked;
+
+      const qualifiedCount = enriched.filter(
+        (token) => this.qualifies(token)
+      ).length;
 
       console.log(
-        "[TrendingService] Tokens with valid market data:",
-        ranked.length
+        "[TrendingService] Market-data tokens:",
+        enriched.filter((token) => token.market).length
       );
 
       console.log(
-        "[TrendingService] Trending coins:",
+        "[TrendingService] Qualified tokens:",
+        qualifiedCount
+      );
+
+      console.log(
+        "[TrendingService] Trending leaderboard:",
         this.trending.length
       );
 
       this.notify();
 
     } catch (error) {
-      console.error("[TrendingService] Error:", error);
+      console.error(
+        "[TrendingService] Refresh failed:",
+        error
+      );
 
     } finally {
       this.refreshing = false;
+
+      if (this.refreshQueued && this.started) {
+        this.refreshQueued = false;
+
+        this.refresh();
+      }
     }
   }
 
@@ -176,22 +276,42 @@ class TrendingService {
 
   notify() {
     this.listeners.forEach((listener) => {
-      listener(this.trending);
+      try {
+        listener(this.trending);
+      } catch (error) {
+        console.error(
+          "[TrendingService] Listener error:",
+          error
+        );
+      }
     });
   }
 
   stop() {
     if (this.interval) {
       clearInterval(this.interval);
-      this.interval = null;
     }
+
+    if (this.discoveryInterval) {
+      clearInterval(this.discoveryInterval);
+    }
+
+    this.interval = null;
+    this.discoveryInterval = null;
 
     if (this.unsubscribe) {
       this.unsubscribe();
-      this.unsubscribe = null;
     }
 
+    this.unsubscribe = null;
+
     this.started = false;
+
+    this.refreshQueued = false;
+
+    console.log(
+      "[TrendingService] Stopped"
+    );
   }
 }
 

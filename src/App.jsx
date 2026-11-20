@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { auth, db } from "./firebase";
@@ -9,9 +9,9 @@ import tokenService from "./Services/tokenservice.js";
 import { enrichTokens } from "./Services/marketDataService.js";
 import "./App.css";
 
-
 const NEW_TOKEN_DELAY = 10 * 60 * 1000;
 const TOKEN_REFRESH_INTERVAL = 15000;
+const IMAGE_REFRESH_INTERVAL = 30 * 1000;
 
 const navigation = [
   { id: "home", icon: "⌂", label: "Home" },
@@ -61,7 +61,93 @@ function formatChange(value) {
   return `${number >= 0 ? "+" : ""}${number.toFixed(2)}%`;
 }
 
-function TokenCard({ token, index }) {
+function toBrowserImageUri(uri) {
+  if (!uri || typeof uri !== "string") return null;
+
+  const value = uri.trim();
+
+  if (value.startsWith("ipfs://")) {
+    return `https://ipfs.io/ipfs/${value.slice(7).replace(/^ipfs\//, "")}`;
+  }
+
+  if (value.startsWith("ar://")) {
+    return `https://arweave.net/${value.slice(5)}`;
+  }
+
+  if (value.startsWith("https://") || value.startsWith("http://")) {
+    return value;
+  }
+
+  return null;
+}
+
+async function fetchTokenImage(token) {
+  if (token.uri) {
+    const metadataUrl = toBrowserImageUri(token.uri);
+
+    if (metadataUrl) {
+      try {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 5000);
+
+        try {
+          const response = await fetch(metadataUrl, {
+            signal: controller.signal
+          });
+
+          if (response.ok) {
+            const metadata = await response.json();
+            const image = toBrowserImageUri(
+              metadata.image ||
+              metadata.image_url ||
+              metadata.logoURI ||
+              metadata.logo ||
+              metadata.properties?.files?.[0]?.uri
+            );
+
+            if (image) return image;
+          }
+        } finally {
+          clearTimeout(timeout);
+        }
+      } catch (error) {
+        console.warn("[Token images] Metadata lookup failed:", error.message);
+      }
+    }
+  }
+
+  if (token.mint) {
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 5000);
+
+      try {
+        const response = await fetch(
+          `https://api.jup.ag/tokens/v2/search?query=${encodeURIComponent(token.mint)}`,
+          { signal: controller.signal }
+        );
+
+        if (response.ok) {
+          const results = await response.json();
+          const match = Array.isArray(results)
+            ? results.find((item) => item.id === token.mint)
+            : null;
+
+          const image = toBrowserImageUri(match?.icon);
+          if (image) return image;
+        }
+      } finally {
+        clearTimeout(timeout);
+      }
+    } catch (error) {
+      console.warn("[Token images] Jupiter lookup failed:", error.message);
+    }
+  }
+
+  return null;
+}
+
+function TokenCard({ token, index, onImageError }) {
   const market = token.market || {};
   const image = token.imageUrl || market.imageUrl;
   const priceChange = formatChange(market.priceChange24h);
@@ -78,6 +164,8 @@ function TokenCard({ token, index }) {
               loading="lazy"
               onError={(event) => {
                 event.currentTarget.style.display = "none";
+                onImageError?.(token.mint);
+
                 const placeholder =
                   event.currentTarget.parentElement.querySelector(
                     ".tt-token-placeholder"
@@ -94,7 +182,32 @@ function TokenCard({ token, index }) {
             className="tt-token-placeholder"
             style={{ display: image ? "none" : "flex" }}
           >
-            {token.symbol?.charAt(0) || "?"}
+            <svg
+              className="tt-token-placeholder-icon"
+              viewBox="0 0 40 40"
+              role="img"
+              aria-label="Token image unavailable"
+            >
+              <path
+                d="M20 3.5 35 12v16L20 36.5 5 28V12L20 3.5Z"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.2"
+                strokeLinejoin="round"
+              />
+              <path
+                d="m13 15 7-4 7 4v10l-7 4-7-4V15Z"
+                fill="currentColor"
+                opacity=".18"
+              />
+              <path
+                d="m13 15 7 4 7-4M20 19v10"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinejoin="round"
+              />
+            </svg>
           </div>
 
           <div className="tt-token-name">
@@ -106,14 +219,18 @@ function TokenCard({ token, index }) {
         <span className="tt-token-rank">#{index + 1}</span>
       </div>
 
+      {/* MAIN MARKET CAP */}
       <div className="tt-token-price">
-        {formatPrice(market.priceUsd)}
+       {market.marketCap != null
+  ? `${formatMoney(market.marketCap)} MC`
+  : "Market cap unavailable"}
       </div>
 
+      {/* TOKEN STATISTICS */}
       <div className="tt-token-stats">
         <div>
-          <span>Market cap</span>
-          <strong>{formatMoney(market.marketCap)}</strong>
+          <span>Token price</span>
+          <strong>{formatPrice(market.priceUsd)}</strong>
         </div>
 
         <div>
@@ -191,10 +308,28 @@ function App() {
   const [exploreTab, setExploreTab] = useState("trending");
   const [trendingTokens, setTrendingTokens] = useState([]);
   const [newTokens, setNewTokens] = useState([]);
+  const [enrichedNewTokens, setEnrichedNewTokens] = useState([]);
   const [searchResults, setSearchResults] = useState([]);
   const [searchLoading, setSearchLoading] = useState(false);
   const [tokenConnected, setTokenConnected] = useState(false);
   const [clock, setClock] = useState(Date.now());
+  const [failedImageMints, setFailedImageMints] = useState(() => new Set());
+
+  const imageSourcesRef = useRef({
+    newTokens: [],
+    trendingTokens: [],
+    searchResults: []
+  });
+
+  const failedImageMintsRef = useRef(failedImageMints);
+
+  imageSourcesRef.current = {
+    newTokens,
+    trendingTokens,
+    searchResults
+  };
+
+  failedImageMintsRef.current = failedImageMints;
 
   // Firebase authentication.
   useEffect(() => {
@@ -243,8 +378,120 @@ function App() {
     };
   }, []);
 
-  // Update the clock so tokens become visible after ten minutes
-  // without needing a page refresh.
+  // Retry missing token images every ten minutes without blocking Trending.
+  useEffect(() => {
+    let cancelled = false;
+
+    const refreshMissingImages = async () => {
+      const combined = new Map();
+      const sources = imageSourcesRef.current;
+      const failedMints = failedImageMintsRef.current;
+
+      [
+        ...sources.newTokens,
+        ...sources.trendingTokens,
+        ...sources.searchResults
+      ].forEach((token) => {
+        if (!token?.mint) return;
+
+        const image = token.imageUrl || token.market?.imageUrl;
+
+        if (!image || failedMints.has(token.mint)) {
+          combined.set(token.mint, token);
+        }
+      });
+
+      const candidates = Array.from(combined.values());
+
+      if (!candidates.length) return;
+
+      try {
+        let nextIndex = 0;
+        const updates = new Map();
+
+        const worker = async () => {
+          while (nextIndex < candidates.length) {
+            const token = candidates[nextIndex++];
+            const imageUrl = await fetchTokenImage(token);
+
+            if (imageUrl) {
+              updates.set(token.mint, imageUrl);
+            }
+          }
+        };
+
+        await Promise.all(
+          Array.from(
+            { length: Math.min(5, candidates.length) },
+            () => worker()
+          )
+        );
+
+        if (cancelled || !updates.size) return;
+
+        const mergeImages = (current) => current.map((token) => {
+          const imageUrl = updates.get(token.mint);
+
+          return imageUrl
+            ? { ...token, imageUrl }
+            : token;
+        });
+
+        setNewTokens(mergeImages);
+        setTrendingTokens(mergeImages);
+        setSearchResults(mergeImages);
+
+        setFailedImageMints((current) => {
+          const next = new Set(current);
+
+          updates.forEach((_, mint) => next.delete(mint));
+
+          return next;
+        });
+      } catch (error) {
+        console.warn("[Token images] Refresh failed:", error);
+      }
+    };
+
+    const interval = setInterval(
+      refreshMissingImages,
+      IMAGE_REFRESH_INTERVAL
+    );
+
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
+  }, []);
+
+  function handleTokenImageError(mint) {
+    if (!mint) return;
+
+    setFailedImageMints((current) => {
+      const next = new Set(current);
+      next.add(mint);
+      return next;
+    });
+
+    const clearBrokenImage = (current) => current.map((token) =>
+      token.mint === mint
+        ? {
+            ...token,
+            imageUrl: null,
+            market: {
+              ...(token.market || {}),
+              imageUrl: null
+            }
+          }
+        : token
+    );
+
+    setNewTokens(clearBrokenImage);
+    setTrendingTokens(clearBrokenImage);
+    setSearchResults(clearBrokenImage);
+  }
+
+  // Update the clock so tokens become visible after ten minutes.
   useEffect(() => {
     const interval = setInterval(() => {
       setClock(Date.now());
@@ -253,8 +500,7 @@ function App() {
     return () => clearInterval(interval);
   }, []);
 
-  // Search the entire stored token catalogue, including tokens
-  // that have not yet reached the ten-minute display threshold.
+  // Search the entire stored token catalogue.
   useEffect(() => {
     const term = search.trim();
 
@@ -337,24 +583,76 @@ function App() {
     );
   }
 
-  // The ten-minute delay affects the New tab display only.
-  // All detected tokens remain in the search catalogue.
-  const visibleNewTokens = useMemo(() => {
-    return newTokens.filter((token) => {
-      const detectedAt = Number(token.detectedAtMs || 0);
+ // Only show Shrine-detected tokens after ten minutes.
+// Display the 15 newest eligible tokens.
+const visibleNewTokens = useMemo(() => {
+  return newTokens
+    .filter((token) => {
+      if (token.source !== "shrine") return false;
+
+      const detectedAt = Number(
+        token.detectedAtMs ||
+        token.receivedAt ||
+        (Number(token.timestamp) > 0
+          ? Number(token.timestamp) * 1000
+          : 0)
+      );
 
       return (
         detectedAt > 0 &&
         clock - detectedAt >= NEW_TOKEN_DELAY
       );
-    });
-  }, [newTokens, clock]);
+    })
+    .sort(
+      (a, b) =>
+        Number(b.detectedAtMs || 0) -
+        Number(a.detectedAtMs || 0)
+    )
+    .slice(0, 15);
+}, [newTokens, clock]);
+
+useEffect(() => {
+  let cancelled = false;
+
+  const loadNewTokenMarketData = async () => {
+    if (visibleNewTokens.length === 0) {
+      setEnrichedNewTokens([]);
+      return;
+    }
+
+    try {
+      const enriched = await enrichTokens(visibleNewTokens, {
+        includeMetadata: false,
+      });
+
+      if (!cancelled) {
+        setEnrichedNewTokens(enriched);
+      }
+    } catch (error) {
+      console.error("Failed to load New token market data:", error);
+
+      if (!cancelled) {
+        setEnrichedNewTokens((current) =>
+          current.length > 0 ? current : visibleNewTokens
+        );
+      }
+    }
+  };
+
+  loadNewTokenMarketData();
+
+  return () => {
+    cancelled = true;
+  };
+}, [visibleNewTokens]);
 
   const filteredNewTokens = useMemo(() => {
-    if (search.trim()) return searchResults;
+  if (search.trim()) return searchResults;
 
-    return visibleNewTokens;
-  }, [search, searchResults, visibleNewTokens]);
+  return enrichedNewTokens.length > 0
+    ? enrichedNewTokens
+    : visibleNewTokens;
+}, [search, searchResults, enrichedNewTokens, visibleNewTokens]);
 
   const filteredTrendingTokens = useMemo(() => {
     const source = search.trim() ? searchResults : trendingTokens;
@@ -708,6 +1006,7 @@ function App() {
                       key={token.mint}
                       token={token}
                       index={index}
+                      onImageError={handleTokenImageError}
                     />
                   ))}
 
@@ -736,6 +1035,7 @@ function App() {
                       key={token.mint}
                       token={token}
                       index={index}
+                      onImageError={handleTokenImageError}
                     />
                   ))}
 
