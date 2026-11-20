@@ -3,11 +3,11 @@
 :root {
   font-family: 'DM Sans', sans-serif;
 
-  --background: #e2e8d9;
-  --sidebar: #d8e1ce;
-  --surface: #f0f3e9;
-  --surface-hover: #e6ecdc;
-  --surface-dark: #d0dbc3;
+  --background: #dfe6d6;
+  --sidebar: #d5dfca;
+  --surface: #eff2e9;
+  --surface-hover: #e5ebdc;
+  --surface-dark: #cad7bd;
 
   --green: #263b26;
   --green-light: #456342;
@@ -19,7 +19,7 @@
 
   --text: #263527;
   --muted: #74816e;
-  --border: #c8d3bf;
+  --border: #c3cfb9;
 
   --display: 'Space Grotesk', sans-serif;
   --body: 'DM Sans', sans-serif;
@@ -108,13 +108,14 @@ textarea:focus-visible {
   z-index: 100;
 }
 
-/* BRAND AT TOP */
+/* BRAND */
 
 .tt-brand {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 5px 8px 15px;
+  padding: 5px 8px 13px;
+  margin-bottom: 3px;
   border: 0;
   background: transparent;
   color: var(--green);
@@ -135,11 +136,11 @@ textarea:focus-visible {
   color: var(--green-light);
 }
 
-/* PROFILE UNDER BRAND */
+/* PROFILE */
 
 .tt-profile-area {
   position: relative;
-  margin-bottom: 16px;
+  margin-bottom: 17px;
 }
 
 .tt-profile-button {
@@ -147,18 +148,18 @@ textarea:focus-visible {
   display: flex;
   align-items: center;
   gap: 9px;
-  padding: 9px;
-  border: 1px solid var(--border);
+  padding: 10px;
+  border: 1px solid #b3c69f;
   border-radius: 8px;
-  background: rgba(255, 255, 255, .35);
+  background: #c4d4b4;
   color: var(--text);
   text-align: left;
-  transition: .2s;
+  transition: background .2s, border-color .2s;
 }
 
 .tt-profile-button:hover {
-  background: var(--surface);
-  border-color: #aebfa0;
+  background: #bacda9;
+  border-color: #a5bd90;
 }
 
 .tt-profile-details {
@@ -171,7 +172,7 @@ textarea:focus-visible {
 
 .tt-profile-details strong {
   overflow: hidden;
-  color: var(--green);
+  color: #263b26;
   font-size: 11px;
   font-weight: 800;
   text-overflow: ellipsis;
@@ -180,13 +181,13 @@ textarea:focus-visible {
 
 .tt-profile-details small {
   overflow: hidden;
-  color: var(--muted);
+  color: #62775a;
   font-size: 9px;
   text-overflow: ellipsis;
 }
 
 .tt-profile-more {
-  color: var(--muted);
+  color: #526b46;
   font-size: 17px;
 }
 
@@ -220,12 +221,12 @@ textarea:focus-visible {
   background: var(--surface-hover);
 }
 
-/* DIVIDER */
+/* SIDEBAR DIVIDER */
 
 .tt-sidebar-divider {
   height: 1px;
   margin: 0 5px 16px;
-  background: var(--border);
+  background: #bdcbb2;
 }
 
 /* NAVIGATION */
@@ -267,7 +268,7 @@ textarea:focus-visible {
 }
 
 .tt-nav-item.active {
-  background: #c7d6b5;
+  background: #c4d4b2;
   color: var(--green);
 }
 
@@ -320,7 +321,7 @@ textarea:focus-visible {
   display: flex;
   align-items: center;
   gap: 8px;
-  border-top: 1px solid var(--border);
+  border-top: 1px solid #bdcbb2;
   color: #84917b;
   font-size: 9px;
 }
@@ -337,10 +338,10 @@ textarea:focus-visible {
 .tt-main {
   min-height: 100vh;
   margin-left: 245px;
-  background: var(--background);
+  background: #dfe6d6;
 }
 
-/* TOP BAR */
+/* TOP HEADER */
 
 .tt-topbar {
   height: 59px;
@@ -348,20 +349,20 @@ textarea:focus-visible {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid var(--border);
-  background: #e9ede2;
+  border-bottom: 1px solid #bdcbb2;
+  background: #d1ddc5;
 }
 
 .tt-breadcrumb {
   display: flex;
   align-items: center;
   gap: 10px;
-  color: #899583;
+  color: #788a70;
   font-size: 10px;
 }
 
 .tt-breadcrumb-divider {
-  color: #b4beb0;
+  color: #9eae94;
 }
 
 .tt-breadcrumb strong {
@@ -373,7 +374,7 @@ textarea:focus-visible {
   display: flex;
   align-items: center;
   gap: 7px;
-  color: #71816a;
+  color: #62775a;
   font-size: 9px;
   font-weight: 700;
 }
@@ -405,7 +406,7 @@ textarea:focus-visible {
   letter-spacing: 2px;
 }
 
-/* HOME */
+/* HOME INTRO */
 
 .tt-home-intro {
   padding: 10px 0 35px;
@@ -428,7 +429,7 @@ textarea:focus-visible {
 .tt-home-intro p {
   max-width: 530px;
   margin: 0;
-  color: #778372;
+  color: #6f7d68;
   font-size: 13px;
   line-height: 1.8;
 }
@@ -448,9 +449,9 @@ textarea:focus-visible {
   flex-direction: column;
   align-items: flex-start;
   padding: 20px;
-  border: 1px solid var(--border);
+  border: 1px solid #c5d0bb;
   border-radius: 9px;
-  background: var(--surface);
+  background: #edf1e6;
   color: var(--green);
   text-align: left;
   transition: .2s;
@@ -458,18 +459,18 @@ textarea:focus-visible {
 
 .tt-home-card:hover {
   border-color: #aebf9d;
-  background: #f7f9f1;
+  background: #f5f7ef;
   transform: translateY(-3px);
   box-shadow: 0 9px 22px rgba(38, 59, 38, .07);
 }
 
 .tt-home-card-primary {
-  background: #d6e2c6;
-  border-color: #c3d3ae;
+  background: #d1dfbf;
+  border-color: #bdcfa8;
 }
 
 .tt-home-card-primary:hover {
-  background: #e0e9d2;
+  background: #dce8ce;
 }
 
 .tt-home-card-icon {
@@ -479,18 +480,18 @@ textarea:focus-visible {
   display: grid;
   place-items: center;
   border-radius: 8px;
-  background: #e3ebd8;
+  background: #e0e9d3;
   color: #688846;
   font-size: 21px;
 }
 
 .tt-home-card-primary .tt-home-card-icon {
-  background: #eef3e5;
+  background: #eaf0df;
 }
 
 .tt-card-label {
   margin-bottom: 7px;
-  color: #879579;
+  color: #78896c;
   font-family: var(--display);
   font-size: 8px;
   font-weight: 800;
@@ -508,7 +509,7 @@ textarea:focus-visible {
 .tt-home-card p {
   max-width: 260px;
   margin: 0;
-  color: #778372;
+  color: #6f7d68;
   font-size: 10px;
   line-height: 1.7;
 }
@@ -530,7 +531,7 @@ textarea:focus-visible {
   align-items: center;
   justify-content: space-between;
   gap: 20px;
-  border-top: 1px solid var(--border);
+  border-top: 1px solid #c5d0bb;
 }
 
 .tt-home-bottom > div {
@@ -545,7 +546,7 @@ textarea:focus-visible {
   display: grid;
   place-items: center;
   border-radius: 50%;
-  background: #d4e0c5;
+  background: #cbd9ba;
   color: #779849;
   font-size: 19px;
 }
@@ -563,7 +564,7 @@ textarea:focus-visible {
 }
 
 .tt-home-version {
-  color: #879579;
+  color: #78896c;
   font-family: var(--display);
   font-size: 8px;
   font-weight: 800;
@@ -578,7 +579,7 @@ textarea:focus-visible {
   align-items: flex-end;
   padding-bottom: 22px;
   margin-bottom: 20px;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid #c5d0bb;
 }
 
 .tt-page-heading h1 {
@@ -592,7 +593,7 @@ textarea:focus-visible {
 
 .tt-page-heading p {
   margin: 0;
-  color: var(--muted);
+  color: #71806b;
   font-size: 12px;
 }
 
@@ -602,7 +603,7 @@ textarea:focus-visible {
   display: flex;
   gap: 25px;
   margin-bottom: 18px;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid #c5d0bb;
 }
 
 .tt-feed-tabs button {
@@ -610,7 +611,7 @@ textarea:focus-visible {
   border: 0;
   border-bottom: 3px solid transparent;
   background: transparent;
-  color: #87917f;
+  color: #788772;
   font-size: 12px;
   font-weight: 700;
 }
@@ -625,9 +626,9 @@ textarea:focus-visible {
 .tt-composer {
   margin-bottom: 23px;
   padding: 19px;
-  border: 1px solid var(--border);
+  border: 1px solid #c5d0bb;
   border-radius: 9px;
-  background: var(--surface);
+  background: #edf1e6;
 }
 
 .tt-composer-main {
@@ -650,7 +651,7 @@ textarea:focus-visible {
 }
 
 .tt-composer textarea::placeholder {
-  color: #8c9785;
+  color: #84917c;
 }
 
 .tt-composer-footer {
@@ -658,7 +659,7 @@ textarea:focus-visible {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-top: 1px solid var(--border);
+  border-top: 1px solid #d3ddca;
 }
 
 .tt-composer-footer span {
@@ -670,7 +671,7 @@ textarea:focus-visible {
   padding: 9px 22px;
   border: 0;
   border-radius: 30px;
-  background: #d3dfc0;
+  background: #cbdbaa;
   color: var(--green);
   font-family: var(--display);
   font-size: 10px;
@@ -687,7 +688,7 @@ textarea:focus-visible {
   cursor: not-allowed;
 }
 
-/* AVATAR */
+/* AVATARS */
 
 .tt-avatar {
   width: 36px;
@@ -695,9 +696,9 @@ textarea:focus-visible {
   display: grid;
   place-items: center;
   flex-shrink: 0;
-  border: 1px solid #bdcfa7;
+  border: 1px solid #b9cca1;
   border-radius: 50%;
-  background: #e0e9d4;
+  background: #dce7cf;
   color: #59733b;
   font-family: var(--display);
   font-size: 12px;
@@ -721,7 +722,7 @@ textarea:focus-visible {
   align-items: center;
   border: 1px dashed #bdcbb4;
   border-radius: 9px;
-  background: #e5ebdd;
+  background: #d8e2ce;
   text-align: center;
 }
 
@@ -732,7 +733,7 @@ textarea:focus-visible {
   display: grid;
   place-items: center;
   border-radius: 50%;
-  background: #d2dfc2;
+  background: #c8d8b7;
   color: #6e8c47;
   font-size: 22px;
 }
@@ -748,7 +749,7 @@ textarea:focus-visible {
 .tt-empty-feed p {
   max-width: 400px;
   margin: 0;
-  color: #788671;
+  color: #71806b;
   font-size: 11px;
   line-height: 1.8;
 }
@@ -762,9 +763,9 @@ textarea:focus-visible {
   gap: 11px;
   padding: 0 15px;
   margin-bottom: 23px;
-  border: 1px solid var(--border);
+  border: 1px solid #c5d0bb;
   border-radius: 8px;
-  background: var(--surface);
+  background: #edf1e6;
   color: #789849;
 }
 
@@ -782,7 +783,7 @@ textarea:focus-visible {
 }
 
 .tt-search input::placeholder {
-  color: #929e8b;
+  color: #879480;
 }
 
 /* PROFILE PAGE */
@@ -792,9 +793,9 @@ textarea:focus-visible {
   align-items: center;
   gap: 16px;
   padding: 22px;
-  border: 1px solid var(--border);
+  border: 1px solid #c5d0bb;
   border-radius: 9px;
-  background: var(--surface);
+  background: #edf1e6;
 }
 
 .tt-profile-card h2 {
@@ -812,7 +813,7 @@ textarea:focus-visible {
   font-size: 11px;
 }
 
-/* RESPONSIVE */
+/* TABLET */
 
 @media (max-width: 1050px) {
   .tt-sidebar {
@@ -832,6 +833,8 @@ textarea:focus-visible {
     font-size: 16px;
   }
 }
+
+/* MOBILE */
 
 @media (max-width: 750px) {
   .tt-dashboard {
@@ -900,6 +903,8 @@ textarea:focus-visible {
     padding-top: 8px;
   }
 }
+
+/* SMALL MOBILE */
 
 @media (max-width: 520px) {
   .tt-home-grid {
