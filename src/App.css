@@ -3,17 +3,23 @@
 :root {
   font-family: 'DM Sans', sans-serif;
 
-  --background: #edf1e7;
-  --sidebar: #e3e9d9;
-  --surface: #f7f9f2;
-  --surface-hover: #eaf0df;
+  --background: #e2e8d9;
+  --sidebar: #d8e1ce;
+  --surface: #f0f3e9;
+  --surface-hover: #e6ecdc;
+  --surface-dark: #d0dbc3;
+
   --green: #263b26;
-  --green-light: #3e613c;
+  --green-light: #456342;
+  --green-deep: #243b29;
+  --green-muted: #657b59;
+
   --accent: #b9d85a;
   --accent-dark: #91ad3e;
+
   --text: #263527;
   --muted: #74816e;
-  --border: #d7dfcf;
+  --border: #c8d3bf;
 
   --display: 'Space Grotesk', sans-serif;
   --body: 'DM Sans', sans-serif;
@@ -82,41 +88,69 @@ textarea:focus-visible {
 
 .tt-dashboard {
   min-height: 100vh;
-  display: grid;
-  grid-template-columns: 265px minmax(0, 1fr);
   background: var(--background);
 }
 
-/* SIDEBAR */
+/* FIXED SIDEBAR */
 
 .tt-sidebar {
+  width: 245px;
   height: 100vh;
-  position: sticky;
+  position: fixed;
   top: 0;
+  left: 0;
   display: flex;
   flex-direction: column;
-  padding: 22px 19px;
+  padding: 17px 15px;
+  overflow: hidden;
   background: var(--sidebar);
   border-right: 1px solid var(--border);
-  z-index: 20;
+  z-index: 100;
 }
 
-/* PROFILE TOP */
+/* BRAND AT TOP */
+
+.tt-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 8px 15px;
+  border: 0;
+  background: transparent;
+  color: var(--green);
+  font-family: var(--display);
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -1px;
+  text-align: left;
+}
+
+.tt-brand img {
+  width: 38px;
+  height: 38px;
+  object-fit: contain;
+}
+
+.tt-brand > span > span {
+  color: var(--green-light);
+}
+
+/* PROFILE UNDER BRAND */
 
 .tt-profile-area {
   position: relative;
-  margin-bottom: 22px;
+  margin-bottom: 16px;
 }
 
 .tt-profile-button {
   width: 100%;
   display: flex;
   align-items: center;
-  gap: 11px;
-  padding: 12px;
+  gap: 9px;
+  padding: 9px;
   border: 1px solid var(--border);
-  border-radius: 10px;
-  background: rgba(255, 255, 255, .45);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, .35);
   color: var(--text);
   text-align: left;
   transition: .2s;
@@ -124,7 +158,7 @@ textarea:focus-visible {
 
 .tt-profile-button:hover {
   background: var(--surface);
-  border-color: #bdcbb2;
+  border-color: #aebfa0;
 }
 
 .tt-profile-details {
@@ -132,13 +166,13 @@ textarea:focus-visible {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 3px;
 }
 
 .tt-profile-details strong {
   overflow: hidden;
   color: var(--green);
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 800;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -147,37 +181,37 @@ textarea:focus-visible {
 .tt-profile-details small {
   overflow: hidden;
   color: var(--muted);
-  font-size: 10px;
+  font-size: 9px;
   text-overflow: ellipsis;
 }
 
 .tt-profile-more {
   color: var(--muted);
-  font-size: 19px;
+  font-size: 17px;
 }
 
 .tt-profile-menu {
   position: absolute;
-  top: calc(100% + 6px);
+  top: calc(100% + 5px);
   left: 0;
   width: 100%;
-  padding: 7px;
+  padding: 6px;
   display: flex;
   flex-direction: column;
   border: 1px solid var(--border);
-  border-radius: 9px;
+  border-radius: 8px;
   background: var(--surface);
   box-shadow: 0 12px 30px rgba(38, 59, 38, .12);
-  z-index: 40;
+  z-index: 110;
 }
 
 .tt-profile-menu button {
-  padding: 11px;
+  padding: 10px;
   border: 0;
   border-radius: 5px;
   background: transparent;
   color: var(--green);
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
   text-align: left;
 }
@@ -186,66 +220,41 @@ textarea:focus-visible {
   background: var(--surface-hover);
 }
 
-/* BRAND */
-
-.tt-brand {
-  display: flex;
-  align-items: center;
-  gap: 11px;
-  padding: 9px 10px 21px;
-  border: 0;
-  background: transparent;
-  color: var(--green);
-  font-family: var(--display);
-  font-size: 19px;
-  font-weight: 800;
-  letter-spacing: -1px;
-  text-align: left;
-}
-
-.tt-brand img {
-  width: 42px;
-  height: 42px;
-  object-fit: contain;
-}
-
-.tt-brand > span > span {
-  color: var(--green-light);
-}
+/* DIVIDER */
 
 .tt-sidebar-divider {
   height: 1px;
-  margin: 0 8px 23px;
+  margin: 0 5px 16px;
   background: var(--border);
 }
 
 /* NAVIGATION */
 
 .tt-nav-heading {
-  padding: 0 12px;
-  margin-bottom: 11px;
+  padding: 0 10px;
+  margin-bottom: 8px;
   color: #84917b;
   font-family: var(--display);
   font-size: 9px;
   font-weight: 800;
-  letter-spacing: 1.7px;
+  letter-spacing: 1.5px;
 }
 
 .tt-navigation {
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 3px;
 }
 
 .tt-nav-item {
   width: 100%;
-  min-height: 47px;
+  min-height: 42px;
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 0 13px;
+  gap: 12px;
+  padding: 0 11px;
   border: 0;
-  border-radius: 7px;
+  border-radius: 6px;
   background: transparent;
   color: #53634e;
   text-align: left;
@@ -253,24 +262,24 @@ textarea:focus-visible {
 }
 
 .tt-nav-item:hover {
-  background: rgba(255, 255, 255, .45);
+  background: rgba(255, 255, 255, .4);
   color: var(--green);
 }
 
 .tt-nav-item.active {
-  background: #d3dfc2;
+  background: #c7d6b5;
   color: var(--green);
 }
 
 .tt-nav-icon {
-  width: 24px;
-  font-size: 21px;
+  width: 22px;
+  font-size: 19px;
   text-align: center;
 }
 
 .tt-nav-label {
   flex: 1;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
 }
 
@@ -278,78 +287,77 @@ textarea:focus-visible {
 
 .tt-post-button {
   width: 100%;
-  min-height: 48px;
-  margin-top: 25px;
+  min-height: 43px;
+  margin-top: 17px;
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 10px;
-  border: 1px solid #c2d69a;
-  border-radius: 8px;
-  background: #dce8c8;
+  gap: 9px;
+  border: 1px solid #b6ca91;
+  border-radius: 7px;
+  background: #cbdbaa;
   color: var(--green);
   font-family: var(--display);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 800;
   transition: .2s;
 }
 
 .tt-post-button:hover {
   background: var(--accent);
-  border-color: var(--accent);
   transform: translateY(-1px);
 }
 
 .tt-post-button span {
-  font-size: 20px;
+  font-size: 18px;
 }
 
 /* SIDEBAR FOOTER */
 
 .tt-sidebar-footer {
   margin-top: auto;
-  padding: 15px 9px 3px;
+  padding: 12px 8px 2px;
   display: flex;
   align-items: center;
   gap: 8px;
   border-top: 1px solid var(--border);
   color: #84917b;
-  font-size: 10px;
+  font-size: 9px;
 }
 
 .tt-footer-dot {
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: #8eae56;
+  background: #91ad55;
 }
 
 /* MAIN */
 
 .tt-main {
-  min-width: 0;
   min-height: 100vh;
+  margin-left: 245px;
   background: var(--background);
 }
 
 /* TOP BAR */
 
 .tt-topbar {
-  height: 65px;
-  padding: 0 40px;
+  height: 59px;
+  padding: 0 35px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   border-bottom: 1px solid var(--border);
-  background: rgba(247, 249, 242, .65);
+  background: #e9ede2;
 }
 
 .tt-breadcrumb {
   display: flex;
   align-items: center;
-  gap: 11px;
+  gap: 10px;
   color: #899583;
-  font-size: 11px;
+  font-size: 10px;
 }
 
 .tt-breadcrumb-divider {
@@ -366,7 +374,7 @@ textarea:focus-visible {
   align-items: center;
   gap: 7px;
   color: #71816a;
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 700;
 }
 
@@ -383,7 +391,7 @@ textarea:focus-visible {
   width: 100%;
   max-width: 1550px;
   margin: 0 auto;
-  padding: 42px clamp(25px, 4vw, 65px) 70px;
+  padding: 36px clamp(25px, 4vw, 60px) 65px;
 }
 
 /* EYEBROW */
@@ -400,28 +408,28 @@ textarea:focus-visible {
 /* HOME */
 
 .tt-home-intro {
-  padding: 12px 0 42px;
+  padding: 10px 0 35px;
 }
 
 .tt-home-intro h1 {
-  margin: 13px 0 10px;
+  margin: 12px 0 10px;
   color: var(--green);
   font-family: var(--display);
-  font-size: clamp(37px, 5vw, 62px);
+  font-size: clamp(35px, 4vw, 55px);
   font-weight: 800;
-  letter-spacing: -2.5px;
+  letter-spacing: -2px;
   line-height: 1.1;
 }
 
 .tt-home-intro h1 span {
-  color: #789b49;
+  color: #78994b;
 }
 
 .tt-home-intro p {
   max-width: 530px;
   margin: 0;
   color: #778372;
-  font-size: 14px;
+  font-size: 13px;
   line-height: 1.8;
 }
 
@@ -430,18 +438,18 @@ textarea:focus-visible {
 .tt-home-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 17px;
+  gap: 15px;
 }
 
 .tt-home-card {
-  min-height: 250px;
+  min-height: 225px;
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  padding: 23px;
+  padding: 20px;
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: 9px;
   background: var(--surface);
   color: var(--green);
   text-align: left;
@@ -449,51 +457,51 @@ textarea:focus-visible {
 }
 
 .tt-home-card:hover {
-  border-color: #b8c99e;
-  background: #fff;
+  border-color: #aebf9d;
+  background: #f7f9f1;
   transform: translateY(-3px);
-  box-shadow: 0 10px 25px rgba(38, 59, 38, .06);
+  box-shadow: 0 9px 22px rgba(38, 59, 38, .07);
 }
 
 .tt-home-card-primary {
-  background: #e0e9d1;
-  border-color: #cddcbb;
+  background: #d6e2c6;
+  border-color: #c3d3ae;
 }
 
 .tt-home-card-primary:hover {
-  background: #eaf1df;
+  background: #e0e9d2;
 }
 
 .tt-home-card-icon {
-  width: 43px;
-  height: 43px;
-  margin-bottom: 28px;
+  width: 39px;
+  height: 39px;
+  margin-bottom: 23px;
   display: grid;
   place-items: center;
-  border-radius: 9px;
-  background: #e8efdc;
+  border-radius: 8px;
+  background: #e3ebd8;
   color: #688846;
-  font-size: 22px;
+  font-size: 21px;
 }
 
 .tt-home-card-primary .tt-home-card-icon {
-  background: #f2f6e9;
+  background: #eef3e5;
 }
 
 .tt-card-label {
-  margin-bottom: 8px;
+  margin-bottom: 7px;
   color: #879579;
   font-family: var(--display);
-  font-size: 9px;
+  font-size: 8px;
   font-weight: 800;
-  letter-spacing: 1.4px;
+  letter-spacing: 1.3px;
 }
 
 .tt-home-card strong {
-  margin-bottom: 8px;
+  margin-bottom: 7px;
   color: var(--green);
   font-family: var(--display);
-  font-size: 19px;
+  font-size: 17px;
   font-weight: 800;
 }
 
@@ -501,23 +509,23 @@ textarea:focus-visible {
   max-width: 260px;
   margin: 0;
   color: #778372;
-  font-size: 11px;
+  font-size: 10px;
   line-height: 1.7;
 }
 
 .tt-card-arrow {
   position: absolute;
-  right: 21px;
-  bottom: 20px;
+  right: 18px;
+  bottom: 17px;
   color: #789b49;
-  font-size: 20px;
+  font-size: 19px;
 }
 
 /* HOME BOTTOM */
 
 .tt-home-bottom {
-  margin-top: 35px;
-  padding: 21px 0;
+  margin-top: 30px;
+  padding: 18px 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -528,36 +536,36 @@ textarea:focus-visible {
 .tt-home-bottom > div {
   display: flex;
   align-items: center;
-  gap: 13px;
+  gap: 12px;
 }
 
 .tt-home-bottom-icon {
-  width: 39px;
-  height: 39px;
+  width: 36px;
+  height: 36px;
   display: grid;
   place-items: center;
   border-radius: 50%;
-  background: #e0e9d1;
+  background: #d4e0c5;
   color: #779849;
-  font-size: 20px;
+  font-size: 19px;
 }
 
 .tt-home-bottom strong {
   color: var(--green);
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 800;
 }
 
 .tt-home-bottom p {
   margin: 4px 0 0;
   color: var(--muted);
-  font-size: 10px;
+  font-size: 9px;
 }
 
 .tt-home-version {
   color: #879579;
   font-family: var(--display);
-  font-size: 9px;
+  font-size: 8px;
   font-weight: 800;
   letter-spacing: 1px;
 }
@@ -568,16 +576,16 @@ textarea:focus-visible {
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
-  padding-bottom: 25px;
-  margin-bottom: 22px;
+  padding-bottom: 22px;
+  margin-bottom: 20px;
   border-bottom: 1px solid var(--border);
 }
 
 .tt-page-heading h1 {
-  margin: 9px 0 5px;
+  margin: 8px 0 5px;
   color: var(--green);
   font-family: var(--display);
-  font-size: clamp(31px, 4vw, 44px);
+  font-size: clamp(29px, 4vw, 41px);
   font-weight: 800;
   letter-spacing: -1.5px;
 }
@@ -585,25 +593,25 @@ textarea:focus-visible {
 .tt-page-heading p {
   margin: 0;
   color: var(--muted);
-  font-size: 13px;
+  font-size: 12px;
 }
 
 /* FEED TABS */
 
 .tt-feed-tabs {
   display: flex;
-  gap: 27px;
-  margin-bottom: 20px;
+  gap: 25px;
+  margin-bottom: 18px;
   border-bottom: 1px solid var(--border);
 }
 
 .tt-feed-tabs button {
-  padding: 12px 8px;
+  padding: 11px 7px;
   border: 0;
   border-bottom: 3px solid transparent;
   background: transparent;
   color: #87917f;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
 }
 
@@ -615,28 +623,28 @@ textarea:focus-visible {
 /* COMPOSER */
 
 .tt-composer {
-  margin-bottom: 25px;
-  padding: 22px;
+  margin-bottom: 23px;
+  padding: 19px;
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: 9px;
   background: var(--surface);
 }
 
 .tt-composer-main {
   display: flex;
   align-items: flex-start;
-  gap: 14px;
+  gap: 13px;
 }
 
 .tt-composer textarea {
   width: 100%;
-  min-height: 80px;
+  min-height: 75px;
   resize: vertical;
   border: 0;
   outline: 0;
   background: transparent;
   color: var(--green);
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 600;
   line-height: 1.6;
 }
@@ -646,7 +654,7 @@ textarea:focus-visible {
 }
 
 .tt-composer-footer {
-  padding-top: 14px;
+  padding-top: 12px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -659,13 +667,13 @@ textarea:focus-visible {
 }
 
 .tt-composer-footer button {
-  padding: 10px 23px;
+  padding: 9px 22px;
   border: 0;
   border-radius: 30px;
-  background: #dce8c8;
+  background: #d3dfc0;
   color: var(--green);
   font-family: var(--display);
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 800;
   transition: .2s;
 }
@@ -682,78 +690,78 @@ textarea:focus-visible {
 /* AVATAR */
 
 .tt-avatar {
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   display: grid;
   place-items: center;
   flex-shrink: 0;
-  border: 1px solid #c2d4a6;
+  border: 1px solid #bdcfa7;
   border-radius: 50%;
-  background: #e5edd8;
+  background: #e0e9d4;
   color: #59733b;
   font-family: var(--display);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 800;
 }
 
 .tt-avatar.large {
-  width: 46px;
-  height: 46px;
-  font-size: 15px;
+  width: 43px;
+  height: 43px;
+  font-size: 14px;
 }
 
 /* EMPTY FEED */
 
 .tt-empty-feed {
-  min-height: 300px;
-  padding: 60px 25px;
+  min-height: 270px;
+  padding: 50px 22px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  border: 1px dashed #cbd5c1;
-  border-radius: 10px;
-  background: rgba(247, 249, 242, .6);
+  border: 1px dashed #bdcbb4;
+  border-radius: 9px;
+  background: #e5ebdd;
   text-align: center;
 }
 
 .tt-empty-symbol {
-  width: 53px;
-  height: 53px;
-  margin-bottom: 16px;
+  width: 49px;
+  height: 49px;
+  margin-bottom: 14px;
   display: grid;
   place-items: center;
   border-radius: 50%;
-  background: #e4ecd8;
-  color: #789849;
-  font-size: 24px;
+  background: #d2dfc2;
+  color: #6e8c47;
+  font-size: 22px;
 }
 
 .tt-empty-feed h2 {
-  margin: 0 0 9px;
+  margin: 0 0 8px;
   color: var(--green);
   font-family: var(--display);
-  font-size: 19px;
+  font-size: 18px;
   font-weight: 800;
 }
 
 .tt-empty-feed p {
   max-width: 400px;
   margin: 0;
-  color: #82907a;
-  font-size: 12px;
+  color: #788671;
+  font-size: 11px;
   line-height: 1.8;
 }
 
 /* SEARCH */
 
 .tt-search {
-  height: 49px;
+  height: 46px;
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 0 16px;
-  margin-bottom: 25px;
+  gap: 11px;
+  padding: 0 15px;
+  margin-bottom: 23px;
   border: 1px solid var(--border);
   border-radius: 8px;
   background: var(--surface);
@@ -761,7 +769,7 @@ textarea:focus-visible {
 }
 
 .tt-search span {
-  font-size: 22px;
+  font-size: 21px;
 }
 
 .tt-search input {
@@ -770,7 +778,7 @@ textarea:focus-visible {
   outline: 0;
   background: transparent;
   color: var(--green);
-  font-size: 13px;
+  font-size: 12px;
 }
 
 .tt-search input::placeholder {
@@ -782,10 +790,10 @@ textarea:focus-visible {
 .tt-profile-card {
   display: flex;
   align-items: center;
-  gap: 18px;
-  padding: 25px;
+  gap: 16px;
+  padding: 22px;
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: 9px;
   background: var(--surface);
 }
 
@@ -801,37 +809,47 @@ textarea:focus-visible {
   display: block;
   margin: 5px 0;
   color: var(--muted);
-  font-size: 12px;
+  font-size: 11px;
 }
 
 /* RESPONSIVE */
 
 @media (max-width: 1050px) {
-  .tt-dashboard {
-    grid-template-columns: 225px minmax(0, 1fr);
+  .tt-sidebar {
+    width: 215px;
+    padding: 14px 12px;
+  }
+
+  .tt-main {
+    margin-left: 215px;
   }
 
   .tt-home-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .tt-brand {
+    font-size: 16px;
   }
 }
 
 @media (max-width: 750px) {
   .tt-dashboard {
     display: block;
-    padding-bottom: 70px;
+    padding-bottom: 65px;
   }
 
   .tt-sidebar {
     width: 100%;
-    height: auto;
+    height: 65px;
     position: fixed;
     top: auto;
     bottom: 0;
     left: 0;
-    padding: 5px;
+    padding: 4px;
     border-top: 1px solid var(--border);
     border-right: 0;
+    overflow: visible;
     background: var(--sidebar);
   }
 
@@ -845,14 +863,14 @@ textarea:focus-visible {
   }
 
   .tt-navigation {
-    min-height: 58px;
+    height: 100%;
     flex-direction: row;
     justify-content: space-around;
     gap: 2px;
   }
 
   .tt-nav-item {
-    min-height: 50px;
+    min-height: 52px;
     justify-content: center;
     padding: 5px;
   }
@@ -862,16 +880,16 @@ textarea:focus-visible {
   }
 
   .tt-nav-icon {
-    font-size: 22px;
+    font-size: 21px;
   }
 
   .tt-main {
-    min-height: 100vh;
+    margin-left: 0;
   }
 
   .tt-topbar {
-    height: 55px;
-    padding: 0 18px;
+    height: 52px;
+    padding: 0 17px;
   }
 
   .tt-page {
@@ -879,7 +897,7 @@ textarea:focus-visible {
   }
 
   .tt-home-intro {
-    padding-top: 10px;
+    padding-top: 8px;
   }
 }
 
@@ -889,11 +907,11 @@ textarea:focus-visible {
   }
 
   .tt-home-card {
-    min-height: 190px;
+    min-height: 180px;
   }
 
   .tt-home-intro h1 {
-    font-size: 39px;
+    font-size: 38px;
   }
 
   .tt-home-bottom {
@@ -906,11 +924,11 @@ textarea:focus-visible {
   }
 
   .tt-empty-feed {
-    min-height: 240px;
-    padding: 35px 17px;
+    min-height: 220px;
+    padding: 30px 15px;
   }
 
   .tt-composer {
-    padding: 15px;
+    padding: 14px;
   }
 }
