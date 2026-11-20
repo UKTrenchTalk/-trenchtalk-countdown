@@ -129,7 +129,6 @@ textarea:focus-visible {
 
 /* =========================================
    BRAND
-   CSS ORDER PLACES LOGO ABOVE PROFILE
 ========================================= */
 
 .tt-brand {
@@ -957,7 +956,6 @@ textarea:focus-visible {
   .tt-sidebar {
     width: 100%;
     height: 65px;
-    height: 65px;
     position: fixed;
     top: auto;
     bottom: 0;
@@ -1054,5 +1052,303 @@ textarea:focus-visible {
 
   .tt-page-heading h1 {
     font-size: 31px;
+  }
+}
+
+/* =========================================
+   LIVE TOKEN DISCOVERY
+========================================= */
+
+.tt-market-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 4px 0 13px;
+  color: var(--muted);
+  font-family: var(--display);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 1.2px;
+}
+
+.tt-market-header > div {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--forest);
+}
+
+.tt-market-header > span {
+  font-family: var(--body);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+.tt-live-indicator {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #78a84d;
+  box-shadow: 0 0 0 3px rgba(120, 168, 77, .14);
+  animation: tt-live-pulse 1.8s ease-in-out infinite;
+}
+
+@keyframes tt-live-pulse {
+  0%, 100% {
+    opacity: 1;
+    box-shadow: 0 0 0 3px rgba(120, 168, 77, .14);
+  }
+
+  50% {
+    opacity: .65;
+    box-shadow: 0 0 0 6px rgba(120, 168, 77, .05);
+  }
+}
+
+.tt-market-tabs {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.tt-market-tabs button {
+  position: relative;
+  padding: 12px 3px 13px;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -1px;
+  background: transparent;
+  color: #788772;
+  font-size: 12px;
+  font-weight: 700;
+  transition: color .2s, border-color .2s;
+}
+
+.tt-market-tabs button:hover {
+  color: var(--forest-dark);
+}
+
+.tt-market-tabs button.selected {
+  border-bottom-color: #88a84d;
+  color: var(--forest-dark);
+}
+
+.tt-token-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 15px;
+}
+
+.tt-token-card {
+  min-width: 0;
+  padding: 17px;
+  border: 1px solid #bdcbb2;
+  border-radius: 10px;
+  background: #e5ebdd;
+  color: var(--forest-dark);
+  transition: transform .2s, border-color .2s, box-shadow .2s;
+}
+
+.tt-token-card:hover {
+  transform: translateY(-2px);
+  border-color: #a8bd91;
+  box-shadow: 0 8px 20px rgba(38, 59, 38, .07);
+}
+
+.tt-token-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.tt-token-identity {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.tt-token-image,
+.tt-token-placeholder {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border: 1px solid #c2d0b8;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.tt-token-placeholder {
+  display: grid;
+  place-items: center;
+  background: #d3dfc8;
+  color: #637e47;
+  font-family: var(--display);
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.tt-token-name {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.tt-token-name strong {
+  overflow: hidden;
+  color: var(--forest-dark);
+  font-family: var(--display);
+  font-size: 12px;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tt-token-name span {
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tt-token-rank {
+  flex-shrink: 0;
+  padding: 4px 7px;
+  border-radius: 5px;
+  background: #d5e1c9;
+  color: #617c45;
+  font-family: var(--display);
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.tt-token-price {
+  margin: 19px 0 16px;
+  color: var(--forest-dark);
+  font-family: var(--display);
+  font-size: 21px;
+  font-weight: 700;
+  letter-spacing: -.7px;
+}
+
+.tt-token-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 10px;
+  padding: 13px 0;
+  border-top: 1px solid #cbd7c0;
+  border-bottom: 1px solid #cbd7c0;
+}
+
+.tt-token-stats > div {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.tt-token-stats span {
+  color: #788772;
+  font-size: 9px;
+  font-weight: 600;
+}
+
+.tt-token-stats strong {
+  overflow: hidden;
+  color: var(--forest-dark);
+  font-family: var(--display);
+  font-size: 11px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tt-token-stats strong.positive {
+  color: #52813f;
+}
+
+.tt-token-stats strong.negative {
+  color: #a65b4c;
+}
+
+.tt-token-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-top: 12px;
+}
+
+.tt-token-protocol {
+  overflow: hidden;
+  color: #788772;
+  font-size: 9px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.tt-token-view {
+  flex-shrink: 0;
+  color: #668744;
+  font-size: 10px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.tt-token-view:hover {
+  color: var(--forest-dark);
+  text-decoration: underline;
+}
+
+.tt-token-unavailable {
+  color: #8a9582;
+  font-size: 9px;
+  font-weight: 600;
+}
+
+/* =========================================
+   TOKEN DISCOVERY RESPONSIVE LAYOUT
+========================================= */
+
+@media (max-width: 1250px) {
+  .tt-token-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 750px) {
+  .tt-token-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .tt-token-card {
+    padding: 13px;
+  }
+
+  .tt-token-price {
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 520px) {
+  .tt-token-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .tt-market-header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 7px;
   }
 }

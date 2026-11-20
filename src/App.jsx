@@ -3,6 +3,8 @@ import { onAuthStateChanged, signOut } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { auth, db } from "./firebase";
 import Login from "./pages/login.jsx";
+import trendingService from "./Services/trendingservice.js";
+import tokenService from "./Services/tokenservice.js";
 import "./App.css";
 
 const navigation = [
@@ -23,6 +25,165 @@ function Avatar({ letter, large = false }) {
   );
 }
 
+function formatMoney(value) {
+  const number = Number(value);
+
+  if (!Number.isFinite(number)) return "—";
+
+  if (number >= 1_000_000_000) {
+    return `$${(number / 1_000_000_000).toFixed(2)}B`;
+  }
+
+  if (number >= 1_000_000) {
+    return `$${(number / 1_000_000).toFixed(2)}M`;
+  }
+
+  if (number >= 1_000) {
+    return `$${(number / 1_000).toFixed(2)}K`;
+  }
+
+  return `$${number.toFixed(2)}`;
+}
+
+function formatPrice(value) {
+  const number = Number(value);
+
+  if (!Number.isFinite(number) || number <= 0) {
+    return "—";
+  }
+
+  if (number < 0.000001) {
+    return `$${number.toExponential(2)}`;
+  }
+
+  if (number < 0.01) {
+    return `$${number.toFixed(8)}`;
+  }
+
+  if (number < 1) {
+    return `$${number.toFixed(6)}`;
+  }
+
+  return `$${number.toFixed(2)}`;
+}
+
+function formatChange(value) {
+  const number = Number(value);
+
+  if (!Number.isFinite(number)) return null;
+
+  return `${number >= 0 ? "+" : ""}${number.toFixed(2)}%`;
+}
+
+function TokenCard({ token, index }) {
+  const market = token.market || {};
+
+  const image = market.imageUrl || token.imageUrl;
+
+  const priceChange = formatChange(market.priceChange24h);
+
+  return (
+    <article className="tt-token-card">
+
+      <div className="tt-token-card-top">
+
+        <div className="tt-token-identity">
+
+          {image ? (
+            <img
+              className="tt-token-image"
+              src={image}
+              alt={token.name}
+              onError={(event) => {
+                event.currentTarget.style.display = "none";
+              }}
+            />
+          ) : (
+            <div className="tt-token-placeholder">
+              {token.symbol?.charAt(0) || "?"}
+            </div>
+          )}
+
+          <div className="tt-token-name">
+            <strong>{token.name || "Unknown Token"}</strong>
+            <span>${token.symbol || "UNKNOWN"}</span>
+          </div>
+
+        </div>
+
+        <span className="tt-token-rank">
+          #{index + 1}
+        </span>
+
+      </div>
+
+      <div className="tt-token-price">
+        {formatPrice(market.priceUsd)}
+      </div>
+
+      <div className="tt-token-stats">
+
+        <div>
+          <span>Market cap</span>
+          <strong>{formatMoney(market.marketCap)}</strong>
+        </div>
+
+        <div>
+          <span>24h volume</span>
+          <strong>{formatMoney(market.volume24h)}</strong>
+        </div>
+
+        <div>
+          <span>Liquidity</span>
+          <strong>{formatMoney(market.liquidity)}</strong>
+        </div>
+
+        <div>
+          <span>24h change</span>
+
+          <strong
+            className={
+              priceChange === null
+                ? ""
+                : Number(market.priceChange24h) >= 0
+                  ? "positive"
+                  : "negative"
+            }
+          >
+            {priceChange || "—"}
+          </strong>
+
+        </div>
+
+      </div>
+
+      <div className="tt-token-card-footer">
+
+        <span className="tt-token-protocol">
+          {token.protocol || "Solana"}
+        </span>
+
+        {market.pairUrl ? (
+          <a
+            href={market.pairUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="tt-token-view"
+          >
+            View token ↗
+          </a>
+        ) : (
+          <span className="tt-token-unavailable">
+            Market unavailable
+          </span>
+        )}
+
+      </div>
+
+    </article>
+  );
+}
+
 function App() {
   const [user, setUser] = useState(null);
   const [profile, setProfile] = useState(null);
@@ -32,6 +193,10 @@ function App() {
   const [postText, setPostText] = useState("");
   const [search, setSearch] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
+
+  const [exploreTab, setExploreTab] = useState("trending");
+  const [trendingTokens, setTrendingTokens] = useState([]);
+  const [newTokens, setNewTokens] = useState([]);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
@@ -44,10 +209,12 @@ function App() {
           );
 
           setProfile(snapshot.exists() ? snapshot.data() : null);
+
         } catch (error) {
           console.error("Profile loading error:", error);
           setProfile(null);
         }
+
       } else {
         setProfile(null);
       }
@@ -56,6 +223,25 @@ function App() {
     });
 
     return unsubscribe;
+  }, []);
+
+  // Connect live token services.
+  useEffect(() => {
+    const unsubscribeTrending = trendingService.subscribe((tokens) => {
+      setTrendingTokens(tokens);
+    });
+
+    const unsubscribeNew = tokenService.subscribe(({ tokens }) => {
+      setNewTokens(tokens);
+    });
+
+    trendingService.start();
+
+    return () => {
+      unsubscribeTrending();
+      unsubscribeNew();
+      trendingService.stop();
+    };
   }, []);
 
   const username =
@@ -92,12 +278,24 @@ function App() {
 
     if (!postText.trim()) return;
 
-    // Posts will be connected to Firestore in the next stage.
     console.log("Post ready for submission:", postText.trim());
 
     setPostText("");
-    alert("Post publishing will be available when the feed database is connected.");
+
+    alert(
+      "Post publishing will be available when the feed database is connected."
+    );
   }
+
+  const filteredNewTokens = newTokens.filter((token) => {
+    const query = search.toLowerCase();
+
+    return (
+      token.name?.toLowerCase().includes(query) ||
+      token.symbol?.toLowerCase().includes(query) ||
+      token.mint?.toLowerCase().includes(query)
+    );
+  });
 
   if (authLoading) {
     return (
@@ -128,9 +326,8 @@ function App() {
 
       <aside className="tt-sidebar">
 
-        {/* PROFILE AT TOP */}
-
         <div className="tt-profile-area">
+
           <button
             className="tt-profile-button"
             onClick={() => setMenuOpen(!menuOpen)}
@@ -156,9 +353,8 @@ function App() {
               </button>
             </div>
           )}
-        </div>
 
-        {/* BRAND */}
+        </div>
 
         <button
           className="tt-brand"
@@ -172,8 +368,6 @@ function App() {
         </button>
 
         <div className="tt-sidebar-divider" />
-
-        {/* NAVIGATION */}
 
         <div className="tt-nav-heading">
           MENU
@@ -199,8 +393,6 @@ function App() {
           ))}
         </nav>
 
-        {/* POST ACTION */}
-
         <button
           className="tt-post-button"
           onClick={openPost}
@@ -208,8 +400,6 @@ function App() {
           <span>＋</span>
           Create a post
         </button>
-
-        {/* SIDEBAR FOOTER */}
 
         <div className="tt-sidebar-footer">
           <span className="tt-footer-dot" />
@@ -222,9 +412,8 @@ function App() {
 
       <main className="tt-main">
 
-        {/* TOP BAR */}
-
         <header className="tt-topbar">
+
           <div className="tt-breadcrumb">
             <span>TrenchTalk</span>
             <span className="tt-breadcrumb-divider">/</span>
@@ -237,9 +426,8 @@ function App() {
               Account active
             </span>
           </div>
-        </header>
 
-        {/* PAGE CONTENT */}
+        </header>
 
         <div className="tt-page">
 
@@ -258,7 +446,7 @@ function App() {
                 </h1>
 
                 <p>
-                  Welcome back, {displayName}. 
+                  Welcome back, {displayName}.
                   Your communities, conversations and ideas all start here.
                 </p>
               </div>
@@ -410,13 +598,19 @@ function App() {
           {/* EXPLORE */}
 
           {activePage === "explore" && (
-            <section className="tt-standard-page">
+            <section className="tt-standard-page tt-explore">
 
               <div className="tt-page-heading">
                 <div>
-                  <span className="tt-eyebrow">DISCOVER SOMETHING NEW</span>
+                  <span className="tt-eyebrow">
+                    SOLANA TOKEN DISCOVERY
+                  </span>
+
                   <h1>Explore</h1>
-                  <p>Find conversations and communities.</p>
+
+                  <p>
+                    Discover emerging tokens and what's moving in the market.
+                  </p>
                 </div>
               </div>
 
@@ -425,17 +619,100 @@ function App() {
 
                 <input
                   type="search"
-                  placeholder="Search TrenchTalk..."
+                  placeholder="Search tokens..."
                   value={search}
                   onChange={(event) => setSearch(event.target.value)}
                 />
               </label>
 
-              <div className="tt-empty-feed">
-                <div className="tt-empty-symbol">⌕</div>
-                <h2>Nothing to see here yet.</h2>
-                <p>Discoverable content will appear here.</p>
+              <div className="tt-market-header">
+                <div>
+                  <span className="tt-live-indicator" />
+                  LIVE SOLANA DATA
+                </div>
+
+                <span>
+                  {exploreTab === "trending"
+                    ? `${trendingTokens.length} trending tokens`
+                    : `${newTokens.length} detected tokens`}
+                </span>
               </div>
+
+              <div className="tt-market-tabs">
+
+                <button
+                  className={exploreTab === "trending" ? "selected" : ""}
+                  onClick={() => setExploreTab("trending")}
+                >
+                  Trending
+                </button>
+
+                <button
+                  className={exploreTab === "new" ? "selected" : ""}
+                  onClick={() => setExploreTab("new")}
+                >
+                  New
+                </button>
+
+              </div>
+
+              {exploreTab === "trending" && (
+                <div className="tt-token-grid">
+
+                  {trendingTokens
+                    .filter((token) => {
+                      const query = search.toLowerCase();
+
+                      return (
+                        token.name?.toLowerCase().includes(query) ||
+                        token.symbol?.toLowerCase().includes(query) ||
+                        token.mint?.toLowerCase().includes(query)
+                      );
+                    })
+                    .map((token, index) => (
+                      <TokenCard
+                        key={token.mint}
+                        token={token}
+                        index={index}
+                      />
+                    ))}
+
+                  {trendingTokens.length === 0 && (
+                    <div className="tt-empty-feed">
+                      <div className="tt-empty-symbol">⌕</div>
+                      <h2>Finding trending tokens...</h2>
+                      <p>
+                        Waiting for tokens with available market data.
+                      </p>
+                    </div>
+                  )}
+
+                </div>
+              )}
+
+              {exploreTab === "new" && (
+                <div className="tt-token-grid">
+
+                  {filteredNewTokens.map((token, index) => (
+                    <TokenCard
+                      key={token.mint}
+                      token={token}
+                      index={index}
+                    />
+                  ))}
+
+                  {filteredNewTokens.length === 0 && (
+                    <div className="tt-empty-feed">
+                      <div className="tt-empty-symbol">◈</div>
+                      <h2>Waiting for new tokens.</h2>
+                      <p>
+                        Newly detected tokens will appear here automatically.
+                      </p>
+                    </div>
+                  )}
+
+                </div>
+              )}
 
             </section>
           )}
@@ -444,6 +721,7 @@ function App() {
 
           {activePage === "communities" && (
             <section className="tt-standard-page">
+
               <div className="tt-page-heading">
                 <div>
                   <span className="tt-eyebrow">FIND YOUR PEOPLE</span>
@@ -457,6 +735,7 @@ function App() {
                 <h2>No communities yet.</h2>
                 <p>Your communities will appear here.</p>
               </div>
+
             </section>
           )}
 
@@ -464,6 +743,7 @@ function App() {
 
           {activePage === "messages" && (
             <section className="tt-standard-page">
+
               <div className="tt-page-heading">
                 <div>
                   <span className="tt-eyebrow">YOUR CONVERSATIONS</span>
@@ -477,6 +757,7 @@ function App() {
                 <h2>No messages yet.</h2>
                 <p>Your conversations will appear here.</p>
               </div>
+
             </section>
           )}
 
@@ -484,6 +765,7 @@ function App() {
 
           {activePage === "notifications" && (
             <section className="tt-standard-page">
+
               <div className="tt-page-heading">
                 <div>
                   <span className="tt-eyebrow">STAY UP TO DATE</span>
@@ -497,6 +779,7 @@ function App() {
                 <h2>You're all caught up.</h2>
                 <p>New notifications will appear here.</p>
               </div>
+
             </section>
           )}
 
@@ -504,6 +787,7 @@ function App() {
 
           {activePage === "bookmarks" && (
             <section className="tt-standard-page">
+
               <div className="tt-page-heading">
                 <div>
                   <span className="tt-eyebrow">KEEP WHAT MATTERS</span>
@@ -517,6 +801,7 @@ function App() {
                 <h2>No saved posts yet.</h2>
                 <p>Posts you save will appear here.</p>
               </div>
+
             </section>
           )}
 
@@ -524,6 +809,7 @@ function App() {
 
           {activePage === "profile" && (
             <section className="tt-standard-page">
+
               <div className="tt-page-heading">
                 <div>
                   <span className="tt-eyebrow">YOUR ACCOUNT</span>
@@ -532,6 +818,7 @@ function App() {
               </div>
 
               <div className="tt-profile-card">
+
                 <Avatar
                   letter={username[0]?.toUpperCase()}
                   large
@@ -542,12 +829,16 @@ function App() {
                   <p>@{username}</p>
                   <span>{user.email}</span>
                 </div>
+
               </div>
+
             </section>
           )}
 
         </div>
+
       </main>
+
     </div>
   );
 }
