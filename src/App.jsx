@@ -3,6 +3,7 @@ import { onAuthStateChanged, signOut } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { auth, db } from "./firebase";
 import Countdown from "./countdown.jsx";
+import Login from "./pages/login.jsx";
 import trendingService from "./Services/trendingservice.js";
 import tokenService from "./Services/tokenservice.js";
 import { enrichTokens } from "./Services/marketDataService.js";
@@ -179,6 +180,8 @@ function App() {
   const [user, setUser] = useState(null);
   const [profile, setProfile] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
+
+  const [showLogin, setShowLogin] = useState(false);
 
   const [activePage, setActivePage] = useState("home");
   const [postText, setPostText] = useState("");
@@ -379,9 +382,14 @@ function App() {
     );
   }
 
-  // Public visitors see the countdown, not the login page.
+  // Public visitors see the countdown.
+  // The admin passcode unlocks the login screen.
   if (!user) {
-    return <Countdown />;
+    return showLogin ? (
+      <Login />
+    ) : (
+      <Countdown onLogin={() => setShowLogin(true)} />
+    );
   }
 
   const pageTitles = {
