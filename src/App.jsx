@@ -7,7 +7,7 @@ import trendingService from "./Services/trendingservice.js";
 import tokenService from "./Services/tokenservice.js";
 import { enrichTokens } from "./Services/marketDataService.js";
 import "./App.css";
-import "./countdown.css";
+
 
 const NEW_TOKEN_DELAY = 10 * 60 * 1000;
 const TOKEN_REFRESH_INTERVAL = 15000;
