@@ -20,7 +20,7 @@ import "./App.css";
 
 import ProfileEditor from "./components/ProfileEditor.jsx";
 import ProfilePage from "./components/ProfilePage.jsx";
-import homeIcon from "./assets/home.png";
+import homeIcon from "./assets/Home.png";
 import notificationsIcon from "./assets/notifications.png";
 import messagesIcon from "./assets/messages.png";
 import communitiesIcon from "./assets/communities.png";
