@@ -1,14 +1,10 @@
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap');
 
-
-
 /* =========================================
 
    TRENCHTALK COLOUR SYSTEM
 
-\========================================= */
-
-
+========================================= */
 
 :root {
 
@@ -46,15 +42,11 @@
 
 }
 
-
-
 /* =========================================
 
    GLOBAL
 
-\========================================= */
-
-
+========================================= */
 
 * {
 
@@ -62,13 +54,11 @@
 
 }
 
-
-
 html,
 
 body,
 
-\#root {
+#root {
 
   margin: 0;
 
@@ -77,8 +67,6 @@ body,
   min-height: 100%;
 
 }
-
-
 
 body {
 
@@ -92,8 +80,6 @@ body {
 
 }
 
-
-
 button,
 
 input,
@@ -104,15 +90,11 @@ textarea {
 
 }
 
-
-
 button {
 
   cursor: pointer;
 
 }
-
-
 
 button:focus-visible,
 
@@ -126,15 +108,11 @@ textarea:focus-visible {
 
 }
 
-
-
 /* =========================================
 
    LOADING
 
-\========================================= */
-
-
+========================================= */
 
 .tt-loading {
 
@@ -164,8 +142,6 @@ textarea:focus-visible {
 
 }
 
-
-
 .tt-loading img {
 
   width: 65px;
@@ -176,15 +152,11 @@ textarea:focus-visible {
 
 }
 
-
-
 /* =========================================
 
    DASHBOARD
 
-\========================================= */
-
-
+========================================= */
 
 .tt-dashboard {
 
@@ -194,15 +166,11 @@ textarea:focus-visible {
 
 }
 
-
-
 /* =========================================
 
    SIDEBAR
 
-\========================================= */
-
-
+========================================= */
 
 .tt-sidebar {
 
@@ -238,23 +206,17 @@ textarea:focus-visible {
 
 }
 
-
-
 .tt-sidebar::-webkit-scrollbar {
 
   display: none;
 
 }
 
-
-
 /* =========================================
 
    BRAND
 
-\========================================= */
-
-
+========================================= */
 
 .tt-brand {
 
@@ -294,8 +256,6 @@ textarea:focus-visible {
 
 }
 
-
-
 .tt-brand img {
 
   width: 40px;
@@ -306,15 +266,11 @@ textarea:focus-visible {
 
 }
 
-
-
 .tt-brand > span > span {
 
   color: #77994b;
 
 }
-
-
 
 .tt-brand:hover {
 
@@ -322,15 +278,11 @@ textarea:focus-visible {
 
 }
 
-
-
 /* =========================================
 
    PROFILE
 
-\========================================= */
-
-
+========================================= */
 
 .tt-profile-area {
 
@@ -345,8 +297,6 @@ textarea:focus-visible {
   margin-bottom: 18px;
 
 }
-
-
 
 .tt-profile-button {
 
@@ -378,8 +328,6 @@ textarea:focus-visible {
 
 }
 
-
-
 .tt-profile-button:hover {
 
   background: #405d41;
@@ -387,8 +335,6 @@ textarea:focus-visible {
   border-color: #526d49;
 
 }
-
-
 
 .tt-profile-details {
 
@@ -403,8 +349,6 @@ textarea:focus-visible {
   gap: 4px;
 
 }
-
-
 
 .tt-profile-details strong {
 
@@ -422,8 +366,6 @@ textarea:focus-visible {
 
 }
 
-
-
 .tt-profile-details small {
 
   overflow: hidden;
@@ -438,8 +380,6 @@ textarea:focus-visible {
 
 }
 
-
-
 .tt-profile-more {
 
   color: #d0dfc7;
@@ -447,8 +387,6 @@ textarea:focus-visible {
   font-size: 18px;
 
 }
-
-
 
 .tt-profile-button .tt-avatar {
 
@@ -463,8 +401,6 @@ textarea:focus-visible {
   color: #fff;
 
 }
-
-
 
 .tt-profile-menu {
 
@@ -494,8 +430,6 @@ textarea:focus-visible {
 
 }
 
-
-
 .tt-profile-menu button {
 
   padding: 11px;
@@ -516,23 +450,17 @@ textarea:focus-visible {
 
 }
 
-
-
 .tt-profile-menu button:hover {
 
   background: var(--surface-dark);
 
 }
 
-
-
 /* =========================================
 
    SIDEBAR DIVIDER
 
-\========================================= */
-
-
+========================================= */
 
 .tt-sidebar-divider {
 
@@ -548,15 +476,11 @@ textarea:focus-visible {
 
 }
 
-
-
 /* =========================================
 
    NAVIGATION
 
-\========================================= */
-
-
+========================================= */
 
 .tt-nav-heading {
 
@@ -578,8 +502,6 @@ textarea:focus-visible {
 
 }
 
-
-
 .tt-navigation {
 
   order: 5;
@@ -591,8 +513,6 @@ textarea:focus-visible {
   gap: 4px;
 
 }
-
-
 
 .tt-nav-item {
 
@@ -622,8 +542,6 @@ textarea:focus-visible {
 
 }
 
-
-
 .tt-nav-item:hover {
 
   background: rgba(255, 255, 255, .38);
@@ -632,8 +550,6 @@ textarea:focus-visible {
 
 }
 
-
-
 .tt-nav-item.active {
 
   background: #bdcfac;
@@ -641,8 +557,6 @@ textarea:focus-visible {
   color: var(--forest-dark);
 
 }
-
-
 
 .tt-nav-icon {
 
@@ -656,8 +570,6 @@ textarea:focus-visible {
 
 }
 
-
-
 .tt-nav-label {
 
   flex: 1;
@@ -668,15 +580,11 @@ textarea:focus-visible {
 
 }
 
-
-
 /* =========================================
 
    CREATE POST
 
-\========================================= */
-
-
+========================================= */
 
 .tt-post-button {
 
@@ -716,8 +624,6 @@ textarea:focus-visible {
 
 }
 
-
-
 .tt-post-button:hover {
 
   background: var(--accent);
@@ -726,23 +632,17 @@ textarea:focus-visible {
 
 }
 
-
-
 .tt-post-button span {
 
   font-size: 19px;
 
 }
 
-
-
 /* =========================================
 
    SIDEBAR FOOTER
 
-\========================================= */
-
-
+========================================= */
 
 .tt-sidebar-footer {
 
@@ -766,8 +666,6 @@ textarea:focus-visible {
 
 }
 
-
-
 .tt-footer-dot {
 
   width: 8px;
@@ -782,15 +680,11 @@ textarea:focus-visible {
 
 }
 
-
-
 /* =========================================
 
    MAIN CONTENT
 
-\========================================= */
-
-
+========================================= */
 
 .tt-main {
 
@@ -802,15 +696,11 @@ textarea:focus-visible {
 
 }
 
-
-
 /* =========================================
 
    TOP HEADER
 
-\========================================= */
-
-
+========================================= */
 
 .tt-topbar {
 
@@ -832,8 +722,6 @@ textarea:focus-visible {
 
 }
 
-
-
 .tt-breadcrumb {
 
   display: flex;
@@ -848,15 +736,11 @@ textarea:focus-visible {
 
 }
 
-
-
 .tt-breadcrumb-divider {
 
   color: #a9bea1;
 
 }
-
-
 
 .tt-breadcrumb strong {
 
@@ -865,8 +749,6 @@ textarea:focus-visible {
   font-weight: 700;
 
 }
-
-
 
 .tt-account-status {
 
@@ -884,8 +766,6 @@ textarea:focus-visible {
 
 }
 
-
-
 .tt-account-status > span {
 
   width: 8px;
@@ -900,15 +780,11 @@ textarea:focus-visible {
 
 }
 
-
-
 /* =========================================
 
    PAGE WRAPPER
 
-\========================================= */
-
-
+========================================= */
 
 .tt-page {
 
@@ -922,15 +798,11 @@ textarea:focus-visible {
 
 }
 
-
-
 /* =========================================
 
    EYEBROW
 
-\========================================= */
-
-
+========================================= */
 
 .tt-eyebrow {
 
@@ -948,23 +820,17 @@ textarea:focus-visible {
 
 }
 
-
-
 /* =========================================
 
    HOME INTRO
 
-\========================================= */
-
-
+========================================= */
 
 .tt-home-intro {
 
   padding: 10px 0 39px;
 
 }
-
-
 
 .tt-home-intro h1 {
 
@@ -984,15 +850,11 @@ textarea:focus-visible {
 
 }
 
-
-
 .tt-home-intro h1 span {
 
   color: #78994b;
 
 }
-
-
 
 .tt-home-intro p {
 
@@ -1008,15 +870,11 @@ textarea:focus-visible {
 
 }
 
-
-
 /* =========================================
 
    HOME CARDS
 
-\========================================= */
-
-
+========================================= */
 
 .tt-home-grid {
 
@@ -1027,8 +885,6 @@ textarea:focus-visible {
   gap: 17px;
 
 }
-
-
 
 .tt-home-card {
 
@@ -1058,8 +914,6 @@ textarea:focus-visible {
 
 }
 
-
-
 .tt-home-card:hover {
 
   border-color: #aebf9d;
@@ -1072,8 +926,6 @@ textarea:focus-visible {
 
 }
 
-
-
 .tt-home-card-primary {
 
   background: #cbdab9;
@@ -1082,15 +934,11 @@ textarea:focus-visible {
 
 }
 
-
-
 .tt-home-card-primary:hover {
 
   background: #d5e2c6;
 
 }
-
-
 
 .tt-home-card-icon {
 
@@ -1114,15 +962,11 @@ textarea:focus-visible {
 
 }
 
-
-
 .tt-home-card-primary .tt-home-card-icon {
 
   background: #e1ead5;
 
 }
-
-
 
 .tt-card-label {
 
@@ -1140,8 +984,6 @@ textarea:focus-visible {
 
 }
 
-
-
 .tt-home-card strong {
 
   margin-bottom: 8px;
@@ -1155,8 +997,6 @@ textarea:focus-visible {
   font-weight: 800;
 
 }
-
-
 
 .tt-home-card p {
 
@@ -1172,8 +1012,6 @@ textarea:focus-visible {
 
 }
 
-
-
 .tt-card-arrow {
 
   position: absolute;
@@ -1188,15 +1026,11 @@ textarea:focus-visible {
 
 }
 
-
-
 /* =========================================
 
    HOME FOOTER
 
-\========================================= */
-
-
+========================================= */
 
 .tt-home-bottom {
 
@@ -1216,8 +1050,6 @@ textarea:focus-visible {
 
 }
 
-
-
 .tt-home-bottom > div {
 
   display: flex;
@@ -1227,8 +1059,6 @@ textarea:focus-visible {
   gap: 13px;
 
 }
-
-
 
 .tt-home-bottom-icon {
 
@@ -1250,8 +1080,6 @@ textarea:focus-visible {
 
 }
 
-
-
 .tt-home-bottom strong {
 
   color: var(--forest-dark);
@@ -1262,8 +1090,6 @@ textarea:focus-visible {
 
 }
 
-
-
 .tt-home-bottom p {
 
   margin: 4px 0 0;
@@ -1273,8 +1099,6 @@ textarea:focus-visible {
   font-size: 10px;
 
 }
-
-
 
 .tt-home-version {
 
@@ -1290,15 +1114,11 @@ textarea:focus-visible {
 
 }
 
-
-
 /* =========================================
 
    PAGE HEADINGS
 
-\========================================= */
-
-
+========================================= */
 
 .tt-page-heading {
 
@@ -1316,8 +1136,6 @@ textarea:focus-visible {
 
 }
 
-
-
 .tt-page-heading h1 {
 
   margin: 9px 0 6px;
@@ -1334,8 +1152,6 @@ textarea:focus-visible {
 
 }
 
-
-
 .tt-page-heading p {
 
   margin: 0;
@@ -1346,15 +1162,11 @@ textarea:focus-visible {
 
 }
 
-
-
 /* =========================================
 
    FEED TABS
 
-\========================================= */
-
-
+========================================= */
 
 .tt-feed-tabs {
 
@@ -1367,8 +1179,6 @@ textarea:focus-visible {
   border-bottom: 1px solid var(--border);
 
 }
-
-
 
 .tt-feed-tabs button {
 
@@ -1388,15 +1198,11 @@ textarea:focus-visible {
 
 }
 
-
-
 .tt-feed-tabs button:hover {
 
   color: var(--forest-dark);
 
 }
-
-
 
 .tt-feed-tabs button.selected {
 
@@ -1406,15 +1212,11 @@ textarea:focus-visible {
 
 }
 
-
-
 /* =========================================
 
    POST COMPOSER
 
-\========================================= */
-
-
+========================================= */
 
 .tt-composer {
 
@@ -1430,8 +1232,6 @@ textarea:focus-visible {
 
 }
 
-
-
 .tt-composer-main {
 
   display: flex;
@@ -1441,8 +1241,6 @@ textarea:focus-visible {
   gap: 14px;
 
 }
-
-
 
 .tt-composer textarea {
 
@@ -1468,15 +1266,11 @@ textarea:focus-visible {
 
 }
 
-
-
 .tt-composer textarea::placeholder {
 
   color: #84917c;
 
 }
-
-
 
 .tt-composer-footer {
 
@@ -1492,8 +1286,6 @@ textarea:focus-visible {
 
 }
 
-
-
 .tt-composer-footer span {
 
   color: var(--muted);
@@ -1501,8 +1293,6 @@ textarea:focus-visible {
   font-size: 11px;
 
 }
-
-
 
 .tt-composer-footer button {
 
@@ -1528,15 +1318,11 @@ textarea:focus-visible {
 
 }
 
-
-
 .tt-composer-footer button:hover:not(:disabled) {
 
   background: var(--accent);
 
 }
-
-
 
 .tt-composer-footer button:disabled {
 
@@ -1546,15 +1332,11 @@ textarea:focus-visible {
 
 }
 
-
-
 /* =========================================
 
    AVATARS
 
-\========================================= */
-
-
+========================================= */
 
 .tt-avatar {
 
@@ -1584,8 +1366,6 @@ textarea:focus-visible {
 
 }
 
-
-
 .tt-avatar.large {
 
   width: 45px;
@@ -1596,15 +1376,11 @@ textarea:focus-visible {
 
 }
 
-
-
 /* =========================================
 
    EMPTY STATES
 
-\========================================= */
-
-
+========================================= */
 
 .tt-empty-feed {
 
@@ -1630,8 +1406,6 @@ textarea:focus-visible {
 
 }
 
-
-
 .tt-empty-symbol {
 
   width: 52px;
@@ -1654,8 +1428,6 @@ textarea:focus-visible {
 
 }
 
-
-
 .tt-empty-feed h2 {
 
   margin: 0 0 9px;
@@ -1669,8 +1441,6 @@ textarea:focus-visible {
   font-weight: 800;
 
 }
-
-
 
 .tt-empty-feed p {
 
@@ -1686,15 +1456,11 @@ textarea:focus-visible {
 
 }
 
-
-
 /* =========================================
 
    SEARCH
 
-\========================================= */
-
-
+========================================= */
 
 .tt-search {
 
@@ -1722,23 +1488,17 @@ textarea:focus-visible {
 
 }
 
-
-
 .tt-search:focus-within {
 
   border-color: #91ad68;
 
 }
 
-
-
 .tt-search span {
 
   font-size: 22px;
 
 }
-
-
 
 .tt-search input {
 
@@ -1756,23 +1516,17 @@ textarea:focus-visible {
 
 }
 
-
-
 .tt-search input::placeholder {
 
   color: #879480;
 
 }
 
-
-
 /* =========================================
 
    PROFILE PAGE
 
-\========================================= */
-
-
+========================================= */
 
 .tt-profile-card {
 
@@ -1792,8 +1546,6 @@ textarea:focus-visible {
 
 }
 
-
-
 .tt-profile-card h2 {
 
   margin: 0 0 6px;
@@ -1805,8 +1557,6 @@ textarea:focus-visible {
   font-weight: 800;
 
 }
-
-
 
 .tt-profile-card p,
 
@@ -1822,15 +1572,11 @@ textarea:focus-visible {
 
 }
 
-
-
 /* =========================================
 
    TABLET
 
-\========================================= */
-
-
+========================================= */
 
 @media (max-width: 1050px) {
 
@@ -1842,15 +1588,11 @@ textarea:focus-visible {
 
   }
 
-
-
   .tt-main {
 
     margin-left: 215px;
 
   }
-
-
 
   .tt-home-grid {
 
@@ -1858,15 +1600,11 @@ textarea:focus-visible {
 
   }
 
-
-
   .tt-brand {
 
     font-size: 16px;
 
   }
-
-
 
   .tt-page {
 
@@ -1878,15 +1616,11 @@ textarea:focus-visible {
 
 }
 
-
-
 /* =========================================
 
    MOBILE
 
-\========================================= */
-
-
+========================================= */
 
 @media (max-width: 750px) {
 
@@ -1897,8 +1631,6 @@ textarea:focus-visible {
     padding-bottom: 65px;
 
   }
-
-
 
   .tt-sidebar {
 
@@ -1926,8 +1658,6 @@ textarea:focus-visible {
 
   }
 
-
-
   .tt-profile-area,
 
   .tt-brand,
@@ -1944,8 +1674,6 @@ textarea:focus-visible {
 
   }
 
-
-
   .tt-navigation {
 
     height: 100%;
@@ -1958,8 +1686,6 @@ textarea:focus-visible {
 
   }
 
-
-
   .tt-nav-item {
 
     min-height: 52px;
@@ -1970,15 +1696,11 @@ textarea:focus-visible {
 
   }
 
-
-
   .tt-nav-label {
 
     display: none;
 
   }
-
-
 
   .tt-nav-icon {
 
@@ -1986,15 +1708,11 @@ textarea:focus-visible {
 
   }
 
-
-
   .tt-main {
 
     margin-left: 0;
 
   }
-
-
 
   .tt-topbar {
 
@@ -2004,15 +1722,11 @@ textarea:focus-visible {
 
   }
 
-
-
   .tt-page {
 
     padding: 28px 18px 45px;
 
   }
-
-
 
   .tt-home-intro {
 
@@ -2022,15 +1736,11 @@ textarea:focus-visible {
 
 }
 
-
-
 /* =========================================
 
    SMALL MOBILE
 
-\========================================= */
-
-
+========================================= */
 
 @media (max-width: 520px) {
 
@@ -2040,23 +1750,17 @@ textarea:focus-visible {
 
   }
 
-
-
   .tt-home-card {
 
     min-height: 185px;
 
   }
 
-
-
   .tt-home-intro h1 {
 
     font-size: 38px;
 
   }
-
-
 
   .tt-home-bottom {
 
@@ -2066,15 +1770,11 @@ textarea:focus-visible {
 
   }
 
-
-
   .tt-account-status {
 
     display: none;
 
   }
-
-
 
   .tt-empty-feed {
 
@@ -2084,15 +1784,11 @@ textarea:focus-visible {
 
   }
 
-
-
   .tt-composer {
 
     padding: 14px;
 
   }
-
-
 
   .tt-page-heading h1 {
 
@@ -2102,15 +1798,11 @@ textarea:focus-visible {
 
 }
 
-
-
 /* =========================================
 
    LIVE TOKEN DISCOVERY
 
-\========================================= */
-
-
+========================================= */
 
 .tt-market-header {
 
@@ -2136,8 +1828,6 @@ textarea:focus-visible {
 
 }
 
-
-
 .tt-market-header > div {
 
   display: flex;
@@ -2150,8 +1840,6 @@ textarea:focus-visible {
 
 }
 
-
-
 .tt-market-header > span {
 
   font-family: var(--body);
@@ -2163,8 +1851,6 @@ textarea:focus-visible {
   letter-spacing: 0;
 
 }
-
-
 
 .tt-live-indicator {
 
@@ -2182,8 +1868,6 @@ textarea:focus-visible {
 
 }
 
-
-
 @keyframes tt-live-pulse {
 
   0%, 100% {
@@ -2194,8 +1878,6 @@ textarea:focus-visible {
 
   }
 
-
-
   50% {
 
     opacity: .65;
@@ -2205,8 +1887,6 @@ textarea:focus-visible {
   }
 
 }
-
-
 
 .tt-market-tabs {
 
@@ -2221,8 +1901,6 @@ textarea:focus-visible {
   border-bottom: 1px solid var(--border);
 
 }
-
-
 
 .tt-market-tabs button {
 
@@ -2248,15 +1926,11 @@ textarea:focus-visible {
 
 }
 
-
-
 .tt-market-tabs button:hover {
 
   color: var(--forest-dark);
 
 }
-
-
 
 .tt-market-tabs button.selected {
 
@@ -2265,8 +1939,6 @@ textarea:focus-visible {
   color: var(--forest-dark);
 
 }
-
-
 
 .tt-token-grid {
 
@@ -2277,8 +1949,6 @@ textarea:focus-visible {
   gap: 15px;
 
 }
-
-
 
 .tt-token-card {
 
@@ -2298,8 +1968,6 @@ textarea:focus-visible {
 
 }
 
-
-
 .tt-token-card:hover {
 
   transform: translateY(-2px);
@@ -2309,8 +1977,6 @@ textarea:focus-visible {
   box-shadow: 0 8px 20px rgba(38, 59, 38, .07);
 
 }
-
-
 
 .tt-token-card-top {
 
@@ -2324,8 +1990,6 @@ textarea:focus-visible {
 
 }
 
-
-
 .tt-token-identity {
 
   min-width: 0;
@@ -2337,8 +2001,6 @@ textarea:focus-visible {
   gap: 10px;
 
 }
-
-
 
 .tt-token-image,
 
@@ -2358,8 +2020,6 @@ textarea:focus-visible {
 
 }
 
-
-
 .tt-token-placeholder {
 
   display: grid;
@@ -2378,8 +2038,6 @@ textarea:focus-visible {
 
 }
 
-
-
 .tt-token-name {
 
   min-width: 0;
@@ -2391,8 +2049,6 @@ textarea:focus-visible {
   gap: 4px;
 
 }
-
-
 
 .tt-token-name strong {
 
@@ -2412,8 +2068,6 @@ textarea:focus-visible {
 
 }
 
-
-
 .tt-token-name span {
 
   overflow: hidden;
@@ -2429,8 +2083,6 @@ textarea:focus-visible {
   white-space: nowrap;
 
 }
-
-
 
 .tt-token-rank {
 
@@ -2452,8 +2104,6 @@ textarea:focus-visible {
 
 }
 
-
-
 .tt-token-price {
 
   margin: 19px 0 16px;
@@ -2469,8 +2119,6 @@ textarea:focus-visible {
   letter-spacing: -.7px;
 
 }
-
-
 
 .tt-token-stats {
 
@@ -2488,8 +2136,6 @@ textarea:focus-visible {
 
 }
 
-
-
 .tt-token-stats > div {
 
   min-width: 0;
@@ -2502,8 +2148,6 @@ textarea:focus-visible {
 
 }
 
-
-
 .tt-token-stats span {
 
   color: #788772;
@@ -2513,8 +2157,6 @@ textarea:focus-visible {
   font-weight: 600;
 
 }
-
-
 
 .tt-token-stats strong {
 
@@ -2534,23 +2176,17 @@ textarea:focus-visible {
 
 }
 
-
-
 .tt-token-stats strong.positive {
 
   color: #52813f;
 
 }
 
-
-
 .tt-token-stats strong.negative {
 
   color: #a65b4c;
 
 }
-
-
 
 .tt-token-card-footer {
 
@@ -2565,8 +2201,6 @@ textarea:focus-visible {
   padding-top: 12px;
 
 }
-
-
 
 .tt-token-protocol {
 
@@ -2586,8 +2220,6 @@ textarea:focus-visible {
 
 }
 
-
-
 .tt-token-view {
 
   flex-shrink: 0;
@@ -2602,8 +2234,6 @@ textarea:focus-visible {
 
 }
 
-
-
 .tt-token-view:hover {
 
   color: var(--forest-dark);
@@ -2611,8 +2241,6 @@ textarea:focus-visible {
   text-decoration: underline;
 
 }
-
-
 
 .tt-token-unavailable {
 
@@ -2624,15 +2252,11 @@ textarea:focus-visible {
 
 }
 
-
-
 /* =========================================
 
    TOKEN DISCOVERY RESPONSIVE LAYOUT
 
-\========================================= */
-
-
+========================================= */
 
 @media (max-width: 1250px) {
 
@@ -2644,8 +2268,6 @@ textarea:focus-visible {
 
 }
 
-
-
 @media (max-width: 750px) {
 
   .tt-token-grid {
@@ -2656,15 +2278,11 @@ textarea:focus-visible {
 
   }
 
-
-
   .tt-token-card {
 
     padding: 13px;
 
   }
-
-
 
   .tt-token-price {
 
@@ -2674,8 +2292,6 @@ textarea:focus-visible {
 
 }
 
-
-
 @media (max-width: 520px) {
 
   .tt-token-grid {
@@ -2683,8 +2299,6 @@ textarea:focus-visible {
     grid-template-columns: 1fr;
 
   }
-
-
 
   .tt-market-header {
 
@@ -2698,8 +2312,6 @@ textarea:focus-visible {
 
 }
 
-
-
 .tt-token-market-cap {
 
   display: flex;
@@ -2709,8 +2321,6 @@ textarea:focus-visible {
   gap: 4px;
 
 }
-
-
 
 .tt-token-market-cap small {
 
@@ -2724,15 +2334,11 @@ textarea:focus-visible {
 
 }
 
-
-
 /* =========================================
 
    AVATAR IMAGE
 
-\========================================= */
-
-
+========================================= */
 
 .tt-avatar img {
 
@@ -2746,15 +2352,11 @@ textarea:focus-visible {
 
 }
 
-
-
 /* =========================================
 
    TRENCHTALK PROFILE SETTINGS
 
-\========================================= */
-
-
+========================================= */
 
 .ttpe-layout {
 
@@ -2778,8 +2380,6 @@ textarea:focus-visible {
 
 }
 
-
-
 .ttpe-sidebar {
 
   position: sticky;
@@ -2796,8 +2396,6 @@ textarea:focus-visible {
 
 }
 
-
-
 .ttpe-sidebar-heading {
 
   margin: 0 0 12px;
@@ -2813,8 +2411,6 @@ textarea:focus-visible {
   letter-spacing: 1.3px;
 
 }
-
-
 
 .ttpe-nav-item {
 
@@ -2846,15 +2442,11 @@ textarea:focus-visible {
 
 }
 
-
-
 .ttpe-nav-item:hover {
 
   background: rgba(52, 77, 53, .08);
 
 }
-
-
 
 .ttpe-nav-item.active {
 
@@ -2863,8 +2455,6 @@ textarea:focus-visible {
   color: #f1f5eb;
 
 }
-
-
 
 .ttpe-nav-icon {
 
@@ -2878,8 +2468,6 @@ textarea:focus-visible {
 
 }
 
-
-
 .ttpe-sidebar-divider {
 
   height: 1px;
@@ -2889,8 +2477,6 @@ textarea:focus-visible {
   background: var(--border);
 
 }
-
-
 
 .ttpe-sidebar-account {
 
@@ -2909,8 +2495,6 @@ textarea:focus-visible {
   background: rgba(52, 77, 53, .06);
 
 }
-
-
 
 .ttpe-sidebar-avatar {
 
@@ -2938,8 +2522,6 @@ textarea:focus-visible {
 
 }
 
-
-
 .ttpe-sidebar-avatar img {
 
   width: 100%;
@@ -2949,8 +2531,6 @@ textarea:focus-visible {
   object-fit: cover;
 
 }
-
-
 
 .ttpe-sidebar-account-info {
 
@@ -2964,8 +2544,6 @@ textarea:focus-visible {
 
 }
 
-
-
 .ttpe-sidebar-account-info strong,
 
 .ttpe-sidebar-account-info span {
@@ -2978,15 +2556,11 @@ textarea:focus-visible {
 
 }
 
-
-
 .ttpe-sidebar-account-info strong {
 
   font-size: 12px;
 
 }
-
-
 
 .ttpe-sidebar-account-info span {
 
@@ -2995,8 +2569,6 @@ textarea:focus-visible {
   font-size: 11px;
 
 }
-
-
 
 .ttpe-main {
 
@@ -3010,8 +2582,6 @@ textarea:focus-visible {
 
 }
 
-
-
 .ttpe-header {
 
   padding-bottom: 22px;
@@ -3019,8 +2589,6 @@ textarea:focus-visible {
   border-bottom: 1px solid var(--border);
 
 }
-
-
 
 .ttpe-eyebrow {
 
@@ -3038,8 +2606,6 @@ textarea:focus-visible {
 
 }
 
-
-
 .ttpe-header h1 {
 
   margin: 0;
@@ -3056,8 +2622,6 @@ textarea:focus-visible {
 
 }
 
-
-
 .ttpe-header p {
 
   margin: 8px 0 0;
@@ -3067,8 +2631,6 @@ textarea:focus-visible {
   font-size: 13px;
 
 }
-
-
 
 .ttpe-section {
 
@@ -3081,8 +2643,6 @@ textarea:focus-visible {
   scroll-margin-top: 25px;
 
 }
-
-
 
 .ttpe-section-heading h2 {
 
@@ -3098,8 +2658,6 @@ textarea:focus-visible {
 
 }
 
-
-
 .ttpe-section-heading p {
 
   margin: 5px 0 0;
@@ -3109,8 +2667,6 @@ textarea:focus-visible {
   font-size: 12px;
 
 }
-
-
 
 .ttpe-preview-card {
 
@@ -3123,8 +2679,6 @@ textarea:focus-visible {
   background: var(--surface);
 
 }
-
-
 
 .ttpe-banner {
 
@@ -3142,8 +2696,6 @@ textarea:focus-visible {
 
 }
 
-
-
 .ttpe-banner::after {
 
   content: "";
@@ -3157,8 +2709,6 @@ textarea:focus-visible {
   pointer-events: none;
 
 }
-
-
 
 .ttpe-banner-button {
 
@@ -3186,8 +2736,6 @@ textarea:focus-visible {
 
 }
 
-
-
 .ttpe-banner-button input,
 
 .ttpe-avatar-button input {
@@ -3195,8 +2743,6 @@ textarea:focus-visible {
   display: none;
 
 }
-
-
 
 .ttpe-preview-content {
 
@@ -3207,8 +2753,6 @@ textarea:focus-visible {
   padding: 0 23px 22px;
 
 }
-
-
 
 .ttpe-avatar-container {
 
@@ -3225,8 +2769,6 @@ textarea:focus-visible {
   margin-bottom: 13px;
 
 }
-
-
 
 .ttpe-avatar {
 
@@ -3258,8 +2800,6 @@ textarea:focus-visible {
 
 }
 
-
-
 .ttpe-avatar img {
 
   width: 100%;
@@ -3269,8 +2809,6 @@ textarea:focus-visible {
   object-fit: cover;
 
 }
-
-
 
 .ttpe-avatar-button {
 
@@ -3294,15 +2832,11 @@ textarea:focus-visible {
 
 }
 
-
-
 .ttpe-avatar-button:hover {
 
   background: var(--surface-dark);
 
 }
-
-
 
 .ttpe-preview-identity h2 {
 
@@ -3318,8 +2852,6 @@ textarea:focus-visible {
 
 }
 
-
-
 .ttpe-preview-identity > span {
 
   display: block;
@@ -3331,8 +2863,6 @@ textarea:focus-visible {
   font-size: 12px;
 
 }
-
-
 
 .ttpe-preview-identity p {
 
@@ -3347,8 +2877,6 @@ textarea:focus-visible {
   line-height: 1.6;
 
 }
-
-
 
 .ttpe-preview-badge {
 
@@ -3374,8 +2902,6 @@ textarea:focus-visible {
 
 }
 
-
-
 .ttpe-form-card {
 
   padding: 25px;
@@ -3394,8 +2920,6 @@ textarea:focus-visible {
 
 }
 
-
-
 .ttpe-field {
 
   width: 100%;
@@ -3407,8 +2931,6 @@ textarea:focus-visible {
   gap: 9px;
 
 }
-
-
 
 .ttpe-field > label,
 
@@ -3423,8 +2945,6 @@ textarea:focus-visible {
   letter-spacing: 1.1px;
 
 }
-
-
 
 .ttpe-field input:not([type="color"]),
 
@@ -3450,8 +2970,6 @@ textarea:focus-visible {
 
 }
 
-
-
 .ttpe-field input:focus,
 
 .ttpe-field textarea:focus {
@@ -3461,8 +2979,6 @@ textarea:focus-visible {
   box-shadow: 0 0 0 3px rgba(52,77,53,.08);
 
 }
-
-
 
 .ttpe-field input::placeholder,
 
@@ -3474,8 +2990,6 @@ textarea:focus-visible {
 
 }
 
-
-
 .ttpe-field textarea {
 
   min-height: 100px;
@@ -3486,8 +3000,6 @@ textarea:focus-visible {
 
 }
 
-
-
 .ttpe-field small {
 
   color: var(--muted);
@@ -3495,8 +3007,6 @@ textarea:focus-visible {
   font-size: 11px;
 
 }
-
-
 
 .ttpe-label-row {
 
@@ -3508,8 +3018,6 @@ textarea:focus-visible {
 
 }
 
-
-
 .ttpe-label-row > span {
 
   color: var(--muted);
@@ -3517,8 +3025,6 @@ textarea:focus-visible {
   font-size: 10px;
 
 }
-
-
 
 .ttpe-username-input {
 
@@ -3536,8 +3042,6 @@ textarea:focus-visible {
 
 }
 
-
-
 .ttpe-username-input:focus-within {
 
   border-color: var(--forest);
@@ -3545,8 +3049,6 @@ textarea:focus-visible {
   box-shadow: 0 0 0 3px rgba(52,77,53,.08);
 
 }
-
-
 
 .ttpe-username-input > span {
 
@@ -3560,8 +3062,6 @@ textarea:focus-visible {
 
 }
 
-
-
 .ttpe-username-input input:not([type="color"]) {
 
   border: 0;
@@ -3571,8 +3071,6 @@ textarea:focus-visible {
   background: transparent;
 
 }
-
-
 
 .ttpe-colour-picker {
 
@@ -3592,8 +3090,6 @@ textarea:focus-visible {
 
 }
 
-
-
 .ttpe-colour-preview {
 
   width: 40px;
@@ -3610,8 +3106,6 @@ textarea:focus-visible {
 
 }
 
-
-
 .ttpe-colour-preview input {
 
   width: 100%;
@@ -3626,8 +3120,6 @@ textarea:focus-visible {
 
 }
 
-
-
 .ttpe-colour-value {
 
   flex: 1;
@@ -3640,8 +3132,6 @@ textarea:focus-visible {
 
 }
 
-
-
 .ttpe-colour-value strong {
 
   color: var(--text);
@@ -3652,8 +3142,6 @@ textarea:focus-visible {
 
 }
 
-
-
 .ttpe-colour-value span {
 
   color: var(--muted);
@@ -3661,8 +3149,6 @@ textarea:focus-visible {
   font-size: 10px;
 
 }
-
-
 
 .ttpe-reset-button {
 
@@ -3684,15 +3170,11 @@ textarea:focus-visible {
 
 }
 
-
-
 .ttpe-reset-button:hover {
 
   background: var(--surface-dark);
 
 }
-
-
 
 .ttpe-message {
 
@@ -3706,8 +3188,6 @@ textarea:focus-visible {
 
 }
 
-
-
 .ttpe-message.success {
 
   border: 1px solid rgba(75,130,70,.2);
@@ -3718,8 +3198,6 @@ textarea:focus-visible {
 
 }
 
-
-
 .ttpe-message.error {
 
   border: 1px solid rgba(170,70,55,.2);
@@ -3729,8 +3207,6 @@ textarea:focus-visible {
   color: #8d3b30;
 
 }
-
-
 
 .ttpe-save-row {
 
@@ -3748,8 +3224,6 @@ textarea:focus-visible {
 
 }
 
-
-
 .ttpe-save-row > div {
 
   display: flex;
@@ -3760,8 +3234,6 @@ textarea:focus-visible {
 
 }
 
-
-
 .ttpe-save-row strong {
 
   color: var(--text);
@@ -3770,8 +3242,6 @@ textarea:focus-visible {
 
 }
 
-
-
 .ttpe-save-row span {
 
   color: var(--muted);
@@ -3779,8 +3249,6 @@ textarea:focus-visible {
   font-size: 11px;
 
 }
-
-
 
 .ttpe-save-button {
 
@@ -3804,8 +3272,6 @@ textarea:focus-visible {
 
 }
 
-
-
 .ttpe-save-button:hover:not(:disabled) {
 
   background: var(--forest-hover);
@@ -3813,8 +3279,6 @@ textarea:focus-visible {
   transform: translateY(-1px);
 
 }
-
-
 
 .ttpe-save-button:disabled {
 
@@ -3824,15 +3288,11 @@ textarea:focus-visible {
 
 }
 
-
-
 /* =========================================
 
    PROFILE SETTINGS RESPONSIVE
 
-\========================================= */
-
-
+========================================= */
 
 @media (max-width: 850px) {
 
@@ -3846,8 +3306,6 @@ textarea:focus-visible {
 
   }
 
-
-
   .ttpe-preview-badge {
 
     display: none;
@@ -3855,8 +3313,6 @@ textarea:focus-visible {
   }
 
 }
-
-
 
 @media (max-width: 650px) {
 
@@ -3871,8 +3327,6 @@ textarea:focus-visible {
     padding: 15px 10px 40px;
 
   }
-
-
 
   .ttpe-sidebar {
 
@@ -3890,8 +3344,6 @@ textarea:focus-visible {
 
   }
 
-
-
   .ttpe-sidebar-heading,
 
   .ttpe-sidebar-divider,
@@ -3901,8 +3353,6 @@ textarea:focus-visible {
     display: none;
 
   }
-
-
 
   .ttpe-nav-item {
 
@@ -3918,15 +3368,11 @@ textarea:focus-visible {
 
   }
 
-
-
   .ttpe-nav-icon {
 
     display: none;
 
   }
-
-
 
   .ttpe-main {
 
@@ -3934,15 +3380,11 @@ textarea:focus-visible {
 
   }
 
-
-
   .ttpe-header h1 {
 
     font-size: 25px;
 
   }
-
-
 
   .ttpe-banner {
 
@@ -3950,15 +3392,11 @@ textarea:focus-visible {
 
   }
 
-
-
   .ttpe-preview-content {
 
     padding: 0 16px 18px;
 
   }
-
-
 
   .ttpe-avatar {
 
@@ -3968,15 +3406,11 @@ textarea:focus-visible {
 
   }
 
-
-
   .ttpe-avatar-container {
 
     margin-top: -37px;
 
   }
-
-
 
   .ttpe-form-card {
 
@@ -3986,8 +3420,6 @@ textarea:focus-visible {
 
   }
 
-
-
   .ttpe-save-row {
 
     align-items: stretch;
@@ -3995,8 +3427,6 @@ textarea:focus-visible {
     flex-direction: column;
 
   }
-
-
 
   .ttpe-save-button {
 
@@ -4006,8 +3436,6 @@ textarea:focus-visible {
 
 }
 
-
-
 @media (max-width: 380px) {
 
   .ttpe-nav-item {
@@ -4016,8 +3444,6 @@ textarea:focus-visible {
 
   }
 
-
-
   .ttpe-avatar-button {
 
     padding: 7px 9px;
@@ -4025,8 +3451,6 @@ textarea:focus-visible {
     font-size: 10px;
 
   }
-
-
 
   .ttpe-colour-picker {
 
@@ -4037,395 +3461,805 @@ textarea:focus-visible {
 }
 
 /* =========================================
+
    PUBLIC PROFILE PAGE
+
 ========================================= */
+
 .tt-profile-page {
+
   width: 100%;
+
   max-width: 1050px;
+
   margin: 0 auto;
+
 }
+
 .tt-profile-page-heading {
+
   display: flex;
+
   align-items: flex-end;
+
   justify-content: space-between;
+
   gap: 20px;
+
   padding-bottom: 22px;
+
   margin-bottom: 24px;
+
   border-bottom: 1px solid var(--border);
+
 }
+
 .tt-profile-page-heading h1 {
+
   margin: 8px 0 5px;
+
   color: var(--forest-dark);
+
   font-family: var(--display);
+
   font-size: clamp(30px, 4vw, 42px);
+
   letter-spacing: -1.4px;
+
 }
+
 .tt-profile-page-heading p {
+
   margin: 0;
+
   color: var(--muted);
+
   font-size: 13px;
+
 }
+
 .tt-profile-edit-button {
+
   flex-shrink: 0;
+
   padding: 11px 18px;
+
   border: 0;
+
   border-radius: 8px;
+
   background: var(--forest);
+
   color: #f1f5eb;
+
   font-size: 12px;
+
   font-weight: 700;
+
 }
+
 .tt-profile-edit-button:hover { background: var(--forest-hover); }
+
 .tt-public-profile-card {
+
   overflow: hidden;
+
   border: 1px solid var(--border);
+
   border-radius: 13px;
+
   background: var(--surface);
+
 }
+
 .tt-public-profile-banner {
+
   height: 190px;
+
   background-position: center;
+
   background-size: cover;
+
   background-repeat: no-repeat;
+
 }
+
 .tt-public-profile-content {
+
   position: relative;
+
   padding: 0 25px 23px;
+
 }
+
 .tt-public-profile-avatar {
+
   width: 104px;
+
   height: 104px;
+
   margin-top: -52px;
+
   margin-bottom: 12px;
+
   display: grid;
+
   place-items: center;
+
   overflow: hidden;
+
   border: 5px solid var(--surface);
+
   border-radius: 50%;
+
   background: var(--forest);
+
   color: white;
+
   font-size: 34px;
+
   font-weight: 800;
+
 }
+
 .tt-public-profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
 .tt-public-profile-identity h2 {
+
   margin: 0;
+
   color: var(--forest-dark);
+
   font-family: var(--display);
+
   font-size: 25px;
+
 }
+
 .tt-public-profile-identity span {
+
   display: block;
+
   margin-top: 3px;
+
   color: var(--muted);
+
   font-size: 13px;
+
 }
+
 .tt-public-profile-identity p {
+
   margin: 12px 0 20px;
+
   color: var(--text);
+
   font-size: 13px;
+
   line-height: 1.6;
+
 }
+
 .tt-profile-stats {
+
   display: flex;
+
   flex-wrap: wrap;
+
   gap: 30px;
+
   padding-top: 17px;
+
   border-top: 1px solid var(--border);
+
 }
+
 .tt-profile-stat { display: flex; align-items: baseline; gap: 6px; }
+
 .tt-profile-stat strong { color: var(--forest-dark); font-size: 15px; font-weight: 800; }
+
 .tt-profile-stat span { color: var(--muted); font-size: 12px; }
+
 .tt-public-profile-tabs {
+
   display: flex;
+
   gap: 28px;
+
   margin-top: 23px;
+
   border-bottom: 1px solid var(--border);
+
 }
+
 .tt-public-profile-tabs button {
+
   padding: 13px 7px;
+
   border: 0;
+
   border-bottom: 3px solid transparent;
+
   background: transparent;
+
   color: var(--muted);
+
   font-size: 13px;
+
   font-weight: 700;
+
 }
+
 .tt-public-profile-tabs button.selected {
+
   border-bottom-color: var(--forest);
+
   color: var(--forest-dark);
+
 }
+
 .tt-profile-empty {
+
   min-height: 250px;
+
   padding: 38px 20px;
+
   display: flex;
+
   flex-direction: column;
+
   align-items: center;
+
   justify-content: center;
+
   text-align: center;
+
 }
+
 .tt-profile-empty > span { color: var(--forest-light); font-size: 30px; }
+
 .tt-profile-empty h2 {
+
   margin: 12px 0 5px;
+
   color: var(--forest-dark);
+
   font-family: var(--display);
+
   font-size: 19px;
+
 }
+
 .tt-profile-empty p { margin: 0 0 17px; color: var(--muted); font-size: 12px; }
+
 .tt-profile-empty button {
+
   padding: 10px 16px;
+
   border: 1px solid var(--border);
+
   border-radius: 7px;
+
   background: var(--surface);
+
   color: var(--forest-dark);
+
   font-size: 12px;
+
   font-weight: 700;
+
 }
+
 .tt-profile-empty button:hover { background: var(--surface-dark); }
 
 /* Settings pages use the existing two-column settings layout. */
+
 .ttpe-layout { max-width: 1250px; }
+
 @media (max-width: 650px) {
+
   .tt-profile-page-heading { align-items: flex-start; flex-direction: column; }
+
   .tt-public-profile-banner { height: 135px; }
+
   .tt-public-profile-content { padding: 0 16px 18px; }
+
   .tt-public-profile-avatar { width: 86px; height: 86px; margin-top: -43px; }
+
   .tt-profile-stats { gap: 15px 20px; }
+
   .tt-profile-stat { flex-direction: column; gap: 2px; }
+
   .tt-public-profile-tabs { gap: 15px; }
+
 }
 
-
 /* Profile page refinements */
+
 .tt-public-profile-avatar {
+
   width: 124px;
+
   height: 124px;
+
   margin-top: -62px;
+
   font-size: 40px;
+
 }
 
 .tt-profile-stats {
+
   gap: 0;
+
   justify-content: flex-start;
+
 }
 
 .tt-profile-stat {
+
   min-width: 145px;
+
 }
 
 .tt-public-profile-tabs {
+
   justify-content: center;
+
   gap: clamp(36px, 7vw, 100px);
+
 }
 
 .ttpe-add-account {
+
   width: 100%;
+
   margin-top: 14px;
+
   padding: 12px;
+
   display: flex;
+
   align-items: center;
+
   gap: 10px;
+
   border: 1px dashed var(--border);
+
   border-radius: 8px;
+
   background: transparent;
+
   color: var(--forest);
+
   font-size: 12px;
+
   font-weight: 700;
+
   text-align: left;
+
   cursor: pointer;
+
   transition: background .2s, border-color .2s;
+
 }
 
 .ttpe-add-account:hover {
+
   border-color: var(--forest-light);
+
   background: rgba(52, 77, 53, .07);
+
 }
 
 .ttpe-add-account > span {
+
   width: 20px;
+
   height: 20px;
+
   display: grid;
+
   place-items: center;
+
   border-radius: 50%;
+
   background: var(--surface-dark);
+
   font-size: 17px;
+
 }
 
 @media (max-width: 600px) {
+
   .tt-profile-stats { gap: 15px 0; }
+
   .tt-profile-stat { min-width: 33.333%; }
+
   .tt-public-profile-tabs { gap: 25px; }
+
 }
 
-
 /* SIDEBAR PROFILE NAVIGATION AND SETTINGS ACTIONS */
+
 .tt-profile-button {
+
   cursor: pointer;
+
   border: 0;
+
 }
 
 .tt-profile-button:focus-visible,
+
 .tt-nav-item:focus-visible,
+
 .ttpe-add-account:focus-visible,
+
 .ttpe-logout-button:focus-visible {
+
   outline: 2px solid var(--accent-dark);
+
   outline-offset: 3px;
+
 }
 
 .tt-nav-icon img {
+
   display: block;
+
   width: 23px;
+
   height: 23px;
+
   object-fit: contain;
+
 }
 
 .tt-nav-item.active .tt-nav-icon img {
+
   filter: brightness(.72) saturate(1.15);
+
 }
 
 .ttpe-sidebar {
+
   min-height: calc(100vh - 50px);
+
 }
 
 .ttpe-sidebar-actions {
+
   width: 100%;
+
   margin-top: auto;
+
   padding-top: 18px;
+
   display: flex;
+
   flex-direction: column;
+
   gap: 9px;
+
 }
 
 .ttpe-add-account {
+
   margin-top: 0;
+
 }
 
 .ttpe-logout-button {
+
   width: 100%;
+
   padding: 12px;
+
   border: 1px solid rgba(166, 83, 68, .28);
+
   border-radius: 8px;
+
   background: transparent;
+
   color: #965344;
+
   font-size: 12px;
+
   font-weight: 700;
+
   text-align: left;
+
   cursor: pointer;
+
   transition: background .2s, border-color .2s;
+
 }
 
 .ttpe-logout-button:hover {
+
   border-color: rgba(166, 83, 68, .5);
+
   background: rgba(166, 83, 68, .07);
+
 }
 
 @media (max-width: 900px) {
-  .ttpe-sidebar { min-height: auto; }
-  .ttpe-sidebar-actions { margin-top: 18px; }
-}
 
+  .ttpe-sidebar { min-height: auto; }
+
+  .ttpe-sidebar-actions { margin-top: 18px; }
+
+}
 
 /* FINAL SIDEBAR / PROFILE SETTINGS REFINEMENTS */
+
 .tt-nav-icon {
+
   width: 38px;
+
   min-width: 38px;
+
   height: 38px;
+
   display: inline-flex;
+
   align-items: center;
+
   justify-content: center;
+
   background: transparent !important;
+
   border: 0 !important;
+
   box-shadow: none !important;
-}
-.tt-nav-icon img {
-  width: 34px !important;
-  height: 34px !important;
-  max-width: none;
-  object-fit: contain;
-  background: transparent !important;
-  mix-blend-mode: multiply;
-}
-.tt-nav-item.active .tt-nav-icon img { filter: none !important; }
-.ttpe-sidebar { min-height: auto; }
-.ttpe-sidebar-actions {
-  margin-top: 16px !important;
-  padding-top: 0 !important;
-  gap: 8px;
-}
-.ttpe-add-account {
-  margin: 0 !important;
-  padding: 9px 0 !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: flex-start !important;
-  gap: 10px !important;
-  border: 0 !important;
-  border-radius: 0 !important;
-  background: transparent !important;
-  box-shadow: none !important;
-  text-align: left;
-}
-.ttpe-add-account:hover {
-  border: 0 !important;
-  background: transparent !important;
-  color: var(--forest-dark);
-}
-.ttpe-add-account > span:first-child {
-  width: 28px !important;
-  height: 28px !important;
-  flex: 0 0 28px;
-  display: grid !important;
-  place-items: center !important;
-  padding: 0 !important;
-  line-height: 1 !important;
-  text-align: center !important;
-  border-radius: 50%;
-  background: var(--surface-dark) !important;
-  font-size: 21px !important;
-}
-.ttpe-add-account-label { display: inline-block; }
-.ttpe-logout-button {
-  width: auto !important;
-  align-self: flex-start;
-  padding: 8px 0 !important;
-  border: 0 !important;
-  border-radius: 0 !important;
-  background: transparent !important;
-  box-shadow: none !important;
-  text-align: left;
-}
-.ttpe-logout-button:hover {
-  border: 0 !important;
-  background: transparent !important;
-  color: #8d4538;
-  text-decoration: underline;
+
 }
 
+.tt-nav-icon img {
+
+  width: 34px !important;
+
+  height: 34px !important;
+
+  max-width: none;
+
+  object-fit: contain;
+
+  background: transparent !important;
+
+  mix-blend-mode: multiply;
+
+}
+
+.tt-nav-item.active .tt-nav-icon img { filter: none !important; }
+
+.ttpe-sidebar { min-height: auto; }
+
+.ttpe-sidebar-actions {
+
+  margin-top: 16px !important;
+
+  padding-top: 0 !important;
+
+  gap: 8px;
+
+}
+
+.ttpe-add-account {
+
+  margin: 0 !important;
+
+  padding: 9px 0 !important;
+
+  display: flex !important;
+
+  align-items: center !important;
+
+  justify-content: flex-start !important;
+
+  gap: 10px !important;
+
+  border: 0 !important;
+
+  border-radius: 0 !important;
+
+  background: transparent !important;
+
+  box-shadow: none !important;
+
+  text-align: left;
+
+}
+
+.ttpe-add-account:hover {
+
+  border: 0 !important;
+
+  background: transparent !important;
+
+  color: var(--forest-dark);
+
+}
+
+.ttpe-add-account > span:first-child {
+
+  width: 28px !important;
+
+  height: 28px !important;
+
+  flex: 0 0 28px;
+
+  display: grid !important;
+
+  place-items: center !important;
+
+  padding: 0 !important;
+
+  line-height: 1 !important;
+
+  text-align: center !important;
+
+  border-radius: 50%;
+
+  background: var(--surface-dark) !important;
+
+  font-size: 21px !important;
+
+}
+
+.ttpe-add-account-label { display: inline-block; }
+
+.ttpe-logout-button {
+
+  width: auto !important;
+
+  align-self: flex-start;
+
+  padding: 8px 0 !important;
+
+  border: 0 !important;
+
+  border-radius: 0 !important;
+
+  background: transparent !important;
+
+  box-shadow: none !important;
+
+  text-align: left;
+
+}
+
+.ttpe-logout-button:hover {
+
+  border: 0 !important;
+
+  background: transparent !important;
+
+  color: #8d4538;
+
+  text-decoration: underline;
+
+}
 
 /* EXPLORE DISCOVERY HUB + PROFILE SETTINGS SIDEBAR FIX */
+
 .tt-explore-search { margin-bottom: 18px; }
+
 .tt-explore-tabs { gap: clamp(20px, 4vw, 46px); margin-bottom: 22px; }
+
 .tt-explore-tabs button { font-size: 13px; padding: 13px 4px 14px; }
+
 .tt-discovery-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px; }
+
 .tt-discovery-card { min-width: 0; display: flex; align-items: flex-start; gap: 14px; padding: 17px; border: 1px solid var(--border); border-radius: 12px; background: rgba(233, 238, 226, .72); }
+
 .tt-discovery-avatar, .tt-community-mark { width: 48px; height: 48px; flex: 0 0 48px; display: grid; place-items: center; overflow: hidden; border-radius: 50%; background: var(--forest); color: #f4f7ed; font-size: 20px; font-weight: 700; }
+
 .tt-discovery-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
 .tt-community-mark { border-radius: 12px; color: var(--accent); }
+
 .tt-discovery-copy { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+
 .tt-discovery-copy strong { color: var(--forest-dark); font-size: 14px; }
+
 .tt-discovery-copy span, .tt-discovery-post-meta span { color: var(--muted); font-size: 12px; }
+
 .tt-discovery-copy p { margin: 5px 0 0; color: var(--text); font-size: 12px; line-height: 1.5; }
+
 .tt-discovery-posts { display: flex; flex-direction: column; gap: 12px; }
+
 .tt-discovery-post { padding: 18px 20px; border: 1px solid var(--border); border-radius: 12px; background: rgba(233, 238, 226, .72); }
+
 .tt-discovery-post-meta { display: flex; align-items: baseline; gap: 9px; }
+
 .tt-discovery-post-meta strong { color: var(--forest-dark); font-size: 13px; }
+
 .tt-discovery-post > p { margin: 12px 0; color: var(--text); font-size: 14px; line-height: 1.6; white-space: pre-wrap; overflow-wrap: anywhere; }
+
 .tt-discovery-post-stats { display: flex; flex-wrap: wrap; gap: 18px; color: var(--muted); font-size: 11px; }
 
 /* Keep account actions inside the settings column without wrapping or overlap. */
+
 .ttpe-sidebar-actions { width: 100% !important; min-width: 0 !important; box-sizing: border-box !important; display: flex !important; flex-direction: column !important; align-items: stretch !important; gap: 6px !important; margin: 16px 0 0 !important; padding: 0 !important; }
+
 .ttpe-add-account { width: 100% !important; min-width: 0 !important; max-width: 100% !important; box-sizing: border-box !important; display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: flex-start !important; gap: 10px !important; padding: 8px 0 !important; white-space: nowrap !important; overflow: visible !important; }
+
 .ttpe-add-account > span:first-child { width: 30px !important; height: 30px !important; flex: 0 0 30px !important; display: grid !important; place-items: center !important; line-height: 1 !important; padding: 0 !important; }
+
 .ttpe-add-account-label { flex: 1 1 auto !important; min-width: 0 !important; display: block !important; white-space: nowrap !important; }
+
 .ttpe-logout-button { width: 100% !important; min-width: 0 !important; box-sizing: border-box !important; align-self: stretch !important; padding: 7px 0 !important; white-space: nowrap !important; }
+
 @media (max-width: 900px) { .tt-discovery-grid { grid-template-columns: 1fr; } .tt-explore-tabs { gap: 18px; overflow-x: auto; } }
+
+/* =========================================
+
+   HOME FEED REFINEMENTS
+
+========================================= */
+
+.tt-topbar {
+
+  justify-content: flex-start;
+
+}
+
+.tt-composer {
+
+  background: #c6d4b8;
+
+  border-color: #aebf9e;
+
+  box-shadow: 0 5px 16px rgba(38, 59, 41, 0.06);
+
+}
+
+.tt-composer textarea {
+
+  color: #263b29;
+
+}
+
+.tt-composer textarea::placeholder {
+
+  color: #65775d;
+
+}
+
+.tt-composer-footer {
+
+  border-top-color: #aebf9e;
+
+}
+
+.tt-composer-footer span {
+
+  color: #53664d;
+
+}
+
+.tt-composer-footer button {
+
+  background: #344d35;
+
+  color: #f3f7ee;
+
+}
+
+.tt-composer-footer button:hover:not(:disabled) {
+
+  background: #405d41;
+
+}
+
+.tt-composer-footer button:disabled {
+
+  background: #829579;
+
+  color: #f3f7ee;
+
+  opacity: 0.55;
+
+}

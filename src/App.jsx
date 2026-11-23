@@ -1621,20 +1621,6 @@ useEffect(() => {
 
           </div>
 
-
-
-          <div className="tt-topbar-right">
-
-            <span className="tt-account-status">
-
-              <span />
-
-              Account active
-
-            </span>
-
-          </div>
-
         </header>
 
 
@@ -1646,20 +1632,6 @@ useEffect(() => {
           {(activePage === "home" || activePage === "feed") && (
 
             <section className="tt-feed">
-
-              <div className="tt-page-heading">
-
-                <div>
-
-                  <span className="tt-eyebrow">YOUR COMMUNITY</span>
-
-                  <h1>Your feed</h1>
-
-                  <p>See what's happening across TrenchTalk.</p>
-
-                </div>
-
-              </div>
 
 
 
