@@ -4,22 +4,22 @@ import { onAuthStateChanged, signOut } from "firebase/auth";
 
 import { collection, doc, getDoc, getDocs } from "firebase/firestore";
 
-import { auth, db } from "./src/firebase.js";
+import { auth, db } from "./firebase.js";
 
-import Countdown from "./src/countdown.jsx";
+import Countdown from "./countdown.jsx";
 
-import Login from "./src/pages/login.jsx";
+import Login from "./pages/login.jsx";
 
-import trendingService from "./src/Services/trendingservice.js";
+import trendingService from "./Services/trendingservice.js";
 
-import tokenService from "./src/Services/tokenservice.js";
+import tokenService from "./Services/tokenservice.js";
 
-import { enrichTokens } from "./src/Services/marketDataService.js";
+import { enrichTokens } from "./Services/marketDataService.js";
 
 import "./App.css";
 
-import ProfileEditor from "./src/components/ProfileEditor.jsx";
-import ProfilePage from "./src/components/ProfilePage.jsx";
+import ProfileEditor from "./components/ProfileEditor.jsx";
+import ProfilePage from "./components/ProfilePage.jsx";
 import homeIcon from "./assets/Home.png";
 import notificationsIcon from "./assets/notifications.png";
 import messagesIcon from "./assets/messages.png";
