@@ -1577,19 +1577,51 @@ useEffect(() => {
 
 
 
-        <button
+        <div className="tt-create-wrap">
+          <button
+            type="button"
+            className="tt-post-button"
+            onClick={() => setCreateMenuOpen((open) => !open)}
+            aria-expanded={createMenuOpen}
+            aria-haspopup="menu"
+          >
+            <span>＋</span>
+            Create
+          </button>
 
-          className="tt-post-button"
-
-          onClick={openPost}
-
-        >
-
-          <span>＋</span>
-
-          Create a post
-
-        </button>
+          {createMenuOpen && (
+            <div className="tt-create-menu" role="menu">
+              <button
+                type="button"
+                role="menuitem"
+                onClick={() => {
+                  setCreateMenuOpen(false);
+                  openPost();
+                }}
+              >
+                <span className="tt-create-menu-icon">✎</span>
+                <span>
+                  <strong>Post</strong>
+                  <small>Share something with the community</small>
+                </span>
+              </button>
+              <button type="button" role="menuitem" disabled>
+                <span className="tt-create-menu-icon">♧</span>
+                <span>
+                  <strong>Community</strong>
+                  <small>Coming soon</small>
+                </span>
+              </button>
+              <button type="button" role="menuitem" disabled>
+                <span className="tt-create-menu-icon">◈</span>
+                <span>
+                  <strong>Coin room</strong>
+                  <small>Coming soon</small>
+                </span>
+              </button>
+            </div>
+          )}
+        </div>
 
 
 
@@ -1609,19 +1641,7 @@ useEffect(() => {
 
       <main className="tt-main">
 
-        <header className="tt-topbar">
 
-          <div className="tt-breadcrumb">
-
-            <span>TrenchTalk</span>
-
-            <span className="tt-breadcrumb-divider">/</span>
-
-            <strong>{pageTitles[activePage]}</strong>
-
-          </div>
-
-        </header>
 
 
 
