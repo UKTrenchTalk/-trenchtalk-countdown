@@ -610,7 +610,7 @@ function App() {
 
   const [authLoading, setAuthLoading] = useState(true);
 
-
+const [createMenuOpen, setCreateMenuOpen] = useState(false);
 
   const [showLogin, setShowLogin] = useState(false);
 
