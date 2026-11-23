@@ -680,6 +680,21 @@ const [createMenuOpen, setCreateMenuOpen] = useState(false);
 
 
 
+  // Close the Create menu when the user clicks elsewhere or presses Escape.
+  useEffect(() => {
+    if (!createMenuOpen) return undefined;
+    const handlePointerDown = (event) => {
+      if (createMenuRef.current && !createMenuRef.current.contains(event.target)) setCreateMenuOpen(false);
+    };
+    const handleKeyDown = (event) => { if (event.key === "Escape") setCreateMenuOpen(false); };
+    document.addEventListener("pointerdown", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("pointerdown", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [createMenuOpen]);
+
   // Firebase authentication.
 
   useEffect(() => {
@@ -1577,7 +1592,7 @@ useEffect(() => {
 
 
 
-        <div className="tt-create-wrap">
+        <div className="tt-create-wrap" ref={createMenuRef}>
           <button
             type="button"
             className="tt-post-button"
