@@ -611,6 +611,7 @@ function App() {
   const [authLoading, setAuthLoading] = useState(true);
 
 const [createMenuOpen, setCreateMenuOpen] = useState(false);
+  const createMenuRef = useRef(null);
 
   const [showLogin, setShowLogin] = useState(false);
 
