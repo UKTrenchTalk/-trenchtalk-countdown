@@ -2354,3 +2354,115 @@ html, body, #root { min-height: 100%; background: var(--background); }
     gap: 16px;
   }
 }
+
+
+/* =========================================================
+   FINAL SIDEBAR + BANNER UPLOAD CONTROL CORRECTIONS
+   ========================================================= */
+.tt-sidebar .tt-nav-heading {
+  display: block !important;
+  flex: 0 0 auto;
+  order: 4;
+}
+
+.tt-sidebar .tt-navigation {
+  display: flex !important;
+  flex: 0 0 auto;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
+  width: 100%;
+  height: auto !important;
+  min-height: 0;
+  order: 5;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+.tt-sidebar .tt-navigation > .tt-nav-item {
+  display: flex !important;
+  flex: 0 0 auto;
+  width: 100%;
+  min-height: 43px;
+  align-items: center;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+.tt-sidebar .tt-navigation .tt-nav-label {
+  display: block;
+  visibility: visible !important;
+}
+
+.tt-sidebar .tt-create-wrap {
+  order: 0;
+  flex: 0 0 auto;
+}
+
+.tt-sidebar .tt-sidebar-footer {
+  order: 7;
+  margin-top: auto;
+}
+
+/* The upload control is a label, not a full-size button. */
+.ttpe-preview-card .ttpe-banner {
+  position: relative;
+  overflow: hidden;
+}
+
+.ttpe-preview-card .ttpe-banner > .ttpe-banner-button {
+  position: absolute !important;
+  top: auto !important;
+  right: 14px !important;
+  bottom: 14px !important;
+  left: auto !important;
+  display: inline-flex !important;
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: calc(100% - 28px) !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  align-items: center;
+  justify-content: center;
+  padding: 9px 13px !important;
+  margin: 0 !important;
+  border: 1px solid rgba(255,255,255,.45) !important;
+  border-radius: 8px !important;
+  background: rgba(30,48,32,.88) !important;
+  color: #fff !important;
+  font-family: var(--body);
+  font-size: 11px !important;
+  font-weight: 700;
+  line-height: 1.2 !important;
+  letter-spacing: 0;
+  text-align: center;
+  white-space: nowrap;
+  cursor: pointer;
+  z-index: 3;
+  box-shadow: 0 3px 10px rgba(20,35,22,.16);
+}
+
+.ttpe-preview-card .ttpe-banner > .ttpe-banner-button input[type="file"] {
+  display: none !important;
+}
+
+.ttpe-preview-card .ttpe-banner > .ttpe-banner-button:hover {
+  background: var(--forest-hover) !important;
+}
+
+@media (max-width: 750px) {
+  .tt-sidebar .tt-navigation {
+    height: 100% !important;
+    flex-direction: row;
+    flex: 1 1 auto;
+  }
+  .tt-sidebar .tt-navigation > .tt-nav-item {
+    width: auto;
+    min-width: 0;
+    min-height: 52px;
+  }
+  .tt-sidebar .tt-nav-label {
+    display: none;
+  }
+}
