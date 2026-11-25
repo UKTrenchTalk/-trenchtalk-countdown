@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 
-import { onAuthStateChanged, signOut, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
+import { onAuthStateChanged, signOut } from "firebase/auth";
 
 import { collection, doc, getDoc, getDocs, limit, query } from "firebase/firestore";
 
-import { auth, db, googleProvider } from "./firebase.js";
+import { auth, db } from "./firebase.js";
 
 import Countdown from "./countdown.jsx";
 
@@ -14,7 +14,6 @@ import trendingService from "./Services/trendingservice.js";
 
 import tokenService from "./Services/tokenservice.js";
 
-import { enrichTokens } from "./Services/marketDataService.js";
 
 import "./App.css";
 
@@ -632,16 +631,6 @@ const [createMenuOpen, setCreateMenuOpen] = useState(false);
   const exploreCacheRef = useRef(new Map());
   const [exploreLoading, setExploreLoading] = useState(false);
   const [exploreError, setExploreError] = useState("");
-  const [viewingPublicProfile, setViewingPublicProfile] = useState(null);
-  const [accountModalOpen, setAccountModalOpen] = useState(false);
-  const [savedAccounts, setSavedAccounts] = useState(() => {
-    try { return JSON.parse(localStorage.getItem("tt-saved-accounts") || "[]"); }
-    catch { return []; }
-  });
-  const [accountEmail, setAccountEmail] = useState("");
-  const [accountPassword, setAccountPassword] = useState("");
-  const [accountBusy, setAccountBusy] = useState(false);
-  const [accountError, setAccountError] = useState("");
 
   const [trendingTokens, setTrendingTokens] = useState([]);
 
@@ -708,68 +697,6 @@ const [createMenuOpen, setCreateMenuOpen] = useState(false);
     };
   }, [createMenuOpen]);
 
-  // The profile sidebar opens the account manager through this event.
-  useEffect(() => {
-    const openAccountManager = () => {
-      setAccountError("");
-      setAccountPassword("");
-      setAccountEmail("");
-      setAccountModalOpen(true);
-    };
-    window.addEventListener("tt-open-add-account", openAccountManager);
-    return () => window.removeEventListener("tt-open-add-account", openAccountManager);
-  }, []);
-
-  function rememberAccount(accountUser) {
-    if (!accountUser?.uid || !accountUser?.email) return;
-    setSavedAccounts((previous) => {
-      const next = [{ uid: accountUser.uid, email: accountUser.email, displayName: accountUser.displayName || accountUser.email.split("@")[0] }, ...previous.filter((item) => item.uid !== accountUser.uid)].slice(0, 8);
-      try { localStorage.setItem("tt-saved-accounts", JSON.stringify(next)); } catch (error) { console.warn("Could not save account list:", error); }
-      return next;
-    });
-  }
-
-  async function authenticateAnotherAccount(method = "password") {
-    setAccountError("");
-    setAccountBusy(true);
-    try {
-      if (user) rememberAccount(user);
-      let credential;
-      if (method === "google") {
-        googleProvider.setCustomParameters({ prompt: "select_account" });
-        credential = await signInWithPopup(auth, googleProvider);
-      } else {
-        if (!accountEmail.trim() || !accountPassword) {
-          setAccountError("Enter the account email and password.");
-          return;
-        }
-        credential = await signInWithEmailAndPassword(auth, accountEmail.trim(), accountPassword);
-      }
-      if (credential.user.uid === user?.uid) {
-        setAccountError("That is already the active account.");
-        return;
-      }
-      rememberAccount(credential.user);
-      setAccountPassword("");
-      setAccountModalOpen(false);
-      setActivePage("home");
-      setViewingPublicProfile(null);
-    } catch (error) {
-      const messages = {
-        "auth/invalid-credential": "The email or password is incorrect.",
-        "auth/user-not-found": "No account was found with that email.",
-        "auth/wrong-password": "The password is incorrect.",
-        "auth/too-many-requests": "Too many attempts. Try again later.",
-        "auth/popup-closed-by-user": "Google sign-in was cancelled.",
-        "auth/popup-blocked": "Your browser blocked the Google sign-in window.",
-        "auth/network-request-failed": "Network error. Check your connection."
-      };
-      setAccountError(messages[error.code] || error.message || "Could not sign in to that account.");
-    } finally {
-      setAccountBusy(false);
-    }
-  }
-
   // Firebase authentication.
 
   useEffect(() => {
@@ -777,7 +704,6 @@ const [createMenuOpen, setCreateMenuOpen] = useState(false);
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
 
       setUser(currentUser);
-      if (currentUser) rememberAccount(currentUser);
 
 
 
@@ -1109,7 +1035,7 @@ const [createMenuOpen, setCreateMenuOpen] = useState(false);
 
 
 
-  // Search the entire stored token catalogue.
+  // Search CoinGecko-listed assets and GeckoTerminal on-chain tokens.
 
   useEffect(() => {
 
@@ -1206,7 +1132,7 @@ const [createMenuOpen, setCreateMenuOpen] = useState(false);
       exploreTab === "trending"
         ? "posts"
         : exploreTab === "people"
-          ? "publicProfiles"
+          ? "users"
           : "communities";
 
     async function loadExploreCollection() {
@@ -1986,7 +1912,7 @@ useEffect(() => {
                       {exploreResults.map((person) => {
                         const personName = person.displayName || person.name || person.username || "TrenchTalk member";
                         const personUsername = person.username || person.handle || "";
-                        return <article role="button" tabIndex={0} onClick={() => { setViewingPublicProfile(person); setActivePage("public-profile"); }} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); setViewingPublicProfile(person); setActivePage("public-profile"); } }} className="tt-discovery-card tt-person-card" key={person.id}>
+                        return <article className="tt-discovery-card tt-person-card" key={person.id}>
                           <div className="tt-discovery-avatar">{person.avatarUrl ? <img src={person.avatarUrl} alt="" /> : personName[0]?.toUpperCase()}</div>
                           <div className="tt-discovery-copy"><strong>{personName}</strong><span>{personUsername ? `@${personUsername}` : "TrenchTalk member"}</span>{person.bio && <p>{person.bio}</p>}</div>
                         </article>;
@@ -2177,16 +2103,6 @@ useEffect(() => {
             />
           )}
 
-          {activePage === "public-profile" && viewingPublicProfile && (
-            <ProfilePage
-              user={{ uid: viewingPublicProfile.uid || viewingPublicProfile.id, displayName: viewingPublicProfile.displayName, email: "" }}
-              profile={viewingPublicProfile}
-              viewOnly
-              onNavigate={(page) => { setActivePage(page === "profile" ? "explore" : page); }}
-              onLogout={handleLogout}
-            />
-          )}
-
           {activePage === "profile-customisation" && (
             <ProfileEditor
               user={user}
@@ -2202,34 +2118,6 @@ useEffect(() => {
         </div>
 
       </main>
-
-      {accountModalOpen && (
-        <div className="tt-account-modal-backdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget && !accountBusy) setAccountModalOpen(false); }}>
-          <section className="tt-account-modal" role="dialog" aria-modal="true" aria-labelledby="tt-account-modal-title">
-            <button className="tt-account-modal-close" type="button" aria-label="Close" onClick={() => setAccountModalOpen(false)}>×</button>
-            <span className="tt-account-modal-eyebrow">TRENCHTALK ACCOUNTS</span>
-            <h2 id="tt-account-modal-title">Add or switch account</h2>
-            <p className="tt-account-modal-description">Sign in to another account. Your current account will be remembered on this device. Passwords are never saved.</p>
-            {savedAccounts.length > 0 && <div className="tt-account-saved-list">
-              <span className="tt-account-section-label">REMEMBERED ACCOUNTS</span>
-              {savedAccounts.map((item) => <button key={item.uid} type="button" className={`tt-account-saved-item ${user?.uid === item.uid ? "is-current" : ""}`} onClick={() => { setAccountEmail(item.email); setAccountPassword(""); setAccountError(user?.uid === item.uid ? "This account is already active." : "Enter this account's password to switch."); }}>
-                <span className="tt-account-saved-avatar">{(item.displayName || item.email)[0]?.toUpperCase()}</span>
-                <span><strong>{item.displayName || item.email}</strong><small>{item.email}</small></span>
-                {user?.uid === item.uid && <em>Active</em>}
-              </button>)}
-            </div>}
-            <form className="tt-account-login-form" onSubmit={(event) => { event.preventDefault(); authenticateAnotherAccount("password"); }}>
-              <label>Email address<input type="email" autoComplete="username" value={accountEmail} onChange={(event) => setAccountEmail(event.target.value)} placeholder="name@example.com" required /></label>
-              <label>Password<input type="password" autoComplete="current-password" value={accountPassword} onChange={(event) => setAccountPassword(event.target.value)} placeholder="Enter password" required /></label>
-              {accountError && <p className="tt-account-error" role="alert">{accountError}</p>}
-              <button className="tt-account-primary" type="submit" disabled={accountBusy}>{accountBusy ? "Signing in…" : "Sign in to account"}</button>
-            </form>
-            <div className="tt-account-divider"><span>OR</span></div>
-            <button className="tt-account-google" type="button" disabled={accountBusy} onClick={() => authenticateAnotherAccount("google")}>Continue with Google</button>
-            <p className="tt-account-modal-footnote">Switching accounts signs this app into the selected account. To switch back, select the remembered account and enter its password again.</p>
-          </section>
-        </div>
-      )}
 
     </div>
 
