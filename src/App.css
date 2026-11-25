@@ -2911,3 +2911,51 @@ html, body, #root { min-height: 100%; background: var(--background); }
     overflow: visible;
   }
 }
+
+
+/* =========================================================
+   SCROLLBAR + CREATE BUTTON SPACING TWEAKS
+   Keep scrolling enabled; hide only the visible scrollbar.
+   ========================================================= */
+@media (min-width: 751px) {
+  /* Keep a little breathing room beneath the Create button. */
+  .tt-dashboard > .tt-sidebar > .tt-create-wrap {
+    margin-bottom: 8px !important;
+  }
+
+  /* Hide the main page scrollbar without disabling scrolling. */
+  .tt-dashboard > .tt-main {
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+  }
+
+  .tt-dashboard > .tt-main::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+  }
+
+  /* Also hide the sidebar scrollbar while retaining its own scroll. */
+  .tt-dashboard > .tt-sidebar {
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+  }
+
+  .tt-dashboard > .tt-sidebar::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+  }
+}
+
+
+/* =========================================================
+   SIDEBAR ICON SIZE — ICONS ONLY
+   Keeps navigation labels, row heights and spacing unchanged.
+   ========================================================= */
+@media (min-width: 751px) {
+  .tt-dashboard > .tt-sidebar > nav.tt-navigation .tt-nav-icon {
+    transform: scale(1.2) !important;
+    transform-origin: center center !important;
+  }
+}
