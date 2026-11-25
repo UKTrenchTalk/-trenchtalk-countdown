@@ -3852,3 +3852,126 @@ html, body, #root { min-height: 100%; background: var(--background); }
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
   }
 }
+
+/* Add / switch account dialog */
+.tt-account-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: grid;
+  place-items: center;
+  padding: 22px;
+  background: rgba(8, 16, 9, .62);
+  backdrop-filter: blur(7px);
+}
+.tt-account-modal {
+  position: relative;
+  width: min(100%, 440px);
+  max-height: min(90vh, 760px);
+  overflow: auto;
+  padding: 30px;
+  border: 1px solid rgba(23, 41, 28, .12);
+  border-radius: 18px;
+  background: #edf1e7;
+  color: #17291c;
+  box-shadow: 0 28px 90px rgba(0, 0, 0, .3);
+}
+.tt-account-modal-close {
+  position: absolute;
+  top: 13px;
+  right: 15px;
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 9px;
+  background: rgba(23, 41, 28, .07);
+  color: #17291c;
+  font-size: 25px;
+  line-height: 1;
+  cursor: pointer;
+}
+.tt-account-modal-eyebrow, .tt-account-section-label {
+  display: block;
+  color: #71816d;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .13em;
+}
+.tt-account-modal h2 {
+  margin: 9px 35px 7px 0;
+  color: #17291c;
+  font-size: 25px;
+  letter-spacing: -.045em;
+}
+.tt-account-modal-description, .tt-account-modal-footnote {
+  color: #667363;
+  font-size: 12px;
+  line-height: 1.6;
+}
+.tt-account-saved-list { margin: 22px 0 18px; }
+.tt-account-section-label { margin-bottom: 9px; }
+.tt-account-saved-item {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 11px;
+  margin-top: 7px;
+  padding: 10px;
+  border: 1px solid #d5dece;
+  border-radius: 10px;
+  background: rgba(255,255,255,.48);
+  color: #17291c;
+  text-align: left;
+  cursor: pointer;
+}
+.tt-account-saved-item.is-current { border-color: #8ea66b; background: #e2ebd6; }
+.tt-account-saved-avatar {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  place-items: center;
+  border-radius: 50%;
+  background: #c5d4b7;
+  font-size: 13px;
+  font-weight: 800;
+}
+.tt-account-saved-item > span:nth-child(2) { display: grid; min-width: 0; gap: 2px; }
+.tt-account-saved-item strong { overflow: hidden; font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
+.tt-account-saved-item small { overflow: hidden; color: #71816d; font-size: 10px; text-overflow: ellipsis; white-space: nowrap; }
+.tt-account-saved-item em { margin-left: auto; color: #536b3d; font-size: 10px; font-style: normal; font-weight: 800; }
+.tt-account-login-form { display: grid; gap: 12px; margin-top: 18px; }
+.tt-account-login-form label { display: grid; gap: 6px; color: #344536; font-size: 11px; font-weight: 700; }
+.tt-account-login-form input {
+  width: 100%;
+  min-height: 43px;
+  box-sizing: border-box;
+  padding: 0 12px;
+  border: 1px solid #cbd5c3;
+  border-radius: 9px;
+  outline: none;
+  background: #f8faf5;
+  color: #17291c;
+  font: inherit;
+  font-size: 13px;
+}
+.tt-account-login-form input:focus { border-color: #819b5f; box-shadow: 0 0 0 3px rgba(129,155,95,.14); }
+.tt-account-primary, .tt-account-google {
+  width: 100%;
+  min-height: 44px;
+  border-radius: 9px;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+.tt-account-primary { border: 1px solid #17291c; background: #17291c; color: #f4f7ef; }
+.tt-account-google { border: 1px solid #cbd5c3; background: #f8faf5; color: #17291c; }
+.tt-account-primary:disabled, .tt-account-google:disabled { opacity: .55; cursor: wait; }
+.tt-account-error { margin: 0; color: #a33e32; font-size: 11px; line-height: 1.45; }
+.tt-account-divider { display: flex; align-items: center; gap: 12px; margin: 15px 0; color: #899585; font-size: 9px; font-weight: 800; }
+.tt-account-divider::before, .tt-account-divider::after { height: 1px; flex: 1; background: #d6ded0; content: ""; }
+.tt-account-modal-footnote { margin: 14px 0 0; font-size: 10px; }
+@media (max-width: 520px) {
+  .tt-account-modal { padding: 25px 19px; border-radius: 15px; }
+  .tt-account-modal h2 { font-size: 22px; }
+}
