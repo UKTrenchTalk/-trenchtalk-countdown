@@ -154,11 +154,37 @@ export default function ProfileEditor({
         updatedAt: serverTimestamp()
       };
 
-      await setDoc(
-        doc(db, "users", user.uid),
-        updatedProfile,
-        { merge: true }
-      );
+      await setDoc(doc(db, "users", user.uid), updatedProfile, { merge: true });
+
+      // Publish only explicitly public profile fields. Never copy email or account metadata.
+      const publicProfile = {
+        uid: user.uid,
+        displayName,
+        username,
+        bio,
+        avatarUrl: updatedProfile.avatarUrl || "",
+        bannerUrl: updatedProfile.bannerUrl || "",
+        accentColor: updatedProfile.accentColor || DEFAULT_ACCENT,
+        cardColor: updatedProfile.cardColor || "#e4eadc",
+        borderColor: updatedProfile.borderColor || "#bac8ae",
+        nameColor: updatedProfile.nameColor || "#263827",
+        nameSize: updatedProfile.nameSize || "large",
+        fontFamily: updatedProfile.fontFamily || "space",
+        avatarShape: updatedProfile.avatarShape || "circle",
+        avatarSize: updatedProfile.avatarSize || "large",
+        avatarBorderColor: updatedProfile.avatarBorderColor || "#e4eadc",
+        bannerHeight: updatedProfile.bannerHeight || 220,
+        bannerPosition: updatedProfile.bannerPosition || "center",
+        profileTheme: updatedProfile.profileTheme || "minimal",
+        profileLayout: updatedProfile.profileLayout || "standard",
+        decoration: updatedProfile.decoration || "none",
+        badgeText: updatedProfile.badgeText || "",
+        website: updatedProfile.website || "",
+        twitter: updatedProfile.twitter || "",
+        telegram: updatedProfile.telegram || "",
+        updatedAt: serverTimestamp()
+      };
+      await setDoc(doc(db, "publicProfiles", user.uid), publicProfile, { merge: true });
 
       // Update the main React profile state immediately.
       onProfileUpdated?.({

@@ -632,6 +632,7 @@ const [createMenuOpen, setCreateMenuOpen] = useState(false);
   const exploreCacheRef = useRef(new Map());
   const [exploreLoading, setExploreLoading] = useState(false);
   const [exploreError, setExploreError] = useState("");
+  const [viewingPublicProfile, setViewingPublicProfile] = useState(null);
 
   const [trendingTokens, setTrendingTokens] = useState([]);
 
@@ -1133,7 +1134,7 @@ const [createMenuOpen, setCreateMenuOpen] = useState(false);
       exploreTab === "trending"
         ? "posts"
         : exploreTab === "people"
-          ? "users"
+          ? "publicProfiles"
           : "communities";
 
     async function loadExploreCollection() {
@@ -1913,7 +1914,7 @@ useEffect(() => {
                       {exploreResults.map((person) => {
                         const personName = person.displayName || person.name || person.username || "TrenchTalk member";
                         const personUsername = person.username || person.handle || "";
-                        return <article className="tt-discovery-card tt-person-card" key={person.id}>
+                        return <article role="button" tabIndex={0} onClick={() => { setViewingPublicProfile(person); setActivePage("public-profile"); }} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); setViewingPublicProfile(person); setActivePage("public-profile"); } }} className="tt-discovery-card tt-person-card" key={person.id}>
                           <div className="tt-discovery-avatar">{person.avatarUrl ? <img src={person.avatarUrl} alt="" /> : personName[0]?.toUpperCase()}</div>
                           <div className="tt-discovery-copy"><strong>{personName}</strong><span>{personUsername ? `@${personUsername}` : "TrenchTalk member"}</span>{person.bio && <p>{person.bio}</p>}</div>
                         </article>;
@@ -2100,6 +2101,16 @@ useEffect(() => {
               user={user}
               profile={profile}
               onNavigate={navigate}
+              onLogout={handleLogout}
+            />
+          )}
+
+          {activePage === "public-profile" && viewingPublicProfile && (
+            <ProfilePage
+              user={{ uid: viewingPublicProfile.uid || viewingPublicProfile.id, displayName: viewingPublicProfile.displayName, email: "" }}
+              profile={viewingPublicProfile}
+              viewOnly
+              onNavigate={(page) => { setActivePage(page === "profile" ? "explore" : page); }}
               onLogout={handleLogout}
             />
           )}
