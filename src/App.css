@@ -2797,3 +2797,102 @@ html, body, #root { min-height: 100%; background: var(--background); }
     font-size: 13px !important;
   }
 }
+
+/* =========================================================
+   TRENCHTALK — FIT THE COMPLETE DESKTOP SIDEBAR ON SCREEN
+   Keeps the approved forest styling while scaling vertical
+   spacing to the available viewport height. Mobile is untouched.
+   ========================================================= */
+@media (min-width: 751px) {
+  .tt-dashboard > .tt-sidebar {
+    height: 100vh !important;
+    height: 100dvh !important;
+    min-height: 0 !important;
+    overflow-y: hidden !important;
+    overflow-x: hidden !important;
+    padding-top: clamp(10px, 2.2vh, 24px) !important;
+    padding-bottom: clamp(10px, 2.2vh, 24px) !important;
+  }
+
+  .tt-dashboard > .tt-sidebar > .tt-brand {
+    flex: 0 0 auto !important;
+    min-height: clamp(46px, 7.5vh, 72px) !important;
+    margin-bottom: clamp(7px, 1.7vh, 18px) !important;
+    font-size: clamp(18px, 2.5vh, 24px) !important;
+  }
+
+  .tt-dashboard > .tt-sidebar > .tt-brand img {
+    width: clamp(38px, 5.8vh, 52px) !important;
+    height: clamp(38px, 5.8vh, 52px) !important;
+  }
+
+  .tt-dashboard > .tt-sidebar > .tt-profile-area {
+    flex: 0 0 auto !important;
+    margin-bottom: clamp(7px, 1.7vh, 19px) !important;
+  }
+
+  .tt-dashboard > .tt-sidebar .tt-profile-button {
+    min-height: clamp(58px, 9.2vh, 88px) !important;
+    padding: clamp(8px, 1.3vh, 13px) clamp(10px, 1.6vh, 15px) !important;
+  }
+
+  .tt-dashboard > .tt-sidebar .tt-profile-button .tt-avatar {
+    width: clamp(38px, 5.6vh, 52px) !important;
+    height: clamp(38px, 5.6vh, 52px) !important;
+  }
+
+  .tt-dashboard > .tt-sidebar > .tt-sidebar-divider {
+    flex: 0 0 1px !important;
+    margin-bottom: clamp(7px, 1.7vh, 19px) !important;
+  }
+
+  .tt-dashboard > .tt-sidebar > .tt-nav-heading {
+    flex: 0 0 auto !important;
+    min-height: 0 !important;
+    margin-bottom: clamp(5px, 1.2vh, 13px) !important;
+  }
+
+  .tt-dashboard > .tt-sidebar > nav.tt-navigation {
+    flex: 0 1 auto !important;
+    min-height: 0 !important;
+    height: auto !important;
+    gap: clamp(2px, .55vh, 5px) !important;
+  }
+
+  .tt-dashboard > .tt-sidebar > nav.tt-navigation > button.tt-nav-item {
+    flex: 0 1 clamp(34px, 6.1vh, 63px) !important;
+    height: clamp(34px, 6.1vh, 63px) !important;
+    min-height: clamp(34px, 6.1vh, 63px) !important;
+    gap: clamp(9px, 1.7vh, 17px) !important;
+    padding-left: clamp(10px, 1.7vh, 17px) !important;
+    padding-right: clamp(10px, 1.7vh, 17px) !important;
+  }
+
+  .tt-dashboard > .tt-sidebar > nav.tt-navigation .tt-nav-icon {
+    width: clamp(25px, 4.5vh, 36px) !important;
+    min-width: clamp(25px, 4.5vh, 36px) !important;
+    height: clamp(25px, 4.5vh, 36px) !important;
+    font-size: clamp(22px, 3.8vh, 29px) !important;
+  }
+
+  .tt-dashboard > .tt-sidebar > nav.tt-navigation .tt-nav-icon svg,
+  .tt-dashboard > .tt-sidebar > nav.tt-navigation .tt-nav-icon img {
+    width: clamp(22px, 3.8vh, 29px) !important;
+    height: clamp(22px, 3.8vh, 29px) !important;
+  }
+
+  .tt-dashboard > .tt-sidebar > nav.tt-navigation .tt-nav-label {
+    font-size: clamp(13px, 2.1vh, 16px) !important;
+  }
+
+  .tt-dashboard > .tt-sidebar > .tt-create-wrap {
+    flex: 0 0 auto !important;
+    margin-top: auto !important;
+    padding-top: clamp(7px, 1.8vh, 22px) !important;
+  }
+
+  .tt-dashboard > .tt-sidebar .tt-post-button {
+    min-height: clamp(44px, 7.2vh, 65px) !important;
+    font-size: clamp(14px, 2.2vh, 17px) !important;
+  }
+}
