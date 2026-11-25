@@ -52,7 +52,7 @@ class TokenService {
     if (this.searches.has(key)) return this.searches.get(key);
     const request = searchAllCoins(term).catch(error => {
       console.error("[TokenService] Coin search failed:", error);
-      return [];
+      throw error;
     }).finally(() => this.searches.delete(key));
     this.searches.set(key, request);
     return request;

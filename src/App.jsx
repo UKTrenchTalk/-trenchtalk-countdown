@@ -13,6 +13,7 @@ import Login from "./pages/login.jsx";
 import trendingService from "./Services/trendingservice.js";
 
 import tokenService from "./Services/tokenservice.js";
+import { enrichTokens } from "./Services/marketDataService.js";
 
 
 import "./App.css";
@@ -642,6 +643,8 @@ const [createMenuOpen, setCreateMenuOpen] = useState(false);
 
   const [searchLoading, setSearchLoading] = useState(false);
 
+  const [coinSearchError, setCoinSearchError] = useState("");
+
   const [tokenConnected, setTokenConnected] = useState(false);
 
   const [clock, setClock] = useState(Date.now());
@@ -1047,6 +1050,8 @@ const [createMenuOpen, setCreateMenuOpen] = useState(false);
 
       setSearchResults([]);
 
+      setCoinSearchError("");
+
       setSearchLoading(false);
 
       return;
@@ -1062,6 +1067,9 @@ const [createMenuOpen, setCreateMenuOpen] = useState(false);
     const timer = setTimeout(async () => {
 
       setSearchLoading(true);
+
+      setCoinSearchError("");
+
 
 
 
@@ -1088,6 +1096,7 @@ const [createMenuOpen, setCreateMenuOpen] = useState(false);
         if (!cancelled) {
 
           setSearchResults([]);
+          setCoinSearchError(error?.message || "Coin search failed. Please try again.");
 
         }
 
@@ -1882,10 +1891,12 @@ useEffect(() => {
               {exploreTab === "coins" ? (
                 <>
                   <div className="tt-market-header">
-                    <div><span className={`tt-live-indicator ${tokenConnected ? "" : "tt-live-offline"}`} />{tokenConnected ? "LIVE SOLANA DATA" : "CONNECTING TO SOLANA DATA"}</div>
+                    <div><span className={`tt-live-indicator ${tokenConnected ? "" : "tt-live-offline"}`} />COINGECKO + GECKOTERMINAL</div>
                     <span>{search.trim() ? `${searchResults.length} coin results` : `${trendingTokens.length} trending coins`}</span>
                   </div>
-                  {searchLoading ? <div className="tt-search-status">Searching the full token catalogue...</div> : filteredTrendingTokens.length ? (
+                  {searchLoading ? <div className="tt-search-status">Searching CoinGecko assets and on-chain tokens...</div> : coinSearchError ? (
+                    <EmptyState icon="!" title="Coin search unavailable" description={coinSearchError} />
+                  ) : filteredTrendingTokens.length ? (
                     <div className="tt-token-grid">
                       {filteredTrendingTokens.map((token, index) => <TokenCard key={token.mint} token={token} index={index} onImageError={handleTokenImageError} />)}
                     </div>
