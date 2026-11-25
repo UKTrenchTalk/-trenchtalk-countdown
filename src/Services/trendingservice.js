@@ -6,12 +6,12 @@ import {
 } from "./marketDataService.js";
 
 const REFRESH_INTERVAL = 60_000;
-const DISCOVERY_INTERVAL = 120_000;
+const DISCOVERY_INTERVAL = 10 * 60_000;
+const REFRESH_DEBOUNCE = 5_000;
 
-const MAX_SOURCE_TOKENS = 1000;
+const MAX_SOURCE_TOKENS = 200;
 const MAX_TRENDING = 20;
 
-// Minimum requirements for Trending.
 const MIN_VOLUME_24H = 500_000;
 const MIN_MARKET_CAP = 500_000;
 const MIN_LIQUIDITY = 25_000;
@@ -20,18 +20,18 @@ class TrendingService {
   constructor() {
     this.tokens = [];
     this.trending = [];
-
     this.listeners = new Set();
 
     this.started = false;
     this.refreshing = false;
     this.refreshQueued = false;
+    this.discoveryRunning = false;
 
     this.interval = null;
     this.discoveryInterval = null;
+    this.refreshTimer = null;
 
     this.unsubscribe = null;
-    this.discoveryRunning = false;
   }
 
   start() {
@@ -43,7 +43,6 @@ class TrendingService {
       "[TrendingService] Starting Solana discovery and leaderboard"
     );
 
-    // Subscribe to the combined token catalogue.
     this.unsubscribe = tokenService.subscribe(
       ({ tokens, connected }) => {
         this.tokens = tokens;
@@ -55,27 +54,38 @@ class TrendingService {
           tokens.length
         );
 
-        this.refresh();
+        // A burst of incoming tokens should produce one refresh,
+        // not one market-data request per token.
+        this.scheduleRefresh();
       }
     );
 
-    // Start Shrine and Firestore.
     tokenService.connect();
 
-    // Start independent token discovery immediately.
     this.discover();
 
-    // Refresh market data every minute.
     this.interval = setInterval(
       () => this.refresh(),
       REFRESH_INTERVAL
     );
 
-    // Discover additional tokens every two minutes.
     this.discoveryInterval = setInterval(
       () => this.discover(),
       DISCOVERY_INTERVAL
     );
+  }
+
+  scheduleRefresh() {
+    if (!this.started) return;
+
+    if (this.refreshTimer) {
+      clearTimeout(this.refreshTimer);
+    }
+
+    this.refreshTimer = setTimeout(() => {
+      this.refreshTimer = null;
+      this.refresh();
+    }, REFRESH_DEBOUNCE);
   }
 
   async discover() {
@@ -84,19 +94,14 @@ class TrendingService {
     this.discoveryRunning = true;
 
     try {
-      console.log(
-        "[TrendingService] Running independent token discovery..."
-      );
+      console.log("[TrendingService] Running token discovery...");
 
       const discovered = await discoverSolanaTokens();
 
       if (!this.started) return;
 
-      if (!discovered.length) {
-        console.warn(
-          "[TrendingService] Discovery returned no tokens"
-        );
-
+      if (!Array.isArray(discovered) || !discovered.length) {
+        console.warn("[TrendingService] Discovery returned no tokens");
         return;
       }
 
@@ -106,14 +111,12 @@ class TrendingService {
         "Solana tokens"
       );
 
-      // Add discovered tokens to the persistent catalogue.
+      // Tokens are added to the local in-memory catalogue and browser cache.
+      // This client no longer writes every discovery result to Firestore.
       tokenService.addDiscoveredTokens(discovered);
 
     } catch (error) {
-      console.error(
-        "[TrendingService] Discovery failed:",
-        error
-      );
+      console.error("[TrendingService] Discovery failed:", error);
     } finally {
       this.discoveryRunning = false;
     }
@@ -121,11 +124,9 @@ class TrendingService {
 
   qualifies(token) {
     const market = token?.market;
-
     if (!market) return false;
 
     const volume = Number(market.volume24h) || 0;
-
     const liquidity = Number(market.liquidity) || 0;
 
     const marketCap = Number(
@@ -153,7 +154,6 @@ class TrendingService {
 
       const existing = unique.get(token.mint);
 
-      // Keep the version with the newest market data.
       if (
         !existing ||
         Number(token.market?.updatedAt || 0) >=
@@ -169,9 +169,7 @@ class TrendingService {
           Number(b.market.volume24h || 0) -
           Number(a.market.volume24h || 0);
 
-        if (volumeDifference !== 0) {
-          return volumeDifference;
-        }
+        if (volumeDifference !== 0) return volumeDifference;
 
         return (
           Number(b.market.liquidity || 0) -
@@ -198,7 +196,6 @@ class TrendingService {
     this.refreshing = true;
 
     try {
-      // Use the combined Shrine and discovery catalogue.
       const sourceTokens = this.tokens
         .filter((token) => token?.mint)
         .slice(0, MAX_SOURCE_TOKENS);
@@ -211,20 +208,12 @@ class TrendingService {
 
       const enriched = await enrichTokens(
         sourceTokens,
-        {
-          includeMetadata: false
-        }
+        { includeMetadata: false }
       );
 
       if (!this.started) return;
 
-      const ranked = this.rankTokens(enriched);
-
-      this.trending = ranked;
-
-      const qualifiedCount = enriched.filter(
-        (token) => this.qualifies(token)
-      ).length;
+      this.trending = this.rankTokens(enriched);
 
       console.log(
         "[TrendingService] Market-data tokens:",
@@ -233,7 +222,7 @@ class TrendingService {
 
       console.log(
         "[TrendingService] Qualified tokens:",
-        qualifiedCount
+        enriched.filter((token) => this.qualifies(token)).length
       );
 
       console.log(
@@ -244,18 +233,13 @@ class TrendingService {
       this.notify();
 
     } catch (error) {
-      console.error(
-        "[TrendingService] Refresh failed:",
-        error
-      );
-
+      console.error("[TrendingService] Refresh failed:", error);
     } finally {
       this.refreshing = false;
 
       if (this.refreshQueued && this.started) {
         this.refreshQueued = false;
-
-        this.refresh();
+        this.scheduleRefresh();
       }
     }
   }
@@ -266,7 +250,6 @@ class TrendingService {
 
   subscribe(listener) {
     this.listeners.add(listener);
-
     listener(this.trending);
 
     return () => {
@@ -279,39 +262,27 @@ class TrendingService {
       try {
         listener(this.trending);
       } catch (error) {
-        console.error(
-          "[TrendingService] Listener error:",
-          error
-        );
+        console.error("[TrendingService] Listener error:", error);
       }
     });
   }
 
   stop() {
-    if (this.interval) {
-      clearInterval(this.interval);
-    }
-
-    if (this.discoveryInterval) {
-      clearInterval(this.discoveryInterval);
-    }
+    if (this.interval) clearInterval(this.interval);
+    if (this.discoveryInterval) clearInterval(this.discoveryInterval);
+    if (this.refreshTimer) clearTimeout(this.refreshTimer);
 
     this.interval = null;
     this.discoveryInterval = null;
+    this.refreshTimer = null;
 
-    if (this.unsubscribe) {
-      this.unsubscribe();
-    }
-
+    if (this.unsubscribe) this.unsubscribe();
     this.unsubscribe = null;
 
     this.started = false;
-
     this.refreshQueued = false;
 
-    console.log(
-      "[TrendingService] Stopped"
-    );
+    console.log("[TrendingService] Stopped");
   }
 }
 

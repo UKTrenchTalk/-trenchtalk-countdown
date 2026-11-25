@@ -2,24 +2,22 @@ import { io } from "socket.io-client";
 
 import {
   collection,
-  doc,
   getDocs,
   limit,
-  onSnapshot,
   orderBy,
-  query,
-  setDoc,
-  where
+  query
 } from "firebase/firestore";
 
 import { db } from "../firebase";
 
 const SHRINE_URL = "https://sol.shrine.trade";
-
 const TOKEN_COLLECTION = "solanaTokens";
 
-const MAX_TOKENS = 5000;
-const SEARCH_LIMIT = 50;
+// Keep the initial database read deliberately small.
+// The browser cache prevents this query running on every page load.
+const MAX_STORED_TOKENS = 250;
+const CACHE_KEY = "trenchtalk_token_catalogue_v1";
+const CACHE_TTL = 30 * 60 * 1000;
 
 const PROTOCOLS = [
   "PUMPFUN",
@@ -35,16 +33,14 @@ const PROTOCOLS = [
 class TokenService {
   constructor() {
     this.socket = null;
-
     this.tokens = new Map();
     this.listeners = new Set();
 
     this.connected = false;
     this.loading = false;
+    this.firestoreLoaded = false;
 
-    this.firestoreUnsubscribe = null;
-
-    this.persistQueue = Promise.resolve();
+    this.cacheSaveTimer = null;
   }
 
   connect() {
@@ -52,6 +48,8 @@ class TokenService {
 
     console.log("[TokenService] Starting...");
 
+    // Load the local cache immediately, then refresh it from Firestore
+    // only when the cache is missing or expired.
     this.loadStoredTokens();
 
     this.socket = io(SHRINE_URL, {
@@ -64,7 +62,6 @@ class TokenService {
 
     this.socket.on("connect", () => {
       console.log("[TokenService] Connected to Shrine");
-
       this.connected = true;
 
       this.socket.emit(
@@ -84,9 +81,7 @@ class TokenService {
 
     this.socket.on("disconnect", () => {
       console.log("[TokenService] Disconnected from Shrine");
-
       this.connected = false;
-
       this.notifyListeners();
     });
 
@@ -98,79 +93,131 @@ class TokenService {
     });
   }
 
-  loadStoredTokens() {
-    if (this.firestoreUnsubscribe) return;
+  async loadStoredTokens() {
+    if (this.firestoreLoaded || this.loading) return;
 
     this.loading = true;
 
-    console.log("[TokenService] Loading stored tokens...");
+    // Use the browser's cached catalogue first.
+    const cached = this.readLocalCache();
 
-    const tokensRef = collection(db, TOKEN_COLLECTION);
+    if (cached.length) {
+      cached.forEach((token) => {
+        if (token?.mint) this.tokens.set(token.mint, token);
+      });
 
-    const tokensQuery = query(
-      tokensRef,
-      orderBy("detectedAtMs", "desc"),
-      limit(MAX_TOKENS)
-    );
+      this.trimTokens();
+      this.firestoreLoaded = true;
+      this.loading = false;
+      this.notifyListeners();
 
-    this.firestoreUnsubscribe = onSnapshot(
-      tokensQuery,
-      (snapshot) => {
-        snapshot.docChanges().forEach((change) => {
-          const data = change.doc.data();
+      console.log(
+        "[TokenService] Loaded local cached tokens:",
+        this.tokens.size
+      );
 
-          if (!data?.mint) return;
+      // A valid cache is enough for this session. No Firestore read.
+      return;
+    }
 
-          if (change.type === "removed") {
-            this.tokens.delete(data.mint);
-            return;
-          }
+    try {
+      console.log("[TokenService] Loading stored tokens from Firestore...");
 
-          const existing = this.tokens.get(data.mint);
+      const tokensRef = collection(db, TOKEN_COLLECTION);
+      const tokensQuery = query(
+        tokensRef,
+        orderBy("detectedAtMs", "desc"),
+        limit(MAX_STORED_TOKENS)
+      );
 
-          const token = {
-            ...data,
-            detectedAtMs:
-              Number(data.detectedAtMs) ||
-              Number(existing?.detectedAtMs) ||
-              Date.now()
-          };
+      const snapshot = await getDocs(tokensQuery);
 
-          this.tokens.set(token.mint, {
-            ...existing,
-            ...token
-          });
+      snapshot.forEach((document) => {
+        const data = document.data();
+        if (!data?.mint) return;
+
+        const existing = this.tokens.get(data.mint);
+
+        this.tokens.set(data.mint, {
+          ...existing,
+          ...data
         });
+      });
 
-        this.trimTokens();
+      this.trimTokens();
+      this.writeLocalCache();
+      this.firestoreLoaded = true;
 
-        this.loading = false;
+      console.log(
+        "[TokenService] Firestore tokens loaded:",
+        this.tokens.size
+      );
+    } catch (error) {
+      console.error(
+        "[TokenService] Firestore loading error:",
+        error
+      );
+    } finally {
+      this.loading = false;
+      this.notifyListeners();
+    }
+  }
 
-        console.log(
-          "[TokenService] Stored tokens loaded:",
-          this.tokens.size
-        );
+  readLocalCache() {
+    try {
+      const raw = localStorage.getItem(CACHE_KEY);
+      if (!raw) return [];
 
-        this.notifyListeners();
-      },
-      (error) => {
-        console.error(
-          "[TokenService] Firestore loading error:",
-          error
-        );
+      const parsed = JSON.parse(raw);
 
-        this.loading = false;
-
-        this.notifyListeners();
+      if (
+        !parsed ||
+        !Array.isArray(parsed.tokens) ||
+        Date.now() - Number(parsed.savedAt || 0) > CACHE_TTL
+      ) {
+        localStorage.removeItem(CACHE_KEY);
+        return [];
       }
-    );
+
+      return parsed.tokens;
+    } catch (error) {
+      console.warn("[TokenService] Could not read local cache:", error);
+      return [];
+    }
+  }
+
+  scheduleCacheSave() {
+    if (this.cacheSaveTimer) {
+      clearTimeout(this.cacheSaveTimer);
+    }
+
+    this.cacheSaveTimer = setTimeout(() => {
+      this.writeLocalCache();
+      this.cacheSaveTimer = null;
+    }, 1500);
+  }
+
+  writeLocalCache() {
+    try {
+      const tokens = this.getTokens().slice(0, MAX_STORED_TOKENS);
+
+      localStorage.setItem(
+        CACHE_KEY,
+        JSON.stringify({
+          savedAt: Date.now(),
+          tokens
+        })
+      );
+    } catch (error) {
+      // Storage may be unavailable or full; the app can still operate in memory.
+      console.warn("[TokenService] Could not save local cache:", error);
+    }
   }
 
   normaliseShrineToken(rawToken) {
     if (!rawToken?.mint) return null;
 
     const existing = this.tokens.get(rawToken.mint);
-
     const timestamp = Number(rawToken.timestamp);
 
     const createdAtMs =
@@ -180,94 +227,58 @@ class TokenService {
           : timestamp
         : existing?.createdAtMs || Date.now();
 
+    const name =
+      rawToken.name?.trim() ||
+      existing?.name ||
+      "Unknown Token";
+
+    const symbol =
+      rawToken.symbol?.trim() ||
+      existing?.symbol ||
+      "UNKNOWN";
+
     return {
       ...existing,
-
       mint: rawToken.mint,
-
       pool: rawToken.pool || existing?.pool || null,
-
-      name:
-        rawToken.name?.trim() ||
-        existing?.name ||
-        "Unknown Token",
-
-      symbol:
-        rawToken.symbol?.trim() ||
-        existing?.symbol ||
-        "UNKNOWN",
-
-      nameLower: (
-        rawToken.name?.trim() ||
-        existing?.name ||
-        "Unknown Token"
-      ).toLowerCase(),
-
-      symbolLower: (
-        rawToken.symbol?.trim() ||
-        existing?.symbol ||
-        "UNKNOWN"
-      ).toLowerCase(),
-
-      protocol:
-        rawToken.protocol ||
-        existing?.protocol ||
-        "UNKNOWN",
-
+      name,
+      symbol,
+      nameLower: name.toLowerCase(),
+      symbolLower: symbol.toLowerCase(),
+      protocol: rawToken.protocol || existing?.protocol || "UNKNOWN",
       decimals: rawToken.decimals ?? existing?.decimals ?? 6,
-
       quote: rawToken.quote || existing?.quote || null,
-
       supply: rawToken.supply ?? existing?.supply ?? null,
-
       creator: rawToken.creator || existing?.creator || null,
-
       uri: rawToken.uri || existing?.uri || null,
-
       timestamp:
         rawToken.timestamp ||
         existing?.timestamp ||
         Math.floor(Date.now() / 1000),
-
       createdAtMs,
-
       detectedAtMs:
         Number(existing?.detectedAtMs) || Date.now(),
-
       receivedAt: Date.now(),
-
       source: "shrine"
     };
   }
 
   addToken(rawToken) {
     const token = this.normaliseShrineToken(rawToken);
-
     if (!token) return;
 
+    // Update memory only. Do not let every browser session write the same
+    // live token into Firestore; shared ingestion should be server-side.
     this.tokens.set(token.mint, token);
-
     this.trimTokens();
-
+    this.scheduleCacheSave();
     this.notifyListeners();
-
-    this.persistToken(token);
   }
 
-  /*
-   * Add independently discovered tokens.
-   *
-   * These tokens are saved to Firestore and become
-   * available to Trending and token search.
-   *
-   * They are marked as "discovery", not "shrine",
-   * so they can be kept out of the New tab.
-   */
   addDiscoveredTokens(discoveredTokens) {
     if (!Array.isArray(discoveredTokens)) return;
 
     let added = 0;
-
     const now = Date.now();
 
     for (const rawToken of discoveredTokens) {
@@ -289,67 +300,52 @@ class TokenService {
 
       const token = {
         ...existing,
-
         mint: rawToken.mint,
-
         name,
         symbol,
-
         nameLower: name.toLowerCase(),
         symbolLower: symbol.toLowerCase(),
-
         protocol:
           rawToken.protocol ||
           rawToken.dexId ||
           existing?.protocol ||
           "Solana",
-
         pool:
           rawToken.pool ||
           rawToken.pairAddress ||
           existing?.pool ||
           null,
-
-        uri:
-          rawToken.uri ||
-          existing?.uri ||
-          null,
-
+        uri: rawToken.uri || existing?.uri || null,
         imageUrl:
           rawToken.imageUrl ||
           rawToken.icon ||
           existing?.imageUrl ||
           null,
-
         detectedAtMs:
           Number(existing?.detectedAtMs) || now,
-
         discoveredAtMs:
           Number(existing?.discoveredAtMs) || now,
-
         receivedAt: now,
-
-        // Never downgrade a Shrine token to discovery.
         source:
           existing?.source === "shrine"
             ? "shrine"
             : "discovery"
       };
 
+      if (!existing) added++;
+
       this.tokens.set(token.mint, token);
+    }
 
-      this.persistToken(token);
-
-      added++;
+    if (discoveredTokens.length) {
+      this.trimTokens();
+      this.scheduleCacheSave();
+      this.notifyListeners();
     }
 
     if (added > 0) {
-      this.trimTokens();
-
-      this.notifyListeners();
-
       console.log(
-        "[TokenService] Discovered tokens added:",
+        "[TokenService] New locally discovered tokens:",
         added,
         "| catalogue size:",
         this.tokens.size
@@ -357,41 +353,16 @@ class TokenService {
     }
   }
 
-  persistToken(token) {
-    if (!token?.mint) return Promise.resolve();
-
-    const tokenRef = doc(
-      db,
-      TOKEN_COLLECTION,
-      token.mint
-    );
-
-    this.persistQueue = this.persistQueue
-      .then(() => setDoc(tokenRef, token, { merge: true }))
-      .catch((error) => {
-        console.error(
-          "[TokenService] Could not save token:",
-          token.symbol,
-          error
-        );
-      });
-
-    return this.persistQueue;
-  }
-
   trimTokens() {
-    if (this.tokens.size <= MAX_TOKENS) return;
+    if (this.tokens.size <= MAX_STORED_TOKENS * 4) return;
 
-    const sorted = Array.from(this.tokens.entries())
-      .sort(
-        (a, b) =>
-          Number(b[1].detectedAtMs || 0) -
-          Number(a[1].detectedAtMs || 0)
-      );
-
-    this.tokens = new Map(
-      sorted.slice(0, MAX_TOKENS)
+    const sorted = Array.from(this.tokens.entries()).sort(
+      (a, b) =>
+        Number(b[1].detectedAtMs || 0) -
+        Number(a[1].detectedAtMs || 0)
     );
+
+    this.tokens = new Map(sorted.slice(0, MAX_STORED_TOKENS * 4));
   }
 
   getTokens() {
@@ -403,74 +374,23 @@ class TokenService {
   }
 
   async searchTokens(searchTerm) {
-    const term = searchTerm.trim().toLowerCase();
-
+    const term = String(searchTerm || "").trim().toLowerCase();
     if (!term) return [];
 
-    console.log("[TokenService] Searching:", term);
+    // Search the in-memory catalogue. The previous implementation ran
+    // three Firestore queries for every search, which could be expensive.
+    const results = [];
 
-    const results = new Map();
-
-    // Search the local catalogue first.
     for (const token of this.tokens.values()) {
       const matches =
         token.mint?.toLowerCase().includes(term) ||
         token.name?.toLowerCase().includes(term) ||
         token.symbol?.toLowerCase().includes(term);
 
-      if (matches) {
-        results.set(token.mint, token);
-      }
+      if (matches) results.push(token);
     }
 
-    // Search Firestore for older or unloaded tokens.
-    try {
-      const tokensRef = collection(db, TOKEN_COLLECTION);
-
-      const searches = [
-        query(
-          tokensRef,
-          where("mint", "==", searchTerm.trim()),
-          limit(SEARCH_LIMIT)
-        ),
-
-        query(
-          tokensRef,
-          where("nameLower", ">=", term),
-          where("nameLower", "<=", term + "\uf8ff"),
-          limit(SEARCH_LIMIT)
-        ),
-
-        query(
-          tokensRef,
-          where("symbolLower", ">=", term),
-          where("symbolLower", "<=", term + "\uf8ff"),
-          limit(SEARCH_LIMIT)
-        )
-      ];
-
-      const snapshots = await Promise.all(
-        searches.map((searchQuery) => getDocs(searchQuery))
-      );
-
-      snapshots.forEach((snapshot) => {
-        snapshot.forEach((document) => {
-          const token = document.data();
-
-          if (token.mint) {
-            results.set(token.mint, token);
-          }
-        });
-      });
-
-    } catch (error) {
-      console.error(
-        "[TokenService] Firestore search error:",
-        error
-      );
-    }
-
-    return Array.from(results.values()).sort(
+    return results.sort(
       (a, b) =>
         Number(b.detectedAtMs || 0) -
         Number(a.detectedAtMs || 0)
@@ -500,10 +420,7 @@ class TokenService {
       try {
         listener(data);
       } catch (error) {
-        console.error(
-          "[TokenService] Listener error:",
-          error
-        );
+        console.error("[TokenService] Listener error:", error);
       }
     });
   }
@@ -514,12 +431,15 @@ class TokenService {
       this.socket = null;
     }
 
-    if (this.firestoreUnsubscribe) {
-      this.firestoreUnsubscribe();
-      this.firestoreUnsubscribe = null;
+    if (this.cacheSaveTimer) {
+      clearTimeout(this.cacheSaveTimer);
+      this.cacheSaveTimer = null;
     }
 
+    this.writeLocalCache();
+
     this.connected = false;
+    this.firestoreLoaded = false;
 
     console.log("[TokenService] Disconnected");
   }
