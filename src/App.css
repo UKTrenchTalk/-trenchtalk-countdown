@@ -2958,4 +2958,341 @@ html, body, #root { min-height: 100%; background: var(--background); }
     transform: scale(1.2) !important;
     transform-origin: center center !important;
   }
+
+
+
+/* =========================================
+   TRENCHTALK PROFILE EDITOR — MODERN UI
+========================================= */
+
+.ttpe-advanced-form {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  padding: 30px;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: var(--surface);
+}
+
+.ttpe-settings-group {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 25px;
+  border: 1px solid var(--border);
+  border-radius: 15px;
+  background: rgba(255,255,255,.25);
+}
+
+.ttpe-settings-group .ttpe-section-heading {
+  margin-bottom: 5px;
+}
+
+.ttpe-settings-group .ttpe-section-heading h2 {
+  margin: 0 0 6px;
+  color: var(--forest-dark);
+  font-family: var(--display);
+  font-size: 21px;
+  font-weight: 800;
+}
+
+.ttpe-settings-group .ttpe-section-heading p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+/* Field layout */
+
+.ttpe-field {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  margin: 0;
+}
+
+.ttpe-field > label,
+.ttpe-label-row label {
+  color: var(--forest);
+  font-family: var(--display);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.2px;
+}
+
+.ttpe-field small {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.ttpe-label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ttpe-label-row span {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+/* Inputs */
+
+.ttpe-field input:not([type="color"]):not([type="range"]),
+.ttpe-field textarea,
+.ttpe-field select {
+  width: 100%;
+  min-height: 48px;
+  padding: 13px 15px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  outline: none;
+  background: #edf1e8;
+  color: var(--forest-dark);
+  font-family: var(--body);
+  font-size: 13px;
+  font-weight: 600;
+  transition: border-color .2s, box-shadow .2s, background .2s;
+}
+
+.ttpe-field textarea {
+  min-height: 105px;
+  resize: vertical;
+  line-height: 1.6;
+}
+
+.ttpe-field input:focus,
+.ttpe-field textarea:focus,
+.ttpe-field select:focus {
+  border-color: var(--accent-dark);
+  background: #f5f7f0;
+  box-shadow: 0 0 0 3px rgba(185,216,90,.2);
+}
+
+.ttpe-field input::placeholder,
+.ttpe-field textarea::placeholder {
+  color: #899582;
+  font-weight: 400;
+}
+
+.ttpe-field input[readonly] {
+  opacity: .7;
+  cursor: not-allowed;
+}
+
+/* Dropdown menus */
+
+.ttpe-field select {
+  appearance: none;
+  cursor: pointer;
+  padding-right: 42px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23344d35' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 15px center;
+}
+
+/* Selection buttons */
+
+.ttpe-choice-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+}
+
+.ttpe-choice-row button {
+  min-height: 42px;
+  padding: 10px 17px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: #edf1e8;
+  color: var(--forest);
+  font-size: 12px;
+  font-weight: 700;
+  transition: .2s;
+}
+
+.ttpe-choice-row button:hover {
+  border-color: var(--accent-dark);
+  background: #e1e9d5;
+}
+
+.ttpe-choice-row button.selected {
+  border-color: var(--forest);
+  background: var(--forest);
+  color: white;
+  box-shadow: 0 3px 9px rgba(38,59,38,.12);
+}
+
+/* Colour pickers */
+
+.ttpe-colour-picker {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 64px;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  background: #edf1e8;
+}
+
+.ttpe-colour-picker input[type="color"] {
+  width: 43px;
+  height: 43px;
+  padding: 3px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: white;
+  cursor: pointer;
+}
+
+.ttpe-colour-picker strong {
+  color: var(--forest-dark);
+  font-family: var(--display);
+  font-size: 12px;
+  letter-spacing: .5px;
+}
+
+/* Range slider */
+
+.ttpe-field input[type="range"] {
+  width: 100%;
+  accent-color: var(--forest);
+  cursor: pointer;
+}
+
+/* Upload controls */
+
+.ttpe-banner-button,
+.ttpe-avatar-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  padding: 9px 15px;
+  border: 1px solid rgba(255,255,255,.25);
+  border-radius: 8px;
+  background: var(--forest);
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: .2s;
+}
+
+.ttpe-banner-button:hover,
+.ttpe-avatar-button:hover {
+  background: var(--forest-hover);
+}
+
+.ttpe-banner-button input,
+.ttpe-avatar-button input {
+  display: none;
+}
+
+/* Save area */
+
+.ttpe-save-row {
+  position: sticky;
+  bottom: 12px;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 19px 22px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: rgba(237,241,232,.96);
+  box-shadow: 0 8px 25px rgba(38,59,38,.1);
+  backdrop-filter: blur(12px);
+}
+
+.ttpe-save-row > div {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.ttpe-save-row strong {
+  color: var(--forest-dark);
+  font-family: var(--display);
+  font-size: 14px;
+}
+
+.ttpe-save-row span {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.ttpe-save-button {
+  min-height: 46px;
+  padding: 0 25px;
+  border: 0;
+  border-radius: 9px;
+  background: var(--forest);
+  color: white;
+  font-size: 12px;
+  font-weight: 800;
+  transition: .2s;
+}
+
+.ttpe-save-button:hover:not(:disabled) {
+  background: var(--forest-hover);
+  transform: translateY(-1px);
+}
+
+.ttpe-save-button:disabled {
+  opacity: .55;
+  cursor: not-allowed;
+}
+
+/* Save feedback */
+
+.ttpe-message {
+  padding: 14px 17px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.ttpe-message.success {
+  border-color: #9dbb75;
+  background: #e4eed8;
+  color: #344d35;
+}
+
+.ttpe-message.error {
+  border-color: #d5a49b;
+  background: #f6e6e2;
+  color: #873d32;
+}
+
+/* Responsive */
+
+@media (max-width: 750px) {
+  .ttpe-advanced-form {
+    padding: 14px;
+    gap: 18px;
+  }
+
+  .ttpe-settings-group {
+    padding: 17px;
+  }
+
+  .ttpe-save-row {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .ttpe-save-button {
+    width: 100%;
+  }
+}
+
+
 }
