@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 
 import { onAuthStateChanged, signOut } from "firebase/auth";
 
-import { collection, doc, getDoc, getDocs } from "firebase/firestore";
+import { collection, doc, getDoc, getDocs, limit, query } from "firebase/firestore";
 
 import { auth, db } from "./firebase.js";
 
@@ -628,6 +628,8 @@ const [createMenuOpen, setCreateMenuOpen] = useState(false);
 
   const [exploreTab, setExploreTab] = useState("trending");
   const [exploreResults, setExploreResults] = useState([]);
+  const [exploreSourceRows, setExploreSourceRows] = useState([]);
+  const exploreCacheRef = useRef(new Map());
   const [exploreLoading, setExploreLoading] = useState(false);
   const [exploreError, setExploreError] = useState("");
 
@@ -1114,9 +1116,11 @@ const [createMenuOpen, setCreateMenuOpen] = useState(false);
 
   }, [search, activePage, exploreTab]);
 
-  // Each non-coin Explore tab reads only its own Firestore collection.
+  // Load each Explore collection at most once every five minutes.
+  // Search is performed against the cached rows in memory, not by rereading Firestore.
   useEffect(() => {
     if (activePage !== "explore" || exploreTab === "coins") {
+      setExploreSourceRows([]);
       setExploreResults([]);
       setExploreError("");
       setExploreLoading(false);
@@ -1124,51 +1128,134 @@ const [createMenuOpen, setCreateMenuOpen] = useState(false);
     }
 
     let cancelled = false;
-    const collectionName = exploreTab === "trending" ? "posts" : exploreTab === "people" ? "users" : "communities";
-    const term = search.trim().toLowerCase();
+
+    const collectionName =
+      exploreTab === "trending"
+        ? "posts"
+        : exploreTab === "people"
+          ? "users"
+          : "communities";
 
     async function loadExploreCollection() {
       setExploreLoading(true);
       setExploreError("");
+
       try {
-        const snapshot = await getDocs(collection(db, collectionName));
-        let rows = snapshot.docs.map((entry) => ({ id: entry.id, ...entry.data() }));
+        const cached = exploreCacheRef.current.get(collectionName);
+        const cacheIsFresh =
+          cached &&
+          Date.now() - cached.loadedAt < 5 * 60 * 1000;
 
-        if (exploreTab === "people") rows = rows.filter((item) => item.id !== user?.uid);
+        let rows;
 
-        if (term) {
-          rows = rows.filter((item) => {
-            const fields = exploreTab === "trending"
-              ? [item.text, item.content, item.body, item.username, item.user, item.displayName, item.name, item.community]
-              : exploreTab === "people"
-                ? [item.username, item.displayName, item.name, item.bio]
-                : [item.name, item.title, item.description, item.slug, item.handle];
-            return fields.some((value) => String(value || "").toLowerCase().includes(term));
+        if (cacheIsFresh) {
+          rows = cached.rows;
+        } else {
+          // Hard cap the number of documents read per collection load.
+          const collectionQuery = query(
+            collection(db, collectionName),
+            limit(50)
+          );
+
+          const snapshot = await getDocs(collectionQuery);
+          rows = snapshot.docs.map((entry) => ({
+            id: entry.id,
+            ...entry.data()
+          }));
+
+          exploreCacheRef.current.set(collectionName, {
+            rows,
+            loadedAt: Date.now()
           });
         }
 
-        if (exploreTab === "trending") {
-          const engagement = (item) => Number(item.likesCount ?? item.likes ?? 0) + Number(item.commentsCount ?? item.comments ?? 0) + Number(item.repostsCount ?? item.reposts ?? 0);
-          rows.sort((a, b) => engagement(b) - engagement(a));
-        } else {
-          rows.sort((a, b) => String(a.displayName || a.name || a.username || a.title || "").localeCompare(String(b.displayName || b.name || b.username || b.title || "")));
+        if (exploreTab === "people") {
+          rows = rows.filter((item) => item.id !== user?.uid);
         }
 
-        if (!cancelled) setExploreResults(rows);
+        if (!cancelled) {
+          setExploreSourceRows(rows);
+        }
       } catch (error) {
         console.error(`Explore ${exploreTab} lookup failed:`, error);
+
         if (!cancelled) {
+          setExploreSourceRows([]);
           setExploreResults([]);
-          setExploreError(`Couldn't load ${exploreTab}. The Firestore collection "${collectionName}" must exist and be readable.`);
+          setExploreError(
+            `Couldn't load ${exploreTab}. Check that the "${collectionName}" collection exists and that Firestore rules permit reading it.`
+          );
         }
       } finally {
         if (!cancelled) setExploreLoading(false);
       }
     }
 
-    const timer = setTimeout(loadExploreCollection, 220);
-    return () => { cancelled = true; clearTimeout(timer); };
-  }, [activePage, exploreTab, search, user?.uid]);
+    loadExploreCollection();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [activePage, exploreTab, user?.uid]);
+
+  // Filter and sort cached Explore data locally as the user types.
+  useEffect(() => {
+    if (activePage !== "explore" || exploreTab === "coins") return;
+
+    const term = search.trim().toLowerCase();
+    let rows = [...exploreSourceRows];
+
+    if (term) {
+      rows = rows.filter((item) => {
+        const fields =
+          exploreTab === "trending"
+            ? [
+                item.text,
+                item.content,
+                item.body,
+                item.username,
+                item.user,
+                item.displayName,
+                item.name,
+                item.community
+              ]
+            : exploreTab === "people"
+              ? [item.username, item.displayName, item.name, item.bio]
+              : [
+                  item.name,
+                  item.title,
+                  item.description,
+                  item.slug,
+                  item.handle
+                ];
+
+        return fields.some((value) =>
+          String(value || "").toLowerCase().includes(term)
+        );
+      });
+    }
+
+    if (exploreTab === "trending") {
+      const engagement = (item) =>
+        Number(item.likesCount ?? item.likes ?? 0) +
+        Number(item.commentsCount ?? item.comments ?? 0) +
+        Number(item.repostsCount ?? item.reposts ?? 0);
+
+      rows.sort((a, b) => engagement(b) - engagement(a));
+    } else {
+      rows.sort((a, b) =>
+        String(
+          a.displayName || a.name || a.username || a.title || ""
+        ).localeCompare(
+          String(
+            b.displayName || b.name || b.username || b.title || ""
+          )
+        )
+      );
+    }
+
+    setExploreResults(rows);
+  }, [activePage, exploreTab, search, exploreSourceRows]);
 
   const username =
 
