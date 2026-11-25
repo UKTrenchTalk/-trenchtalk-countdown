@@ -2839,3 +2839,75 @@ html, body, #root { min-height: 100%; background: var(--background); }
     background: linear-gradient(165deg, #12351d 0%, #0d2a17 100%) !important;
   }
 }
+
+
+/* =========================================================
+   TRENCHTALK APP SHELL — INDEPENDENT SCROLLING
+   Desktop: fixed app viewport, independently scrolling
+   sidebar and page content. Mobile layout is unchanged.
+   ========================================================= */
+@media (min-width: 751px) {
+  html,
+  body,
+  #root {
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+    overscroll-behavior: none;
+  }
+
+  .tt-dashboard {
+    height: 100vh;
+    height: 100dvh;
+    min-height: 0;
+    overflow: hidden;
+    overscroll-behavior: none;
+  }
+
+  .tt-dashboard > .tt-sidebar {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    height: 100vh;
+    height: 100dvh;
+    min-height: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .tt-dashboard > .tt-main {
+    height: 100vh;
+    height: 100dvh;
+    min-height: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+@media (max-width: 750px) {
+  html,
+  body,
+  #root {
+    height: auto;
+    min-height: 100%;
+    overflow: auto;
+    overscroll-behavior: auto;
+  }
+
+  .tt-dashboard {
+    height: auto;
+    min-height: 100vh;
+    min-height: 100dvh;
+    overflow: visible;
+  }
+
+  .tt-main {
+    height: auto;
+    min-height: 0;
+    overflow: visible;
+  }
+}
