@@ -2573,3 +2573,227 @@ html, body, #root { min-height: 100%; background: var(--background); }
     object-fit: contain !important;
   }
 }
+
+
+/* =========================================================
+   TRENCHTALK — FOREST SIDEBAR VISUAL UPDATE
+   Based on the supplied current stylesheet.
+   Desktop-only: preserves the existing mobile bottom navigation.
+   ========================================================= */
+@media (min-width: 751px) {
+  .tt-dashboard > .tt-sidebar {
+    width: 325px !important;
+    padding: 24px 20px 24px !important;
+    gap: 0;
+    background: linear-gradient(165deg, #0b2410 0%, #06170b 100%) !important;
+    border-right: 1px solid #18351d !important;
+    box-shadow: 8px 0 28px rgba(13, 34, 17, .08);
+  }
+
+  .tt-dashboard > .tt-main {
+    margin-left: 325px !important;
+  }
+
+  /* Brand sits above the account card, as in the approved mockup. */
+  .tt-dashboard > .tt-sidebar > .tt-brand {
+    order: 1 !important;
+    min-height: 72px;
+    margin: 0 0 18px !important;
+    padding: 0 12px !important;
+    gap: 13px;
+    color: #f3f7ee !important;
+    font-size: 24px !important;
+    letter-spacing: -1.1px;
+  }
+
+  .tt-dashboard > .tt-sidebar > .tt-brand img {
+    width: 52px !important;
+    height: 52px !important;
+    filter: brightness(1.15) saturate(1.2);
+  }
+
+  .tt-dashboard > .tt-sidebar > .tt-brand > span > span {
+    color: #c5ff00 !important;
+  }
+
+  .tt-dashboard > .tt-sidebar > .tt-profile-area {
+    order: 2 !important;
+    margin: 0 0 19px !important;
+  }
+
+  .tt-dashboard > .tt-sidebar .tt-profile-button {
+    min-height: 88px !important;
+    padding: 13px 15px !important;
+    gap: 13px;
+    border: 1px solid rgba(180, 220, 155, .08) !important;
+    border-radius: 15px !important;
+    background: linear-gradient(145deg, #102b16, #0a2010) !important;
+    box-shadow: 0 7px 20px rgba(0, 0, 0, .22) !important;
+  }
+
+  .tt-dashboard > .tt-sidebar .tt-profile-button:hover {
+    background: #15351c !important;
+    border-color: rgba(197, 255, 0, .18) !important;
+  }
+
+  .tt-dashboard > .tt-sidebar .tt-profile-button .tt-avatar {
+    width: 52px !important;
+    height: 52px !important;
+    background: #456d35 !important;
+    border: 1px solid #6c914f !important;
+    color: #fff !important;
+    font-size: 16px;
+  }
+
+  .tt-dashboard > .tt-sidebar .tt-profile-details strong {
+    color: #fff !important;
+    font-size: 15px !important;
+  }
+
+  .tt-dashboard > .tt-sidebar .tt-profile-details small {
+    color: #c4d5bd !important;
+    font-size: 12px !important;
+  }
+
+  .tt-dashboard > .tt-sidebar .tt-profile-more {
+    color: #d5e5cc !important;
+  }
+
+  .tt-dashboard > .tt-sidebar > .tt-sidebar-divider {
+    order: 3 !important;
+    margin: 0 10px 19px !important;
+    background: rgba(206, 228, 194, .2) !important;
+  }
+
+  .tt-dashboard > .tt-sidebar > .tt-nav-heading {
+    order: 4 !important;
+    margin: 0 0 13px !important;
+    padding: 0 15px !important;
+    color: #a9bea3 !important;
+    font-size: 10px !important;
+    letter-spacing: 1.8px;
+  }
+
+  .tt-dashboard > .tt-sidebar > nav.tt-navigation {
+    order: 5 !important;
+    min-height: 0 !important;
+    gap: 5px !important;
+  }
+
+  .tt-dashboard > .tt-sidebar > nav.tt-navigation > button.tt-nav-item {
+    flex: 0 0 63px !important;
+    height: 63px !important;
+    min-height: 63px !important;
+    gap: 17px !important;
+    padding: 0 17px !important;
+    border-radius: 12px !important;
+    background: transparent !important;
+    color: #f0f5eb !important;
+    font-size: 16px !important;
+    transition: background .18s ease, color .18s ease, transform .18s ease;
+  }
+
+  .tt-dashboard > .tt-sidebar > nav.tt-navigation > button.tt-nav-item:hover {
+    background: rgba(197, 255, 0, .10) !important;
+    color: #fff !important;
+  }
+
+  .tt-dashboard > .tt-sidebar > nav.tt-navigation > button.tt-nav-item.active {
+    background: linear-gradient(100deg, #294d20, #365b25) !important;
+    color: #fff !important;
+    box-shadow: inset 0 0 0 1px rgba(197, 255, 0, .08);
+  }
+
+  .tt-dashboard > .tt-sidebar > nav.tt-navigation .tt-nav-icon {
+    width: 36px !important;
+    min-width: 36px !important;
+    height: 36px !important;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    color: #eaf3e4 !important;
+    font-size: 29px !important;
+    line-height: 1;
+  }
+
+  .tt-dashboard > .tt-sidebar > nav.tt-navigation .tt-nav-icon svg {
+    width: 29px !important;
+    height: 29px !important;
+    stroke: currentColor;
+  }
+
+  .tt-dashboard > .tt-sidebar > nav.tt-navigation .tt-nav-icon img {
+    width: 29px !important;
+    height: 29px !important;
+    object-fit: contain;
+    filter: brightness(0) invert(1);
+  }
+
+  .tt-dashboard > .tt-sidebar > nav.tt-navigation .tt-nav-label {
+    color: inherit !important;
+    font-size: 16px !important;
+    font-weight: 700 !important;
+  }
+
+  /* Anchor the existing create-menu wrapper to the bottom.
+     Keeping the original wrapper preserves its dropdown behaviour. */
+  .tt-dashboard > .tt-sidebar > .tt-create-wrap {
+    order: 6 !important;
+    flex: 0 0 auto !important;
+    width: 100% !important;
+    margin-top: auto !important;
+    padding-top: 22px;
+  }
+
+  .tt-dashboard > .tt-sidebar .tt-post-button {
+    min-height: 65px !important;
+    border: 1px solid rgba(197, 255, 0, .35) !important;
+    border-radius: 13px !important;
+    background: #c5ff00 !important;
+    color: #07170a !important;
+    font-family: var(--display);
+    font-size: 17px !important;
+    font-weight: 800 !important;
+    box-shadow: 0 7px 20px rgba(0, 0, 0, .2) !important;
+  }
+
+  .tt-dashboard > .tt-sidebar .tt-post-button:hover {
+    background: #d2ff36 !important;
+    color: #07170a !important;
+    transform: translateY(-2px);
+  }
+
+  .tt-dashboard > .tt-sidebar .tt-post-button > span {
+    font-size: 27px !important;
+    line-height: 1;
+  }
+
+  /* The mockup uses the Create button as the bottom anchor,
+     so the small footer is hidden on desktop. */
+  .tt-dashboard > .tt-sidebar > .tt-sidebar-footer {
+    display: none !important;
+  }
+}
+
+/* Keep the dark sidebar identity on narrower desktop/tablet layouts,
+   without changing the established mobile bottom navigation. */
+@media (min-width: 751px) and (max-width: 1050px) {
+  .tt-dashboard > .tt-sidebar {
+    background: linear-gradient(165deg, #0b2410 0%, #06170b 100%) !important;
+  }
+  .tt-dashboard > .tt-sidebar > .tt-brand {
+    font-size: 17px !important;
+    gap: 8px;
+  }
+  .tt-dashboard > .tt-sidebar > .tt-brand img {
+    width: 40px !important;
+    height: 40px !important;
+  }
+  .tt-dashboard > .tt-sidebar > nav.tt-navigation > button.tt-nav-item {
+    gap: 10px !important;
+    padding: 0 10px !important;
+  }
+  .tt-dashboard > .tt-sidebar > nav.tt-navigation .tt-nav-label {
+    font-size: 13px !important;
+  }
+}
