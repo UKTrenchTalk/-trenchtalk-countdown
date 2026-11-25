@@ -199,6 +199,22 @@ export async function discoverSolanaTokens({ force = false } = {}) {
   try { return await discoveryPromise; } finally { discoveryPromise = null; }
 }
 
+async function enrichCoinGeckoSearchCoins(coins) {
+  const ids = [...new Set((coins || []).map(coin => coin.id).filter(Boolean))].slice(0, 50);
+  if (!ids.length) return [];
+  try {
+    const marketRows = await getJson(
+      `${COINGECKO_API}/coins/markets?vs_currency=usd&ids=${encodeURIComponent(ids.join(","))}&order=market_cap_desc&per_page=50&page=1&sparkline=false`,
+      "CoinGecko market data"
+    );
+    const byId = new Map((Array.isArray(marketRows) ? marketRows : []).map(row => [row.id, row]));
+    return coins.map(coin => mapCoinGeckoCoin({ ...coin, ...(byId.get(coin.id) || {}) }));
+  } catch (error) {
+    console.warn("[MarketData] CoinGecko market enrichment unavailable:", error.message);
+    return coins.map(mapCoinGeckoCoin);
+  }
+}
+
 export async function searchAllCoins(term) {
   const query = String(term || "").trim();
   if (query.length < 2) return [];
@@ -234,7 +250,7 @@ export async function searchAllCoins(term) {
 
   if (listedResult.status === "fulfilled") {
     const coins = listedResult.value?.coins || [];
-    results.push(...coins.slice(0, 30).map(mapCoinGeckoCoin));
+    results.push(...await enrichCoinGeckoSearchCoins(coins.slice(0, 30)));
   } else failures.push(listedResult.reason?.message || "CoinGecko search failed.");
 
   if (onchainResult.status === "fulfilled") {
@@ -256,7 +272,13 @@ export async function searchAllCoins(term) {
 
 export async function enrichTokens(tokens) {
   if (!Array.isArray(tokens) || !tokens.length) return [];
-  const onchain = tokens.filter(t => t?.mint && !String(t.mint).startsWith("coingecko:"));
+  const onchain = tokens.filter(t => {
+    if (!t?.mint || String(t.mint).startsWith("coingecko:")) return false;
+    const market = t.market || {};
+    // Pool discovery already includes price, volume and liquidity. Reuse it instead
+    // of issuing one additional API request per token (the public API is rate-limited).
+    return !(Number(market.volume24h) > 0 && Number(market.liquidity) > 0);
+  });
   if (!onchain.length) return tokens;
   const enriched = await Promise.all(onchain.map(async token => {
     const cached = marketCache.get(token.mint);

@@ -1,10 +1,7 @@
 import tokenService from "./tokenservice.js";
-import { enrichTokens } from "./marketDataService.js";
 
 const REFRESH_INTERVAL = 90_000;
 const MAX_TRENDING = 20;
-const MIN_VOLUME_24H = 25_000;
-const MIN_LIQUIDITY = 5_000;
 
 class TrendingService {
   constructor() {
@@ -30,11 +27,17 @@ class TrendingService {
     if (!this.started || this.refreshing || !tokens?.length) return;
     this.refreshing = true;
     try {
-      const enriched = await enrichTokens(tokens.slice(0, 30));
-      this.trending = enriched.filter(t => t.market &&
-        Number(t.market.volume24h || 0) >= MIN_VOLUME_24H &&
-        Number(t.market.liquidity || 0) >= MIN_LIQUIDITY)
-        .sort((a, b) => Number(b.market.volume24h || 0) - Number(a.market.volume24h || 0))
+      // GeckoTerminal's trending/new-pool responses already contain the pool
+      // price, 24h volume and liquidity. Do not fan out into one API call per token.
+      // Keep active pools even when they fall below arbitrary volume thresholds.
+      this.trending = tokens
+        .filter(token => token?.mint && token.market && (
+          Number(token.market.volume24h || 0) > 0 || Number(token.market.liquidity || 0) > 0
+        ))
+        .sort((a, b) => {
+          const volume = Number(b.market?.volume24h || 0) - Number(a.market?.volume24h || 0);
+          return volume || Number(b.market?.liquidity || 0) - Number(a.market?.liquidity || 0);
+        })
         .slice(0, MAX_TRENDING);
       this.notify();
     } catch (error) {
