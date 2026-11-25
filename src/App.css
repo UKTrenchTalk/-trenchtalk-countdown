@@ -2800,70 +2800,42 @@ html, body, #root { min-height: 100%; background: var(--background); }
 
 
 /* =========================================================
-   DESKTOP SIDEBAR — FULL-SIZE ITEMS DISTRIBUTED TO CREATE
-   Retains the original approved sizing and visual styling.
+   FINAL SIDEBAR TUNING
+   Remove Saved, raise the profile slightly, soften the forest.
    ========================================================= */
 @media (min-width: 751px) {
+  /* A softer forest green: still dark, no longer near-black. */
   .tt-dashboard > .tt-sidebar {
-    height: 100vh !important;
-    height: 100dvh !important;
-    min-height: 0 !important;
-    overflow-x: hidden !important;
-    overflow-y: auto !important;
-    display: flex !important;
-    flex-direction: column !important;
+    background: linear-gradient(165deg, #12351d 0%, #0d2a17 100%) !important;
   }
 
-  .tt-dashboard > .tt-sidebar > .tt-brand,
-  .tt-dashboard > .tt-sidebar > .tt-profile-area,
-  .tt-dashboard > .tt-sidebar > .tt-sidebar-divider,
-  .tt-dashboard > .tt-sidebar > .tt-nav-heading,
-  .tt-dashboard > .tt-sidebar > .tt-create-wrap {
-    flex: 0 0 auto !important;
+  /* Lift the account card and free a little more room for navigation. */
+  .tt-dashboard > .tt-sidebar > .tt-brand {
+    margin-bottom: 12px !important;
   }
 
-  .tt-dashboard > .tt-sidebar > nav.tt-navigation {
-    order: 5 !important;
-    display: flex !important;
-    flex: 1 1 auto !important;
-    min-height: 0 !important;
-    height: auto !important;
-    flex-direction: column !important;
-    justify-content: space-evenly !important;
-    align-items: stretch !important;
-    gap: 0 !important;
-    overflow: visible !important;
+  .tt-dashboard > .tt-sidebar > .tt-profile-area {
+    margin-bottom: 12px !important;
   }
 
-  .tt-dashboard > .tt-sidebar > nav.tt-navigation > button.tt-nav-item {
-    flex: 0 0 clamp(52px, 7.5vh, 63px) !important;
-    height: clamp(52px, 7.5vh, 63px) !important;
-    min-height: clamp(52px, 7.5vh, 63px) !important;
-    gap: 17px !important;
-    padding: 0 17px !important;
-    font-size: 16px !important;
+  /* Slightly lighter account card, coordinated with the sidebar. */
+  .tt-dashboard > .tt-sidebar .tt-profile-button {
+    background: linear-gradient(145deg, #193b23, #15331e) !important;
+    border-color: rgba(190, 225, 170, .12) !important;
   }
 
-  .tt-dashboard > .tt-sidebar > nav.tt-navigation .tt-nav-icon {
-    width: 36px !important;
-    min-width: 36px !important;
-    height: 36px !important;
-    font-size: 29px !important;
+  .tt-dashboard > .tt-sidebar .tt-profile-button:hover {
+    background: #20472a !important;
   }
 
-  .tt-dashboard > .tt-sidebar > nav.tt-navigation .tt-nav-icon svg,
-  .tt-dashboard > .tt-sidebar > nav.tt-navigation .tt-nav-icon img {
-    width: 29px !important;
-    height: 29px !important;
+  /* Saved is the sixth/final navigation action. */
+  .tt-dashboard > .tt-sidebar > nav.tt-navigation > button.tt-nav-item:last-child {
+    display: none !important;
   }
+}
 
-  .tt-dashboard > .tt-sidebar > nav.tt-navigation .tt-nav-label {
-    font-size: 16px !important;
-  }
-
-  .tt-dashboard > .tt-sidebar > .tt-create-wrap {
-    order: 6 !important;
-    margin-top: 0 !important;
-    padding-top: clamp(10px, 2.6vh, 22px) !important;
+@media (min-width: 751px) and (max-width: 1050px) {
+  .tt-dashboard > .tt-sidebar {
+    background: linear-gradient(165deg, #12351d 0%, #0d2a17 100%) !important;
   }
 }
