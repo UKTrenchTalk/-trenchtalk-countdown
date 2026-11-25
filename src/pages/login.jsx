@@ -22,7 +22,7 @@ import { auth, db, googleProvider } from "../firebase";
 // USERNAMES THAT CANNOT BE REGISTERED
 const RESERVED_USERNAMES = [
   "admin", "administrator", "moderator", "support", "staff",
-  "help", "security", "official", "trenchtalk", "system",
+  "help", "security", "official", "system",
   "root", "null", "undefined", "elonmusk", "mrbeast",
   "youtube", "discord", "instagram", "tiktok", "twitter",
   "google", "facebook", "microsoft", "apple"
