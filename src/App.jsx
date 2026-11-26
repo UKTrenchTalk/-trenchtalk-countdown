@@ -458,11 +458,11 @@ function TokenCard({ token, index, onImageError }) {
 
       <div className="tt-token-price">
 
-       {market.marketCap != null
-
-  ? `${formatMoney(market.marketCap)} MC`
-
-  : "Market cap unavailable"}
+       {Number(market.marketCap) > 0
+          ? `${formatMoney(market.marketCap)} MC`
+          : Number(market.fdv || market.marketCapOrFdv) > 0
+            ? `${formatMoney(market.fdv || market.marketCapOrFdv)} FDV`
+            : "Valuation unavailable"}
 
       </div>
 

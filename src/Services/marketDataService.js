@@ -69,6 +69,7 @@ function tokensFromPools(json) {
       const t = included.get(ref.id) || {};
       const address = t.address || tokenIdFromResource({ id: ref.id, attributes: t });
       if (!address) continue;
+      const isBaseToken = side === "base_token";
       const token = {
         mint: address,
         name: t.name || "Unknown Token",
@@ -80,10 +81,11 @@ function tokensFromPools(json) {
         pool: attrs.address || null,
         source: "gecko",
         market: {
-          priceUsd: num(attrs.base_token_price_usd),
+          priceUsd: num(isBaseToken ? attrs.base_token_price_usd : attrs.quote_token_price_usd) || null,
           marketCap: num(t.market_cap_usd || attrs.market_cap_usd) || null,
-          fdv: num(attrs.fdv_usd) || null,
-          marketCapOrFdv: num(t.market_cap_usd || attrs.market_cap_usd || attrs.fdv_usd) || null,
+          fdv: num(t.fdv_usd || attrs.fdv_usd) || null,
+          marketCapOrFdv: num(t.market_cap_usd || attrs.market_cap_usd || t.fdv_usd || attrs.fdv_usd) || null,
+          valuationType: num(t.market_cap_usd || attrs.market_cap_usd) > 0 ? "MC" : (num(t.fdv_usd || attrs.fdv_usd) > 0 ? "FDV" : null),
           liquidity: num(attrs.reserve_in_usd),
           volume24h: num(attrs.volume_usd?.h24),
           volume6h: num(attrs.volume_usd?.h6),
