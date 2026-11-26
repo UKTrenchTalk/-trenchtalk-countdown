@@ -44,7 +44,10 @@ export default function ProfileEditor({
   profile,
   onProfileUpdated,
   onNavigate,
-  onLogout
+  onLogout,
+  savedAccounts = [],
+  onAddAccount,
+  onSelectAccount
 }) {
   const [form, setForm] = useState(DEFAULTS);
   const [saving, setSaving] = useState(false);
@@ -235,28 +238,28 @@ export default function ProfileEditor({
 
         <div className="ttpe-sidebar-divider" />
 
-        <div className="ttpe-sidebar-account">
-          <div className="ttpe-sidebar-avatar">
-            {form.avatarUrl ? (
-              <img src={form.avatarUrl} alt="" />
-            ) : (
-              form.displayName?.[0]?.toUpperCase() || "T"
-            )}
+        <div className="ttpe-account-stack">
+          <div className="ttpe-sidebar-account is-active-account">
+            <div className="ttpe-sidebar-avatar">
+              {form.avatarUrl ? <img src={form.avatarUrl} alt="" /> : (form.displayName?.[0]?.toUpperCase() || "T")}
+            </div>
+            <div className="ttpe-sidebar-account-info"><strong>{form.displayName || "Your account"}</strong><span>@{form.username || "username"}</span></div>
+            <em>Active</em>
           </div>
-
-          <div className="ttpe-sidebar-account-info">
-            <strong>{form.displayName || "Your account"}</strong>
-            <span>@{form.username || "username"}</span>
-          </div>
+          {savedAccounts.filter(item => item.uid !== user?.uid).map(item => (
+            <button key={item.uid} type="button" className="ttpe-sidebar-account ttpe-switch-account" onClick={() => onSelectAccount?.(item)} title={`Switch to ${item.email}`}>
+              <div className="ttpe-sidebar-avatar">{(item.displayName || item.email || "A")[0]?.toUpperCase()}</div>
+              <div className="ttpe-sidebar-account-info"><strong>{item.displayName || item.email}</strong><span>{item.email}</span></div>
+              <span className="ttpe-switch-label">Switch</span>
+            </button>
+          ))}
         </div>
 
         <div className="ttpe-sidebar-actions">
           <button
             type="button"
             className="ttpe-add-account"
-            onClick={() =>
-              window.dispatchEvent(new Event("tt-open-add-account"))
-            }
+            onClick={onAddAccount}
           >
             <span>+</span>
             <span className="ttpe-add-account-label">

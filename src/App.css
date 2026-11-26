@@ -3975,3 +3975,15 @@ html, body, #root { min-height: 100%; background: var(--background); }
   .tt-account-modal { padding: 25px 19px; border-radius: 15px; }
   .tt-account-modal h2 { font-size: 22px; }
 }
+
+
+/* Remembered accounts shown directly beneath the active account. */
+.ttpe-account-stack { display: grid; gap: 8px; margin: 18px 0 12px; }
+.ttpe-account-stack .ttpe-sidebar-account { box-sizing: border-box; width: 100%; min-width: 0; }
+.ttpe-sidebar-account.is-active-account { position: relative; padding-right: 62px; }
+.ttpe-sidebar-account.is-active-account em { position: absolute; right: 13px; top: 50%; transform: translateY(-50%); color: #b9d85a; font-size: 9px; font-style: normal; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; }
+.ttpe-switch-account { display: flex; align-items: center; border: 1px solid rgba(222,238,213,.12); background: rgba(255,255,255,.055); color: inherit; text-align: left; cursor: pointer; transition: background .15s ease, border-color .15s ease; }
+.ttpe-switch-account:hover { background: rgba(255,255,255,.12); border-color: rgba(197,255,74,.4); }
+.ttpe-switch-account .ttpe-sidebar-account-info { flex: 1; min-width: 0; }
+.ttpe-switch-account .ttpe-sidebar-account-info strong, .ttpe-switch-account .ttpe-sidebar-account-info span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ttpe-switch-label { flex: 0 0 auto; margin-left: 8px; color: #c5ff4a; font-size: 10px; font-weight: 800; }
