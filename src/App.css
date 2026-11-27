@@ -4099,6 +4099,6 @@ html, body, #root { min-height: 100%; background: var(--background); }
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
 .tt-person-card .tt-discovery-copy p {
-  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+  display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical;
   overflow: hidden; margin: 3px 0 0;
 }
