@@ -635,8 +635,14 @@ const [createMenuOpen, setCreateMenuOpen] = useState(false);
   const [viewingPublicProfile, setViewingPublicProfile] = useState(null);
   const [accountModalOpen, setAccountModalOpen] = useState(false);
   const [savedAccounts, setSavedAccounts] = useState(() => {
-    try { return JSON.parse(localStorage.getItem("tt-saved-accounts") || "[]"); }
-    catch { return []; }
+    try {
+      const raw = JSON.parse(localStorage.getItem("tt-saved-accounts") || "[]");
+      const unique = new Map();
+      for (const item of (Array.isArray(raw) ? raw : [])) {
+        if (item?.uid && !unique.has(item.uid)) unique.set(item.uid, item);
+      }
+      return [...unique.values()];
+    } catch { return []; }
   });
   const [accountEmail, setAccountEmail] = useState("");
   const [accountPassword, setAccountPassword] = useState("");
@@ -716,15 +722,6 @@ const [createMenuOpen, setCreateMenuOpen] = useState(false);
     setAccountModalOpen(true);
   }
 
-  function removeSavedAccount(uid) {
-    if (!uid || uid === user?.uid) return;
-    setSavedAccounts(previous => {
-      const next = previous.filter(item => item.uid !== uid);
-      try { localStorage.setItem("tt-saved-accounts", JSON.stringify(next)); } catch (error) { console.warn("Could not update saved accounts:", error); }
-      return next;
-    });
-  }
-
   function selectRememberedAccount(item) {
     if (!item || item.uid === user?.uid) return;
     // Firebase uses one active Auth user per app. Re-authentication is required;
@@ -737,12 +734,11 @@ const [createMenuOpen, setCreateMenuOpen] = useState(false);
     if (!accountUser?.uid || !accountUser?.email) return;
     setSavedAccounts((previous) => {
       const next = [{
+        ...(previous.find((item) => item.uid === accountUser.uid) || {}),
         uid: accountUser.uid,
         email: accountUser.email,
         displayName: accountUser.displayName || accountUser.email.split("@")[0],
-        username: accountUser.username || accountUser.email.split("@")[0],
-        avatarUrl: accountUser.avatarUrl || "",
-        bannerUrl: accountUser.bannerUrl || ""
+        avatarUrl: accountUser.photoURL || previous.find((item) => item.uid === accountUser.uid)?.avatarUrl || ""
       }, ...previous.filter((item) => item.uid !== accountUser.uid)].slice(0, 8);
       try { localStorage.setItem("tt-saved-accounts", JSON.stringify(next)); } catch (error) { console.warn("Could not save account list:", error); }
       return next;
@@ -790,6 +786,20 @@ const [createMenuOpen, setCreateMenuOpen] = useState(false);
     }
   }
 
+  useEffect(() => {
+    const removeSaved = (event) => {
+      const uid = event.detail;
+      if (!uid || uid === user?.uid) return;
+      setSavedAccounts((previous) => {
+        const next = previous.filter((item) => item.uid !== uid);
+        try { localStorage.setItem("tt-saved-accounts", JSON.stringify(next)); } catch {}
+        return next;
+      });
+    };
+    window.addEventListener("tt-remove-saved-account", removeSaved);
+    return () => window.removeEventListener("tt-remove-saved-account", removeSaved);
+  }, [user?.uid]);
+
   // Firebase authentication.
 
   useEffect(() => {
@@ -815,12 +825,21 @@ const [createMenuOpen, setCreateMenuOpen] = useState(false);
 
           const loadedProfile = snapshot.exists() ? snapshot.data() : null;
           setProfile(loadedProfile);
-          rememberAccount({
-            ...currentUser,
-            displayName: loadedProfile?.displayName || currentUser.displayName,
-            username: loadedProfile?.username,
-            avatarUrl: loadedProfile?.avatarUrl,
-            bannerUrl: loadedProfile?.bannerUrl
+          setSavedAccounts((previous) => {
+            const current = previous.find((item) => item.uid === currentUser.uid) || {};
+            const merged = {
+              ...current,
+              uid: currentUser.uid,
+              email: currentUser.email || current.email || "",
+              displayName: loadedProfile?.displayName || currentUser.displayName || current.email?.split("@")[0] || "TrenchTalk member",
+              username: loadedProfile?.username || current.username || "",
+              avatarUrl: loadedProfile?.avatarUrl || currentUser.photoURL || current.avatarUrl || ""
+            };
+            const next = [merged, ...previous.filter((item) => item.uid !== currentUser.uid)]
+              .filter((item, index, all) => item.uid && all.findIndex((entry) => entry.uid === item.uid) === index)
+              .slice(0, 8);
+            try { localStorage.setItem("tt-saved-accounts", JSON.stringify(next)); } catch {}
+            return next;
           });
 
         } catch (error) {
@@ -1271,15 +1290,7 @@ const [createMenuOpen, setCreateMenuOpen] = useState(false);
         }
 
         if (exploreTab === "people") {
-          rows = rows
-            .filter((item) => item.id !== user?.uid)
-            .filter((item, index, all) => all.findIndex(other => other.id === item.id) === index)
-            .map(item => ({
-              ...item,
-              username: String(item.username || item.handle || item.email?.split("@")[0] || "").replace(/^@/, "").toLowerCase(),
-              displayName: item.displayName || item.name || item.username || item.email?.split("@")[0] || "TrenchTalk member",
-              avatarUrl: item.avatarUrl || item.photoURL || item.photoUrl || ""
-            }));
+          rows = rows.filter((item) => item.id !== user?.uid);
         }
 
         if (!cancelled) {
@@ -1329,7 +1340,7 @@ const [createMenuOpen, setCreateMenuOpen] = useState(false);
                 item.community
               ]
             : exploreTab === "people"
-              ? [item.username, item.handle, item.displayName, item.name, item.bio, item.email?.split("@")[0]]
+              ? [item.username, item.displayName, item.name, item.bio]
               : [
                   item.name,
                   item.title,
@@ -2024,14 +2035,14 @@ useEffect(() => {
                         const personUsername = person.username || person.handle || "";
                         return <article role="button" tabIndex={0} onClick={async () => {
                           try {
-                            const full = await getDoc(doc(db, "publicProfiles", person.id));
-                            setViewingPublicProfile({ ...person, ...(full.exists() ? full.data() : {}) , uid: person.id });
+                            const latest = await getDoc(doc(db, "publicProfiles", person.id));
+                            setViewingPublicProfile(latest.exists() ? { id: person.id, uid: person.id, ...latest.data() } : person);
                           } catch (error) {
-                            console.error("Could not load public profile:", error);
-                            setViewingPublicProfile({ ...person, uid: person.id });
+                            console.warn("Could not refresh public profile:", error);
+                            setViewingPublicProfile(person);
                           }
                           setActivePage("public-profile");
-                        }} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); event.currentTarget.click(); } }} className="tt-discovery-card tt-person-card" key={person.id}>
+                        }} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); setViewingPublicProfile(person); setActivePage("public-profile"); } }} className="tt-discovery-card tt-person-card" key={person.id}>
                           <div className="tt-discovery-avatar">{person.avatarUrl ? <img src={person.avatarUrl} alt="" /> : personName[0]?.toUpperCase()}</div>
                           <div className="tt-discovery-copy"><strong>{personName}</strong><span>{personUsername ? `@${personUsername}` : "TrenchTalk member"}</span>{person.bio && <p>{person.bio}</p>}</div>
                         </article>;
@@ -2220,7 +2231,6 @@ useEffect(() => {
               onNavigate={navigate}
               onLogout={handleLogout}
               savedAccounts={savedAccounts}
-              onRemoveAccount={removeSavedAccount}
               onAddAccount={() => openAccountManager()}
               onSelectAccount={selectRememberedAccount}
             />
@@ -2244,7 +2254,6 @@ useEffect(() => {
               onNavigate={navigate}
               onLogout={handleLogout}
               savedAccounts={savedAccounts}
-              onRemoveAccount={removeSavedAccount}
               onAddAccount={() => openAccountManager()}
               onSelectAccount={selectRememberedAccount}
             />
@@ -2265,14 +2274,11 @@ useEffect(() => {
             <p className="tt-account-modal-description">Sign in to another account. Your current account will be remembered on this device. Passwords are never saved.</p>
             {savedAccounts.length > 0 && <div className="tt-account-saved-list">
               <span className="tt-account-section-label">REMEMBERED ACCOUNTS</span>
-              {savedAccounts.map((item) => <div key={item.uid} className={`tt-account-saved-item ${user?.uid === item.uid ? "is-current" : ""}`}>
-                <button type="button" className="tt-account-saved-select" onClick={() => selectRememberedAccount(item)}>
-                  <span className="tt-account-saved-avatar">{item.avatarUrl ? <img src={item.avatarUrl} alt="" /> : (item.displayName || item.email)[0]?.toUpperCase()}</span>
-                  <span><strong>{item.displayName || item.email}</strong><small>@{item.username || item.email?.split("@")[0]}</small></span>
-                  {user?.uid === item.uid && <em>Active</em>}
-                </button>
-                {user?.uid !== item.uid && <button type="button" className="tt-account-remove" aria-label={`Remove ${item.email}`} onClick={() => removeSavedAccount(item.uid)}>×</button>}
-              </div>)}
+              {savedAccounts.map((item) => <button key={item.uid} type="button" className={`tt-account-saved-item ${user?.uid === item.uid ? "is-current" : ""}`} onClick={() => selectRememberedAccount(item)}>
+                <span className="tt-account-saved-avatar">{item.avatarUrl ? <img src={item.avatarUrl} alt="" /> : (item.displayName || item.email)[0]?.toUpperCase()}</span>
+                <span><strong>{item.displayName || item.email}</strong><small>{item.email}</small></span>
+                {user?.uid === item.uid && <em>Active</em>}
+              </button>)}
             </div>}
             <form className="tt-account-login-form" onSubmit={(event) => { event.preventDefault(); authenticateAnotherAccount("password"); }}>
               <label>Email address<input type="email" autoComplete="username" value={accountEmail} onChange={(event) => setAccountEmail(event.target.value)} placeholder="name@example.com" required /></label>
