@@ -24,7 +24,7 @@ import homeIcon from "./assets/Home.png";
 import notificationsIcon from "./assets/notifications.png";
 import messagesIcon from "./assets/messages.png";
 import communitiesIcon from "./assets/communities.png";
-
+import "./TrenchTalk_account_profile.css";
 
 
 const NEW_TOKEN_DELAY = 10 * 60 * 1000;
