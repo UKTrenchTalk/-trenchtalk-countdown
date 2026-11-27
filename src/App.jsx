@@ -733,6 +733,16 @@ const [createMenuOpen, setCreateMenuOpen] = useState(false);
     });
   }
 
+  function removeSavedAccount(uid) {
+    if (!uid || uid === user?.uid) return;
+    setSavedAccounts((previous) => {
+      const next = previous.filter((item) => item.uid !== uid);
+      try { localStorage.setItem("tt-saved-accounts", JSON.stringify(next)); }
+      catch (error) { console.warn("Could not update saved accounts:", error); }
+      return next;
+    });
+  }
+
   async function authenticateAnotherAccount(method = "password") {
     setAccountError("");
     setAccountBusy(true);
@@ -781,7 +791,6 @@ const [createMenuOpen, setCreateMenuOpen] = useState(false);
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
 
       setUser(currentUser);
-      if (currentUser) rememberAccount(currentUser);
 
 
 
@@ -1990,7 +1999,16 @@ useEffect(() => {
                       {exploreResults.map((person) => {
                         const personName = person.displayName || person.name || person.username || "TrenchTalk member";
                         const personUsername = person.username || person.handle || "";
-                        return <article role="button" tabIndex={0} onClick={() => { setViewingPublicProfile(person); setActivePage("public-profile"); }} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); setViewingPublicProfile(person); setActivePage("public-profile"); } }} className="tt-discovery-card tt-person-card" key={person.id}>
+                        return <article role="button" tabIndex={0} onClick={async () => {
+                          setViewingPublicProfile(person);
+                          setActivePage("public-profile");
+                          try {
+                            const fullProfile = await getDoc(doc(db, "publicProfiles", person.id));
+                            if (fullProfile.exists()) setViewingPublicProfile({ id: person.id, ...fullProfile.data() });
+                          } catch (error) {
+                            console.error("Could not load full public profile:", error);
+                          }
+                        }} onKeyDown={async (event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); setViewingPublicProfile(person); setActivePage("public-profile"); try { const fullProfile = await getDoc(doc(db, "publicProfiles", person.id)); if (fullProfile.exists()) setViewingPublicProfile({ id: person.id, ...fullProfile.data() }); } catch (error) { console.error("Could not load full public profile:", error); } } }} className="tt-discovery-card tt-person-card" key={person.id}>
                           <div className="tt-discovery-avatar">{person.avatarUrl ? <img src={person.avatarUrl} alt="" /> : personName[0]?.toUpperCase()}</div>
                           <div className="tt-discovery-copy"><strong>{personName}</strong><span>{personUsername ? `@${personUsername}` : "TrenchTalk member"}</span>{person.bio && <p>{person.bio}</p>}</div>
                         </article>;
@@ -2181,6 +2199,7 @@ useEffect(() => {
               savedAccounts={savedAccounts}
               onAddAccount={() => openAccountManager()}
               onSelectAccount={selectRememberedAccount}
+              onRemoveAccount={removeSavedAccount}
             />
           )}
 
@@ -2191,6 +2210,10 @@ useEffect(() => {
               viewOnly
               onNavigate={(page) => { setActivePage(page === "profile" ? "explore" : page); }}
               onLogout={handleLogout}
+              savedAccounts={savedAccounts}
+              onAddAccount={() => openAccountManager()}
+              onSelectAccount={selectRememberedAccount}
+              onRemoveAccount={removeSavedAccount}
             />
           )}
 
@@ -2204,6 +2227,7 @@ useEffect(() => {
               savedAccounts={savedAccounts}
               onAddAccount={() => openAccountManager()}
               onSelectAccount={selectRememberedAccount}
+              onRemoveAccount={removeSavedAccount}
             />
           )}
 
@@ -2222,11 +2246,14 @@ useEffect(() => {
             <p className="tt-account-modal-description">Sign in to another account. Your current account will be remembered on this device. Passwords are never saved.</p>
             {savedAccounts.length > 0 && <div className="tt-account-saved-list">
               <span className="tt-account-section-label">REMEMBERED ACCOUNTS</span>
-              {savedAccounts.map((item) => <button key={item.uid} type="button" className={`tt-account-saved-item ${user?.uid === item.uid ? "is-current" : ""}`} onClick={() => selectRememberedAccount(item)}>
-                <span className="tt-account-saved-avatar">{(item.displayName || item.email)[0]?.toUpperCase()}</span>
-                <span><strong>{item.displayName || item.email}</strong><small>{item.email}</small></span>
-                {user?.uid === item.uid && <em>Active</em>}
-              </button>)}
+              {savedAccounts.map((item) => <div key={item.uid} className={`tt-account-saved-item ${user?.uid === item.uid ? "is-current" : ""}`}>
+                <button type="button" className="tt-account-saved-select" onClick={() => selectRememberedAccount(item)}>
+                  <span className="tt-account-saved-avatar">{(item.displayName || item.email)[0]?.toUpperCase()}</span>
+                  <span><strong>{item.displayName || item.email}</strong><small>{item.email}</small></span>
+                  {user?.uid === item.uid && <em>Active</em>}
+                </button>
+                {user?.uid !== item.uid && <button type="button" className="tt-account-remove" aria-label={`Remove ${item.email} from saved accounts`} title="Remove account from this device" onClick={() => removeSavedAccount(item.uid)}>×</button>}
+              </div>)}
             </div>}
             <form className="tt-account-login-form" onSubmit={(event) => { event.preventDefault(); authenticateAnotherAccount("password"); }}>
               <label>Email address<input type="email" autoComplete="username" value={accountEmail} onChange={(event) => setAccountEmail(event.target.value)} placeholder="name@example.com" required /></label>

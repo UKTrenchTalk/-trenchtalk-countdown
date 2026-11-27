@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { doc, setDoc, serverTimestamp } from "firebase/firestore";
+import { doc, setDoc, serverTimestamp, writeBatch } from "firebase/firestore";
 import { db } from "../firebase";
 import { uploadProfileImage } from "../Services/cloudinaryService";
 
@@ -47,7 +47,8 @@ export default function ProfileEditor({
   onLogout,
   savedAccounts = [],
   onAddAccount,
-  onSelectAccount
+  onSelectAccount,
+  onRemoveAccount
 }) {
   const [form, setForm] = useState(DEFAULTS);
   const [saving, setSaving] = useState(false);
@@ -157,37 +158,12 @@ export default function ProfileEditor({
         updatedAt: serverTimestamp()
       };
 
-      await setDoc(doc(db, "users", user.uid), updatedProfile, { merge: true });
-
-      // Publish only explicitly public profile fields. Never copy email or account metadata.
-      const publicProfile = {
-        uid: user.uid,
-        displayName,
-        username,
-        bio,
-        avatarUrl: updatedProfile.avatarUrl || "",
-        bannerUrl: updatedProfile.bannerUrl || "",
-        accentColor: updatedProfile.accentColor || DEFAULT_ACCENT,
-        cardColor: updatedProfile.cardColor || "#e4eadc",
-        borderColor: updatedProfile.borderColor || "#bac8ae",
-        nameColor: updatedProfile.nameColor || "#263827",
-        nameSize: updatedProfile.nameSize || "large",
-        fontFamily: updatedProfile.fontFamily || "space",
-        avatarShape: updatedProfile.avatarShape || "circle",
-        avatarSize: updatedProfile.avatarSize || "large",
-        avatarBorderColor: updatedProfile.avatarBorderColor || "#e4eadc",
-        bannerHeight: updatedProfile.bannerHeight || 220,
-        bannerPosition: updatedProfile.bannerPosition || "center",
-        profileTheme: updatedProfile.profileTheme || "minimal",
-        profileLayout: updatedProfile.profileLayout || "standard",
-        decoration: updatedProfile.decoration || "none",
-        badgeText: updatedProfile.badgeText || "",
-        website: updatedProfile.website || "",
-        twitter: updatedProfile.twitter || "",
-        telegram: updatedProfile.telegram || "",
-        updatedAt: serverTimestamp()
-      };
-      await setDoc(doc(db, "publicProfiles", user.uid), publicProfile, { merge: true });
+      // Keep the private account document and the public profile projection in sync.
+      // Explore reads publicProfiles, while the owner editor reads users.
+      const batch = writeBatch(db);
+      batch.set(doc(db, "users", user.uid), updatedProfile, { merge: true });
+      batch.set(doc(db, "publicProfiles", user.uid), updatedProfile, { merge: true });
+      await batch.commit();
 
       // Update the main React profile state immediately.
       onProfileUpdated?.({
@@ -238,42 +214,38 @@ export default function ProfileEditor({
 
         <div className="ttpe-sidebar-divider" />
 
-        <div className="ttpe-account-stack">
-          <div className="ttpe-sidebar-account is-active-account">
-            <div className="ttpe-sidebar-avatar">
-              {form.avatarUrl ? <img src={form.avatarUrl} alt="" /> : (form.displayName?.[0]?.toUpperCase() || "T")}
-            </div>
-            <div className="ttpe-sidebar-account-info"><strong>{form.displayName || "Your account"}</strong><span>@{form.username || "username"}</span></div>
-            <em>Active</em>
+        <div className="ttpe-sidebar-account">
+          <div className="ttpe-sidebar-avatar">
+            {form.avatarUrl ? (
+              <img src={form.avatarUrl} alt="" />
+            ) : (
+              form.displayName?.[0]?.toUpperCase() || "T"
+            )}
           </div>
-          {savedAccounts.filter(item => item.uid !== user?.uid).map(item => (
-            <button key={item.uid} type="button" className="ttpe-sidebar-account ttpe-switch-account" onClick={() => onSelectAccount?.(item)} title={`Switch to ${item.email}`}>
-              <div className="ttpe-sidebar-avatar">{(item.displayName || item.email || "A")[0]?.toUpperCase()}</div>
-              <div className="ttpe-sidebar-account-info"><strong>{item.displayName || item.email}</strong><span>{item.email}</span></div>
-              <span className="ttpe-switch-label">Switch</span>
-            </button>
-          ))}
+
+          <div className="ttpe-sidebar-account-info">
+            <strong>{form.displayName || "Your account"}</strong>
+            <span>@{form.username || "username"}</span>
+          </div>
         </div>
 
         <div className="ttpe-sidebar-actions">
-          <button
-            type="button"
-            className="ttpe-add-account"
-            onClick={onAddAccount}
-          >
-            <span>+</span>
-            <span className="ttpe-add-account-label">
-              Add another account
-            </span>
+          <button type="button" className="ttpe-add-account" onClick={onAddAccount}>
+            <span>+</span><span className="ttpe-add-account-label">Add another account</span>
           </button>
-
-          <button
-            type="button"
-            className="ttpe-logout-button"
-            onClick={onLogout}
-          >
-            Log out
-          </button>
+          <button type="button" className="ttpe-logout-button" onClick={onLogout}>Log out</button>
+        </div>
+        <div className="ttpe-saved-accounts">
+          <div className="ttpe-sidebar-heading">SAVED ACCOUNTS</div>
+          {savedAccounts.map(item => (
+            <div className="ttpe-saved-account-row" key={item.uid}>
+              <button type="button" className="ttpe-saved-account-select" onClick={() => onSelectAccount?.(item)}>
+                <span className="ttpe-sidebar-avatar">{(item.displayName || item.email || "?")[0].toUpperCase()}</span>
+                <span><strong>{item.displayName || item.email}</strong><small>{item.email}</small></span>
+              </button>
+              {item.uid !== user?.uid && <button type="button" className="ttpe-saved-account-remove" title="Remove account" aria-label={`Remove ${item.email}`} onClick={() => onRemoveAccount?.(item.uid)}>×</button>}
+            </div>
+          ))}
         </div>
       </aside>
 
