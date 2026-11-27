@@ -3987,3 +3987,37 @@ html, body, #root { min-height: 100%; background: var(--background); }
 .ttpe-switch-account .ttpe-sidebar-account-info { flex: 1; min-width: 0; }
 .ttpe-switch-account .ttpe-sidebar-account-info strong, .ttpe-switch-account .ttpe-sidebar-account-info span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .ttpe-switch-label { flex: 0 0 auto; margin-left: 8px; color: #c5ff4a; font-size: 10px; font-weight: 800; }
+
+
+/* TrenchTalk profile/account/search corrective layout */
+.ttpe-layout { display:grid !important; grid-template-columns:minmax(205px,240px) minmax(0,1fr) !important; width:100% !important; max-width:none !important; align-items:start !important; gap:clamp(24px,3vw,48px) !important; }
+.ttpe-main,.tt-profile-page { width:100% !important; min-width:0 !important; max-width:none !important; }
+.tt-public-profile-card { width:100% !important; min-width:0 !important; max-width:none !important; overflow:hidden !important; }
+.tt-public-profile-content { display:grid !important; grid-template-columns: minmax(88px,100px) minmax(0,1fr) !important; align-items:start !important; column-gap:20px !important; row-gap:12px !important; width:100% !important; min-width:0 !important; box-sizing:border-box !important; }
+.tt-public-profile-avatar { grid-column:1 !important; grid-row:1 / span 2 !important; width:88px !important; height:88px !important; min-width:88px !important; }
+.tt-public-profile-identity { grid-column:2 !important; grid-row:1 !important; min-width:0 !important; width:100% !important; padding-top:12px !important; }
+.tt-public-profile-identity h2 { white-space:normal !important; overflow-wrap:anywhere !important; word-break:normal !important; }
+.tt-public-profile-identity p { max-width:100% !important; overflow-wrap:anywhere !important; }
+.tt-public-profile-badge { grid-column:2 !important; justify-self:start !important; }
+.tt-profile-stats { grid-column:2 !important; grid-row:auto !important; justify-content:flex-start !important; flex-wrap:wrap !important; gap:clamp(14px,2vw,28px) !important; }
+.ttpe-public-layout { display:block !important; }
+.ttpe-public-layout .ttpe-main { width:100% !important; }
+.tt-profile-saved-accounts { margin-top:22px; padding-top:16px; border-top:1px solid var(--border); display:flex; flex-direction:column; gap:9px; }
+.tt-profile-saved-account { display:flex; align-items:center; gap:5px; min-width:0; }
+.tt-profile-saved-account > button:first-child { flex:1; min-width:0; display:flex; align-items:center; gap:10px; padding:7px; border:0; border-radius:9px; background:transparent; text-align:left; cursor:pointer; }
+.tt-profile-saved-account > button:first-child:hover { background:rgba(52,77,53,.08); }
+.tt-profile-saved-avatar { width:36px; height:36px; flex:0 0 36px; overflow:hidden; display:grid; place-items:center; border-radius:50%; background:var(--forest); color:white; font-weight:700; }
+.tt-profile-saved-avatar img,.tt-account-saved-avatar img { width:100%; height:100%; object-fit:cover; }
+.tt-profile-saved-account > button:first-child > span:last-child { min-width:0; display:flex; flex-direction:column; }
+.tt-profile-saved-account strong,.tt-profile-saved-account small { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.tt-profile-saved-account strong { color:var(--forest-dark); font-size:12px; }
+.tt-profile-saved-account small { color:var(--muted); font-size:10px; }
+.tt-profile-remove-account,.tt-account-remove { border:0; background:transparent; color:#bd5143; font-size:19px; cursor:pointer; padding:5px 9px; }
+.tt-account-saved-item { display:flex; align-items:center; gap:6px; }
+.tt-account-saved-select { flex:1; min-width:0; display:flex; align-items:center; gap:12px; padding:10px; border:0; background:transparent; text-align:left; cursor:pointer; }
+.tt-account-saved-select > span:nth-child(2) { min-width:0; display:flex; flex-direction:column; }
+.tt-account-saved-select strong,.tt-account-saved-select small { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.tt-account-saved-avatar { width:40px; height:40px; flex:0 0 40px; overflow:hidden; display:grid; place-items:center; border-radius:50%; background:#c8d8b8; }
+.tt-person-card { cursor:pointer; }
+.tt-person-card:focus-visible { outline:2px solid var(--accent); outline-offset:3px; }
+@media(max-width:850px) { .ttpe-layout { grid-template-columns:minmax(0,1fr) !important; } .tt-public-profile-content { grid-template-columns:minmax(0,1fr) !important; } .tt-public-profile-avatar { grid-column:1 !important; grid-row:auto !important; } .tt-public-profile-identity,.tt-public-profile-badge,.tt-profile-stats { grid-column:1 !important; } }

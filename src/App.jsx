@@ -24,7 +24,7 @@ import homeIcon from "./assets/Home.png";
 import notificationsIcon from "./assets/notifications.png";
 import messagesIcon from "./assets/messages.png";
 import communitiesIcon from "./assets/communities.png";
-import "./TrenchTalk_account_profile.css";
+
 
 
 const NEW_TOKEN_DELAY = 10 * 60 * 1000;
@@ -716,6 +716,15 @@ const [createMenuOpen, setCreateMenuOpen] = useState(false);
     setAccountModalOpen(true);
   }
 
+  function removeSavedAccount(uid) {
+    if (!uid || uid === user?.uid) return;
+    setSavedAccounts(previous => {
+      const next = previous.filter(item => item.uid !== uid);
+      try { localStorage.setItem("tt-saved-accounts", JSON.stringify(next)); } catch (error) { console.warn("Could not update saved accounts:", error); }
+      return next;
+    });
+  }
+
   function selectRememberedAccount(item) {
     if (!item || item.uid === user?.uid) return;
     // Firebase uses one active Auth user per app. Re-authentication is required;
@@ -727,18 +736,15 @@ const [createMenuOpen, setCreateMenuOpen] = useState(false);
   function rememberAccount(accountUser) {
     if (!accountUser?.uid || !accountUser?.email) return;
     setSavedAccounts((previous) => {
-      const next = [{ uid: accountUser.uid, email: accountUser.email, displayName: accountUser.displayName || accountUser.email.split("@")[0] }, ...previous.filter((item) => item.uid !== accountUser.uid)].slice(0, 8);
+      const next = [{
+        uid: accountUser.uid,
+        email: accountUser.email,
+        displayName: accountUser.displayName || accountUser.email.split("@")[0],
+        username: accountUser.username || accountUser.email.split("@")[0],
+        avatarUrl: accountUser.avatarUrl || "",
+        bannerUrl: accountUser.bannerUrl || ""
+      }, ...previous.filter((item) => item.uid !== accountUser.uid)].slice(0, 8);
       try { localStorage.setItem("tt-saved-accounts", JSON.stringify(next)); } catch (error) { console.warn("Could not save account list:", error); }
-      return next;
-    });
-  }
-
-  function removeSavedAccount(uid) {
-    if (!uid || uid === user?.uid) return;
-    setSavedAccounts((previous) => {
-      const next = previous.filter((item) => item.uid !== uid);
-      try { localStorage.setItem("tt-saved-accounts", JSON.stringify(next)); }
-      catch (error) { console.warn("Could not update saved accounts:", error); }
       return next;
     });
   }
@@ -791,6 +797,7 @@ const [createMenuOpen, setCreateMenuOpen] = useState(false);
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
 
       setUser(currentUser);
+      if (currentUser) rememberAccount(currentUser);
 
 
 
@@ -806,7 +813,15 @@ const [createMenuOpen, setCreateMenuOpen] = useState(false);
 
 
 
-          setProfile(snapshot.exists() ? snapshot.data() : null);
+          const loadedProfile = snapshot.exists() ? snapshot.data() : null;
+          setProfile(loadedProfile);
+          rememberAccount({
+            ...currentUser,
+            displayName: loadedProfile?.displayName || currentUser.displayName,
+            username: loadedProfile?.username,
+            avatarUrl: loadedProfile?.avatarUrl,
+            bannerUrl: loadedProfile?.bannerUrl
+          });
 
         } catch (error) {
 
@@ -1256,7 +1271,15 @@ const [createMenuOpen, setCreateMenuOpen] = useState(false);
         }
 
         if (exploreTab === "people") {
-          rows = rows.filter((item) => item.id !== user?.uid);
+          rows = rows
+            .filter((item) => item.id !== user?.uid)
+            .filter((item, index, all) => all.findIndex(other => other.id === item.id) === index)
+            .map(item => ({
+              ...item,
+              username: String(item.username || item.handle || item.email?.split("@")[0] || "").replace(/^@/, "").toLowerCase(),
+              displayName: item.displayName || item.name || item.username || item.email?.split("@")[0] || "TrenchTalk member",
+              avatarUrl: item.avatarUrl || item.photoURL || item.photoUrl || ""
+            }));
         }
 
         if (!cancelled) {
@@ -1306,7 +1329,7 @@ const [createMenuOpen, setCreateMenuOpen] = useState(false);
                 item.community
               ]
             : exploreTab === "people"
-              ? [item.username, item.displayName, item.name, item.bio]
+              ? [item.username, item.handle, item.displayName, item.name, item.bio, item.email?.split("@")[0]]
               : [
                   item.name,
                   item.title,
@@ -2000,15 +2023,15 @@ useEffect(() => {
                         const personName = person.displayName || person.name || person.username || "TrenchTalk member";
                         const personUsername = person.username || person.handle || "";
                         return <article role="button" tabIndex={0} onClick={async () => {
-                          setViewingPublicProfile(person);
-                          setActivePage("public-profile");
                           try {
-                            const fullProfile = await getDoc(doc(db, "publicProfiles", person.id));
-                            if (fullProfile.exists()) setViewingPublicProfile({ id: person.id, ...fullProfile.data() });
+                            const full = await getDoc(doc(db, "publicProfiles", person.id));
+                            setViewingPublicProfile({ ...person, ...(full.exists() ? full.data() : {}) , uid: person.id });
                           } catch (error) {
-                            console.error("Could not load full public profile:", error);
+                            console.error("Could not load public profile:", error);
+                            setViewingPublicProfile({ ...person, uid: person.id });
                           }
-                        }} onKeyDown={async (event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); setViewingPublicProfile(person); setActivePage("public-profile"); try { const fullProfile = await getDoc(doc(db, "publicProfiles", person.id)); if (fullProfile.exists()) setViewingPublicProfile({ id: person.id, ...fullProfile.data() }); } catch (error) { console.error("Could not load full public profile:", error); } } }} className="tt-discovery-card tt-person-card" key={person.id}>
+                          setActivePage("public-profile");
+                        }} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); event.currentTarget.click(); } }} className="tt-discovery-card tt-person-card" key={person.id}>
                           <div className="tt-discovery-avatar">{person.avatarUrl ? <img src={person.avatarUrl} alt="" /> : personName[0]?.toUpperCase()}</div>
                           <div className="tt-discovery-copy"><strong>{personName}</strong><span>{personUsername ? `@${personUsername}` : "TrenchTalk member"}</span>{person.bio && <p>{person.bio}</p>}</div>
                         </article>;
@@ -2197,9 +2220,9 @@ useEffect(() => {
               onNavigate={navigate}
               onLogout={handleLogout}
               savedAccounts={savedAccounts}
+              onRemoveAccount={removeSavedAccount}
               onAddAccount={() => openAccountManager()}
               onSelectAccount={selectRememberedAccount}
-              onRemoveAccount={removeSavedAccount}
             />
           )}
 
@@ -2210,10 +2233,6 @@ useEffect(() => {
               viewOnly
               onNavigate={(page) => { setActivePage(page === "profile" ? "explore" : page); }}
               onLogout={handleLogout}
-              savedAccounts={savedAccounts}
-              onAddAccount={() => openAccountManager()}
-              onSelectAccount={selectRememberedAccount}
-              onRemoveAccount={removeSavedAccount}
             />
           )}
 
@@ -2225,9 +2244,9 @@ useEffect(() => {
               onNavigate={navigate}
               onLogout={handleLogout}
               savedAccounts={savedAccounts}
+              onRemoveAccount={removeSavedAccount}
               onAddAccount={() => openAccountManager()}
               onSelectAccount={selectRememberedAccount}
-              onRemoveAccount={removeSavedAccount}
             />
           )}
 
@@ -2248,11 +2267,11 @@ useEffect(() => {
               <span className="tt-account-section-label">REMEMBERED ACCOUNTS</span>
               {savedAccounts.map((item) => <div key={item.uid} className={`tt-account-saved-item ${user?.uid === item.uid ? "is-current" : ""}`}>
                 <button type="button" className="tt-account-saved-select" onClick={() => selectRememberedAccount(item)}>
-                  <span className="tt-account-saved-avatar">{(item.displayName || item.email)[0]?.toUpperCase()}</span>
-                  <span><strong>{item.displayName || item.email}</strong><small>{item.email}</small></span>
+                  <span className="tt-account-saved-avatar">{item.avatarUrl ? <img src={item.avatarUrl} alt="" /> : (item.displayName || item.email)[0]?.toUpperCase()}</span>
+                  <span><strong>{item.displayName || item.email}</strong><small>@{item.username || item.email?.split("@")[0]}</small></span>
                   {user?.uid === item.uid && <em>Active</em>}
                 </button>
-                {user?.uid !== item.uid && <button type="button" className="tt-account-remove" aria-label={`Remove ${item.email} from saved accounts`} title="Remove account from this device" onClick={() => removeSavedAccount(item.uid)}>×</button>}
+                {user?.uid !== item.uid && <button type="button" className="tt-account-remove" aria-label={`Remove ${item.email}`} onClick={() => removeSavedAccount(item.uid)}>×</button>}
               </div>)}
             </div>}
             <form className="tt-account-login-form" onSubmit={(event) => { event.preventDefault(); authenticateAnotherAccount("password"); }}>

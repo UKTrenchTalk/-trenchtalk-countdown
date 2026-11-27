@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { doc, setDoc, serverTimestamp, writeBatch } from "firebase/firestore";
+import { doc, setDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "../firebase";
 import { uploadProfileImage } from "../Services/cloudinaryService";
 
@@ -46,9 +46,9 @@ export default function ProfileEditor({
   onNavigate,
   onLogout,
   savedAccounts = [],
+  onRemoveAccount,
   onAddAccount,
-  onSelectAccount,
-  onRemoveAccount
+  onSelectAccount
 }) {
   const [form, setForm] = useState(DEFAULTS);
   const [saving, setSaving] = useState(false);
@@ -158,12 +158,38 @@ export default function ProfileEditor({
         updatedAt: serverTimestamp()
       };
 
-      // Keep the private account document and the public profile projection in sync.
-      // Explore reads publicProfiles, while the owner editor reads users.
-      const batch = writeBatch(db);
-      batch.set(doc(db, "users", user.uid), updatedProfile, { merge: true });
-      batch.set(doc(db, "publicProfiles", user.uid), updatedProfile, { merge: true });
-      await batch.commit();
+      const publicProfile = {
+        uid: user.uid,
+        displayName,
+        username,
+        bio,
+        accentColor: updatedProfile.accentColor,
+        avatarUrl: updatedProfile.avatarUrl || "",
+        bannerUrl: updatedProfile.bannerUrl || "",
+        profileTheme: updatedProfile.profileTheme,
+        cardColor: updatedProfile.cardColor,
+        borderColor: updatedProfile.borderColor,
+        nameColor: updatedProfile.nameColor,
+        nameSize: updatedProfile.nameSize,
+        fontFamily: updatedProfile.fontFamily,
+        avatarShape: updatedProfile.avatarShape,
+        avatarSize: updatedProfile.avatarSize,
+        avatarBorderColor: updatedProfile.avatarBorderColor,
+        bannerHeight: updatedProfile.bannerHeight,
+        bannerPosition: updatedProfile.bannerPosition,
+        profileLayout: updatedProfile.profileLayout,
+        decoration: updatedProfile.decoration,
+        badgeText: updatedProfile.badgeText,
+        website: updatedProfile.website,
+        twitter: updatedProfile.twitter,
+        telegram: updatedProfile.telegram,
+        updatedAt: serverTimestamp()
+      };
+
+      await Promise.all([
+        setDoc(doc(db, "users", user.uid), updatedProfile, { merge: true }),
+        setDoc(doc(db, "publicProfiles", user.uid), publicProfile, { merge: true })
+      ]);
 
       // Update the main React profile state immediately.
       onProfileUpdated?.({
@@ -230,23 +256,28 @@ export default function ProfileEditor({
         </div>
 
         <div className="ttpe-sidebar-actions">
-          <button type="button" className="ttpe-add-account" onClick={onAddAccount}>
-            <span>+</span><span className="ttpe-add-account-label">Add another account</span>
+          <button
+            type="button"
+            className="ttpe-add-account"
+            onClick={() =>
+              window.dispatchEvent(new Event("tt-open-add-account"))
+            }
+          >
+            <span>+</span>
+            <span className="ttpe-add-account-label">
+              Add another account
+            </span>
           </button>
-          <button type="button" className="ttpe-logout-button" onClick={onLogout}>Log out</button>
+
+          <button
+            type="button"
+            className="ttpe-logout-button"
+            onClick={onLogout}
+          >
+            Log out
+          </button>
         </div>
-        <div className="ttpe-saved-accounts">
-          <div className="ttpe-sidebar-heading">SAVED ACCOUNTS</div>
-          {savedAccounts.map(item => (
-            <div className="ttpe-saved-account-row" key={item.uid}>
-              <button type="button" className="ttpe-saved-account-select" onClick={() => onSelectAccount?.(item)}>
-                <span className="ttpe-sidebar-avatar">{(item.displayName || item.email || "?")[0].toUpperCase()}</span>
-                <span><strong>{item.displayName || item.email}</strong><small>{item.email}</small></span>
-              </button>
-              {item.uid !== user?.uid && <button type="button" className="ttpe-saved-account-remove" title="Remove account" aria-label={`Remove ${item.email}`} onClick={() => onRemoveAccount?.(item.uid)}>×</button>}
-            </div>
-          ))}
-        </div>
+        {savedAccounts.length > 0 && <div className="tt-profile-saved-accounts"><span className="tt-account-section-label">SAVED ACCOUNTS</span>{savedAccounts.map(item=><div className="tt-profile-saved-account" key={item.uid}><button type="button" onClick={()=>onSelectAccount?.(item)}><span className="tt-profile-saved-avatar">{item.avatarUrl?<img src={item.avatarUrl} alt=""/>:(item.displayName||item.email||"T")[0].toUpperCase()}</span><span><strong>{item.displayName||item.email}</strong><small>@{item.username||item.email?.split("@")[0]}</small></span></button>{item.uid!==user?.uid&&<button className="tt-profile-remove-account" type="button" aria-label="Remove saved account" onClick={()=>onRemoveAccount?.(item.uid)}>×</button>}</div>)}</div>}
       </aside>
 
       <main className="ttpe-main">
