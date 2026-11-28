@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 
 import { onAuthStateChanged, signOut, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 
-import { collection, doc, getDoc, getDocs, limit, query, setDoc, deleteDoc, serverTimestamp, writeBatch } from "firebase/firestore";
+import { collection, doc, getDoc, getDocs, limit, query, setDoc, deleteDoc, serverTimestamp, writeBatch, onSnapshot } from "firebase/firestore";
 
 import { auth, db, googleProvider } from "./firebase.js";
 
@@ -884,12 +884,13 @@ const [createMenuOpen, setCreateMenuOpen] = useState(false);
 
   useEffect(() => {
     if (!user?.uid) { setFriendRequests([]); return; }
-    let cancelled = false;
-    getDocs(collection(db, "users", user.uid, "friendRequestsReceived"))
-      .then(snapshot => { if (!cancelled) setFriendRequests(snapshot.docs.map(item => ({ uid: item.id, ...item.data() }))); })
-      .catch(error => console.error("Could not load friend requests:", error));
-    return () => { cancelled = true; };
-  }, [user?.uid, activePage]);
+    const requestsRef = collection(db, "users", user.uid, "friendRequestsReceived");
+    const unsubscribe = onSnapshot(requestsRef,
+      snapshot => setFriendRequests(snapshot.docs.map(item => ({ uid: item.id, ...item.data() }))),
+      error => console.error("Could not listen for friend requests:", error)
+    );
+    return unsubscribe;
+  }, [user?.uid]);
 
   // Firebase authentication.
 
@@ -2259,15 +2260,25 @@ useEffect(() => {
 
 
 
-              <EmptyState
-
-                icon="♧"
-
-                title="You're all caught up."
-
-                description="New notifications will appear here."
-
-              />
+              {friendRequests.length > 0 ? (
+                <section className="tt-notification-list" aria-label="Friend request notifications">
+                  {friendRequests.map(request => (
+                    <article className="tt-notification-card" key={request.uid}>
+                      <div className="tt-friend-request-avatar">{request.fromAvatarUrl ? <img src={request.fromAvatarUrl} alt="" /> : (request.fromName || "M")[0].toUpperCase()}</div>
+                      <div className="tt-friend-request-copy">
+                        <strong>{request.fromName || "A TrenchTalk member"} sent you a friend request</strong>
+                        <span>{request.fromUsername ? `@${request.fromUsername}` : "Friend request"}</span>
+                      </div>
+                      <div className="tt-notification-actions">
+                        <button type="button" onClick={() => handleFriendRequestDecision(request, true)}>Accept</button>
+                        <button type="button" className="decline" onClick={() => handleFriendRequestDecision(request, false)}>Decline</button>
+                      </div>
+                    </article>
+                  ))}
+                </section>
+              ) : (
+                <EmptyState icon="♧" title="You're all caught up." description="New notifications will appear here." />
+              )}
 
             </section>
 

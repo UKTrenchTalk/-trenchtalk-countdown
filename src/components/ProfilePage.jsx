@@ -56,13 +56,15 @@ export default function ProfilePage({
         <ProfileCard profile={profile} displayName={displayName} username={username} />
         {!isOwnProfile && (
           <div className="tt-social-actions">
-            <button type="button" className={`tt-social-button ${socialState.following ? "is-active" : ""}`} disabled={socialState.busy} onClick={() => onFollow?.(!socialState.following)}>
-              {socialState.following ? "Following" : "Follow"}
-            </button>
-            <button type="button" className="tt-social-button secondary" disabled={socialState.busy || socialState.friendStatus === "friends" || socialState.friendStatus === "sent" || socialState.friendStatus === "received"} onClick={() => onFriendRequest?.()}>
-              {socialState.friendStatus === "friends" ? "Friends" : socialState.friendStatus === "sent" ? "Request sent" : socialState.friendStatus === "received" ? "Respond to request" : "Add friend"}
-            </button>
-            {socialState.friendStatus === "received" && <span className="tt-social-hint">This person has already sent you a request. Accept it from your profile.</span>}
+            <div className="tt-social-action-buttons">
+              <button type="button" className={`tt-social-button ${socialState.following ? "is-active" : ""}`} disabled={socialState.busy} onClick={() => onFollow?.(!socialState.following)}>
+                {socialState.following ? "Following" : "Follow"}
+              </button>
+              <button type="button" className="tt-social-button secondary" disabled={socialState.busy || socialState.friendStatus === "friends" || socialState.friendStatus === "sent" || socialState.friendStatus === "received"} onClick={() => onFriendRequest?.()}>
+                {socialState.friendStatus === "friends" ? "Friends" : socialState.friendStatus === "sent" ? "Request sent" : socialState.friendStatus === "received" ? "Request received" : "Add friend"}
+              </button>
+            </div>
+            {socialState.friendStatus === "received" && <span className="tt-social-hint">They've already sent you a request. You can respond in Notifications.</span>}
             {socialState.error && <p className="tt-social-error" role="alert">{socialState.error}</p>}
           </div>
         )}

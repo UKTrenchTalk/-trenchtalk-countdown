@@ -4143,3 +4143,15 @@ html, body, #root { min-height: 100%; background: var(--background); }
 .ttpe-saved-account-avatar{width:28px;height:28px;flex:0 0 28px;display:grid;place-items:center;overflow:hidden;border-radius:50%;background:var(--surface-dark);font-size:11px;font-weight:800}
 .ttpe-saved-account-avatar img{width:100%;height:100%;object-fit:cover}
 @media(max-width:650px){.tt-friend-request-row{flex-wrap:wrap}.tt-friend-request-copy{min-width:calc(100% - 60px)}.tt-friend-request-row button{margin-left:48px}.tt-friend-request-row button+button{margin-left:0}}
+
+
+/* Public-profile actions sit to the right, rather than interrupting the profile card. */
+.tt-public-view .tt-social-actions{justify-content:flex-end;margin:16px 0 26px;text-align:right}
+.tt-public-view .tt-social-action-buttons{display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap}
+.tt-public-view .tt-social-hint,.tt-public-view .tt-social-error{width:100%;text-align:right}
+.tt-notification-list{display:grid;gap:10px;margin-top:24px}
+.tt-notification-card{display:flex;align-items:center;gap:14px;padding:16px 18px;border:1px solid var(--border);border-radius:12px;background:var(--surface)}
+.tt-notification-actions{display:flex;gap:8px;margin-left:auto}
+.tt-notification-actions button{padding:8px 14px;border:1px solid var(--forest);border-radius:8px;background:var(--forest);color:#fff;font-size:12px;font-weight:700;cursor:pointer}
+.tt-notification-actions button.decline{background:transparent;color:var(--muted);border-color:var(--border)}
+@media(max-width:600px){.tt-public-view .tt-social-actions{justify-content:flex-start;text-align:left}.tt-public-view .tt-social-action-buttons{justify-content:flex-start}.tt-public-view .tt-social-hint,.tt-public-view .tt-social-error{text-align:left}.tt-notification-card{align-items:flex-start;flex-wrap:wrap}.tt-notification-actions{width:100%;margin-left:52px}}
