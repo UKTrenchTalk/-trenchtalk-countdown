@@ -3,6 +3,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { onAuthStateChanged, signOut, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 
 import { collection, doc, getDoc, getDocs, limit, query, setDoc, deleteDoc, serverTimestamp, writeBatch, onSnapshot } from "firebase/firestore";
+import Messages from "./components/Messages.jsx";
+import Messages from "./components/Messages.jsx";
 
 import { auth, db, googleProvider } from "./firebase.js";
 
@@ -2322,41 +2324,9 @@ useEffect(() => {
 
 
           {/* MESSAGES */}
-
           {activePage === "messages" && (
-            <section className="tt-standard-page">
-              <div className="tt-page-heading">
-                <div>
-                  <span className="tt-eyebrow">YOUR CONVERSATIONS</span>
-                  <h1>Messages</h1>
-                  <p>People you become friends with are added here automatically.</p>
-                </div>
-              </div>
-
-              {messageContacts.length === 0 ? (
-                <EmptyState
-                  icon="✉"
-                  title="No conversations yet."
-                  description="Accept a friend request and that person will appear here automatically."
-                />
-              ) : (
-                <div className="tt-message-contact-list">
-                  {messageContacts.map((contact) => (
-                    <article className="tt-message-contact" key={contact.uid}>
-                      <Avatar letter={(contact.displayName || contact.username || "M").slice(0, 1).toUpperCase()} imageUrl={contact.avatarUrl} />
-                      <div className="tt-message-contact-copy">
-                        <strong>{contact.displayName || contact.username || "TrenchTalk member"}</strong>
-                        <span>{contact.username ? `@${contact.username}` : "Friend"}</span>
-                        <small>{contact.lastMessage || "You are now friends. Start a conversation soon."}</small>
-                      </div>
-                      <span className="tt-message-contact-status">FRIEND</span>
-                    </article>
-                  ))}
-                </div>
-              )}
-            </section>
+            <Messages user={user} profile={profile} contacts={messageContacts} />
           )}
-
 
 
           {/* NOTIFICATIONS */}
