@@ -5,14 +5,14 @@ function ProfileCard({ profile, displayName, username }) {
   const stats = [
     { label: "Following", value: profile?.followingCount ?? 0 },
     { label: "Posts", value: profile?.postsCount ?? 0 },
-    { label: "Followers", value: profile?.followersCount ?? 0 },
+    { label: "Followers", value: profile?.followersCount ?? 0 }
   ];
   const customStyle = {
     "--profile-accent": accent,
     "--profile-card": profile?.cardColor || "#e4eadc",
     "--profile-border": profile?.borderColor || "#bac8ae",
     "--profile-name": profile?.nameColor || "#263827",
-    "--profile-avatar-border": profile?.avatarBorderColor || "#e4eadc",
+    "--profile-avatar-border": profile?.avatarBorderColor || "#e4eadc"
   };
   const links = [["Website", profile?.website], ["X", profile?.twitter], ["Telegram", profile?.telegram]].filter(([, url]) => url);
   return (
@@ -34,10 +34,17 @@ function ProfileCard({ profile, displayName, username }) {
   );
 }
 
-export default function ProfilePage({ user, profile, onNavigate, onLogout, viewOnly = false }) {
+export default function ProfilePage({
+  user, profile, onNavigate, onLogout, viewOnly = false,
+  savedAccounts = [], onAddAccount, onSelectAccount,
+  currentUid, socialState = {}, onFollow, onFriendRequest,
+  friendRequests = [], onFriendRequestDecision
+}) {
   const [activeTab, setActiveTab] = useState("Posts");
   const username = profile?.username || user?.displayName || user?.email?.split("@")[0] || "member";
   const displayName = profile?.displayName || username;
+  const uid = user?.uid;
+  const isOwnProfile = !viewOnly || (currentUid && uid === currentUid);
 
   if (viewOnly) {
     return (
@@ -47,6 +54,18 @@ export default function ProfilePage({ user, profile, onNavigate, onLogout, viewO
           <span className="tt-eyebrow">PUBLIC PROFILE</span>
         </div>
         <ProfileCard profile={profile} displayName={displayName} username={username} />
+        {!isOwnProfile && (
+          <div className="tt-social-actions">
+            <button type="button" className={`tt-social-button ${socialState.following ? "is-active" : ""}`} disabled={socialState.busy} onClick={() => onFollow?.(!socialState.following)}>
+              {socialState.following ? "Following" : "Follow"}
+            </button>
+            <button type="button" className="tt-social-button secondary" disabled={socialState.busy || socialState.friendStatus === "friends" || socialState.friendStatus === "sent" || socialState.friendStatus === "received"} onClick={() => onFriendRequest?.()}>
+              {socialState.friendStatus === "friends" ? "Friends" : socialState.friendStatus === "sent" ? "Request sent" : socialState.friendStatus === "received" ? "Respond to request" : "Add friend"}
+            </button>
+            {socialState.friendStatus === "received" && <span className="tt-social-hint">This person has already sent you a request. Accept it from your profile.</span>}
+            {socialState.error && <p className="tt-social-error" role="alert">{socialState.error}</p>}
+          </div>
+        )}
         <div className="tt-public-profile-tabs" role="tablist" aria-label="Profile content">
           {["Posts", "Reposts", "Communities"].map(tab => <button key={tab} type="button" role="tab" aria-selected={activeTab === tab} className={activeTab === tab ? "selected" : ""} onClick={() => setActiveTab(tab)}>{tab}</button>)}
         </div>
@@ -55,7 +74,6 @@ export default function ProfilePage({ user, profile, onNavigate, onLogout, viewO
     );
   }
 
-  const accent = profile?.accentColor || "#b9d85a";
   return (
     <div className="ttpe-layout">
       <aside className="ttpe-sidebar">
@@ -64,14 +82,41 @@ export default function ProfilePage({ user, profile, onNavigate, onLogout, viewO
         <button type="button" className="ttpe-nav-item" onClick={() => onNavigate("profile-customisation")}><span className="ttpe-nav-icon">✳</span>Profile Customisation</button>
         <div className="ttpe-sidebar-divider" />
         <div className="ttpe-sidebar-account"><div className="ttpe-sidebar-avatar">{profile?.avatarUrl ? <img src={profile.avatarUrl} alt="" /> : displayName[0]?.toUpperCase()}</div><div className="ttpe-sidebar-account-info"><strong>{displayName}</strong><span>@{username}</span></div></div>
-        <div className="ttpe-sidebar-actions"><button type="button" className="ttpe-add-account" onClick={() => window.dispatchEvent(new Event("tt-open-add-account"))}><span>+</span><span className="ttpe-add-account-label">Add another account</span></button><button type="button" className="ttpe-logout-button" onClick={onLogout}>Log out</button></div>
+        <div className="ttpe-saved-accounts">
+          <div className="ttpe-sidebar-heading">SAVED ACCOUNTS</div>
+          {savedAccounts.filter(item => item?.uid && item.uid !== user?.uid).map(item => (
+            <div className="ttpe-saved-account-row" key={item.uid}>
+              <button type="button" className="ttpe-saved-account-select" onClick={() => onSelectAccount?.(item)}>
+                <span className="ttpe-saved-account-avatar">{item.avatarUrl ? <img src={item.avatarUrl} alt="" /> : (item.displayName || item.email || "T")[0].toUpperCase()}</span>
+                <span><strong>{item.displayName || item.email}</strong><small>{item.email}</small></span>
+              </button>
+            </div>
+          ))}
+        </div>
+        <div className="ttpe-sidebar-actions">
+          <button type="button" className="ttpe-add-account" onClick={() => onAddAccount?.()}><span>+</span><span className="ttpe-add-account-label">Add another account</span></button>
+          <button type="button" className="ttpe-logout-button" onClick={onLogout}>Log out</button>
+        </div>
       </aside>
-      <main className="ttpe-main"><section className="tt-profile-page">
-        <div className="tt-profile-page-heading"><div><span className="tt-eyebrow">YOUR ACCOUNT</span><h1>My Profile</h1><p>Your activity and identity across TrenchTalk.</p></div><button type="button" className="ttpe-save-button" onClick={() => onNavigate("profile-customisation")}>Edit profile</button></div>
-        <ProfileCard profile={profile} displayName={displayName} username={username} />
-        <div className="tt-public-profile-tabs" role="tablist" aria-label="Profile content">{["Posts", "Reposts", "Communities"].map(tab => <button key={tab} type="button" role="tab" aria-selected={activeTab === tab} className={activeTab === tab ? "selected" : ""} onClick={() => setActiveTab(tab)}>{tab}</button>)}</div>
-        <div className="tt-profile-empty"><span>{activeTab === "Communities" ? "◈" : "▤"}</span><h2>No {activeTab.toLowerCase()} yet</h2><p>{activeTab === "Communities" ? "Communities this member joins will appear here." : "When you share something on TrenchTalk, it will appear here."}</p><button type="button" onClick={() => onNavigate("explore")}>Explore TrenchTalk</button></div>
-      </section></main>
+      <main className="ttpe-main">
+        <section className="tt-profile-page">
+          <div className="tt-profile-page-heading"><div><span className="tt-eyebrow">YOUR ACCOUNT</span><h1>My Profile</h1><p>Your activity and identity across TrenchTalk.</p></div><button type="button" className="ttpe-save-button" onClick={() => onNavigate("profile-customisation")}>Edit profile</button></div>
+          <ProfileCard profile={profile} displayName={displayName} username={username} />
+          <section className="tt-friend-requests">
+            <div className="tt-friend-requests-heading"><div><span className="tt-eyebrow">CONNECTIONS</span><h2>Friend requests</h2></div><span>{friendRequests.length} pending</span></div>
+            {friendRequests.length === 0 ? <p className="tt-friend-empty">No pending friend requests.</p> : friendRequests.map(request => (
+              <div className="tt-friend-request-row" key={request.uid}>
+                <div className="tt-friend-request-avatar">{request.fromAvatarUrl ? <img src={request.fromAvatarUrl} alt="" /> : (request.fromName || "M")[0].toUpperCase()}</div>
+                <div className="tt-friend-request-copy"><strong>{request.fromName || "TrenchTalk member"}</strong><span>{request.fromUsername ? `@${request.fromUsername}` : "Wants to add you as a friend"}</span></div>
+                <button type="button" onClick={() => onFriendRequestDecision?.(request, true)}>Accept</button>
+                <button type="button" className="decline" onClick={() => onFriendRequestDecision?.(request, false)}>Decline</button>
+              </div>
+            ))}
+          </section>
+          <div className="tt-public-profile-tabs" role="tablist" aria-label="Profile content">{["Posts", "Reposts", "Communities"].map(tab => <button key={tab} type="button" role="tab" aria-selected={activeTab === tab} className={activeTab === tab ? "selected" : ""} onClick={() => setActiveTab(tab)}>{tab}</button>)}</div>
+          <div className="tt-profile-empty"><span>{activeTab === "Communities" ? "◈" : "▤"}</span><h2>No {activeTab.toLowerCase()} yet</h2><p>{activeTab === "Communities" ? "Communities this member joins will appear here." : "When you share something on TrenchTalk, it will appear here."}</p><button type="button" onClick={() => onNavigate("explore")}>Explore TrenchTalk</button></div>
+        </section>
+      </main>
     </div>
   );
 }

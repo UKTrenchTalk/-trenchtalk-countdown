@@ -46,7 +46,8 @@ export default function ProfileEditor({
   onNavigate,
   onLogout,
   savedAccounts = [],
-  onSelectAccount
+  onSelectAccount,
+  onAddAccount
 }) {
   const [form, setForm] = useState(DEFAULTS);
   const [saving, setSaving] = useState(false);
@@ -239,9 +240,7 @@ export default function ProfileEditor({
           <button
             type="button"
             className="ttpe-add-account"
-            onClick={() =>
-              window.dispatchEvent(new Event("tt-open-add-account"))
-            }
+            onClick={() => onAddAccount?.()}
           >
             <span>+</span>
             <span className="ttpe-add-account-label">

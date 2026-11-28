@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 
 import { onAuthStateChanged, signOut, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 
-import { collection, doc, getDoc, getDocs, limit, query } from "firebase/firestore";
+import { collection, doc, getDoc, getDocs, limit, query, setDoc, deleteDoc, serverTimestamp, writeBatch } from "firebase/firestore";
 
 import { auth, db, googleProvider } from "./firebase.js";
 
@@ -648,6 +648,9 @@ const [createMenuOpen, setCreateMenuOpen] = useState(false);
   const [accountPassword, setAccountPassword] = useState("");
   const [accountBusy, setAccountBusy] = useState(false);
   const [accountError, setAccountError] = useState("");
+  const [socialState, setSocialState] = useState({ following: false, friendStatus: "none", busy: false, error: "" });
+  const [friendRequests, setFriendRequests] = useState([]);
+
 
   const [trendingTokens, setTrendingTokens] = useState([]);
 
@@ -713,6 +716,12 @@ const [createMenuOpen, setCreateMenuOpen] = useState(false);
       document.removeEventListener("keydown", handleKeyDown);
     };
   }, [createMenuOpen]);
+
+  useEffect(() => {
+    const open = () => openAccountManager();
+    window.addEventListener("tt-open-add-account", open);
+    return () => window.removeEventListener("tt-open-add-account", open);
+  }, []);
 
   // Account manager actions are passed directly to profile sidebars.
   function openAccountManager(selectedAccount = null) {
@@ -799,6 +808,88 @@ const [createMenuOpen, setCreateMenuOpen] = useState(false);
     window.addEventListener("tt-remove-saved-account", removeSaved);
     return () => window.removeEventListener("tt-remove-saved-account", removeSaved);
   }, [user?.uid]);
+
+
+  // Social graph: follows are immediate; friendships require recipient acceptance.
+  async function refreshSocialState(target) {
+    if (!user?.uid || !target?.uid || target.uid === user.uid) return;
+    try {
+      const [followingSnap, outgoingSnap, incomingSnap, friendsSnap] = await Promise.all([
+        getDoc(doc(db, "users", user.uid, "following", target.uid)),
+        getDoc(doc(db, "users", user.uid, "friendRequestsSent", target.uid)),
+        getDoc(doc(db, "users", user.uid, "friendRequestsReceived", target.uid)),
+        getDoc(doc(db, "users", user.uid, "friends", target.uid))
+      ]);
+      setSocialState({
+        following: followingSnap.exists(),
+        friendStatus: friendsSnap.exists() ? "friends" : outgoingSnap.exists() ? "sent" : incomingSnap.exists() ? "received" : "none",
+        busy: false, error: ""
+      });
+    } catch (error) {
+      console.error("Social state load failed:", error);
+      setSocialState(current => ({ ...current, error: "Could not load relationship status." }));
+    }
+  }
+
+  useEffect(() => {
+    if (activePage === "public-profile" && viewingPublicProfile?.uid) refreshSocialState(viewingPublicProfile);
+  }, [activePage, viewingPublicProfile?.uid, user?.uid]);
+
+  async function handleFollow(target, shouldFollow) {
+    if (!user?.uid || !target?.uid || target.uid === user.uid) return;
+    setSocialState(current => ({ ...current, busy: true, error: "" }));
+    const me = user.uid, them = target.uid;
+    const batch = writeBatch(db);
+    const followingRef = doc(db, "users", me, "following", them);
+    const followerRef = doc(db, "users", them, "followers", me);
+    if (shouldFollow) {
+      const data = { uid: them, displayName: target.displayName || target.username || "Member", username: target.username || "", avatarUrl: target.avatarUrl || "", createdAt: serverTimestamp() };
+      batch.set(followingRef, data);
+      batch.set(followerRef, { uid: me, displayName: profile?.displayName || user.displayName || user.email?.split("@")[0], username: profile?.username || "", avatarUrl: profile?.avatarUrl || "", createdAt: serverTimestamp() });
+    } else {
+      batch.delete(followingRef); batch.delete(followerRef);
+    }
+    try { await batch.commit(); await refreshSocialState(target); }
+    catch (error) { console.error("Follow update failed:", error); setSocialState(current => ({ ...current, busy: false, error: error.message || "Follow update failed." })); }
+  }
+
+  async function handleFriendRequest(target) {
+    if (!user?.uid || !target?.uid || target.uid === user.uid) return;
+    setSocialState(current => ({ ...current, busy: true, error: "" }));
+    const me = user.uid, them = target.uid;
+    const outgoing = doc(db, "users", me, "friendRequestsSent", them);
+    const incoming = doc(db, "users", them, "friendRequestsReceived", me);
+    const payload = { fromUid: me, toUid: them, fromName: profile?.displayName || user.displayName || user.email?.split("@")[0] || "Member", fromUsername: profile?.username || "", fromAvatarUrl: profile?.avatarUrl || "", toName: target.displayName || target.username || "Member", createdAt: serverTimestamp() };
+    try {
+      await Promise.all([setDoc(outgoing, payload), setDoc(incoming, payload)]);
+      await refreshSocialState(target);
+    } catch (error) { console.error("Friend request failed:", error); setSocialState(current => ({ ...current, busy: false, error: error.message || "Could not send request." })); }
+  }
+
+  async function handleFriendRequestDecision(request, accept) {
+    if (!user?.uid || !request?.fromUid) return;
+    const other = request.fromUid;
+    const batch = writeBatch(db);
+    batch.delete(doc(db, "users", user.uid, "friendRequestsReceived", other));
+    batch.delete(doc(db, "users", other, "friendRequestsSent", user.uid));
+    if (accept) {
+      const mine = { uid: other, displayName: request.fromName || "Member", username: request.fromUsername || "", avatarUrl: request.fromAvatarUrl || "", createdAt: serverTimestamp() };
+      const theirs = { uid: user.uid, displayName: profile?.displayName || user.displayName || "Member", username: profile?.username || "", avatarUrl: profile?.avatarUrl || "", createdAt: serverTimestamp() };
+      batch.set(doc(db, "users", user.uid, "friends", other), mine);
+      batch.set(doc(db, "users", other, "friends", user.uid), theirs);
+    }
+    try { await batch.commit(); setFriendRequests(current => current.filter(item => item.uid !== other)); }
+    catch (error) { console.error("Friend request decision failed:", error); }
+  }
+
+  useEffect(() => {
+    if (!user?.uid) { setFriendRequests([]); return; }
+    let cancelled = false;
+    getDocs(collection(db, "users", user.uid, "friendRequestsReceived"))
+      .then(snapshot => { if (!cancelled) setFriendRequests(snapshot.docs.map(item => ({ uid: item.id, ...item.data() }))); })
+      .catch(error => console.error("Could not load friend requests:", error));
+    return () => { cancelled = true; };
+  }, [user?.uid, activePage]);
 
   // Firebase authentication.
 
@@ -2233,6 +2324,8 @@ useEffect(() => {
               savedAccounts={savedAccounts}
               onAddAccount={() => openAccountManager()}
               onSelectAccount={selectRememberedAccount}
+              onFriendRequestDecision={handleFriendRequestDecision}
+              friendRequests={friendRequests}
             />
           )}
 
@@ -2243,6 +2336,10 @@ useEffect(() => {
               viewOnly
               onNavigate={(page) => { setActivePage(page === "profile" ? "explore" : page); }}
               onLogout={handleLogout}
+              currentUid={user?.uid}
+              socialState={socialState}
+              onFollow={(follow) => handleFollow(viewingPublicProfile, follow)}
+              onFriendRequest={() => handleFriendRequest(viewingPublicProfile)}
             />
           )}
 
