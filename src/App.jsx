@@ -651,6 +651,8 @@ const [createMenuOpen, setCreateMenuOpen] = useState(false);
   const [socialState, setSocialState] = useState({ following: false, friendStatus: "none", busy: false, error: "" });
   const [friendRequests, setFriendRequests] = useState([]);
   const [messageContacts, setMessageContacts] = useState([]);
+  const [relationshipStats, setRelationshipStats] = useState({ followers: 0, following: 0, friends: 0 });
+  const [profileFriends, setProfileFriends] = useState([]);
 
 
   const [trendingTokens, setTrendingTokens] = useState([]);
@@ -929,6 +931,60 @@ const [createMenuOpen, setCreateMenuOpen] = useState(false);
     return unsubscribe;
   }, [user?.uid]);
 
+
+  // Live relationship totals and friend list for the currently displayed profile.
+  useEffect(() => {
+    const targetUid = activePage === "public-profile"
+      ? (viewingPublicProfile?.uid || viewingPublicProfile?.id)
+      : activePage === "profile" ? user?.uid : null;
+    if (!targetUid) {
+      setRelationshipStats({ followers: 0, following: 0, friends: 0 });
+      setProfileFriends([]);
+      return;
+    }
+    let followers = [], following = [], friends = [];
+    const publish = () => {
+      setRelationshipStats({ followers: followers.length, following: following.length, friends: friends.length });
+      setProfileFriends(friends);
+    };
+    const unsubs = [
+      onSnapshot(collection(db, "users", targetUid, "followers"), snap => { followers = snap.docs.map(d => ({ uid: d.id, ...d.data() })); publish(); }, err => console.error("Followers listener:", err)),
+      onSnapshot(collection(db, "users", targetUid, "following"), snap => { following = snap.docs.map(d => ({ uid: d.id, ...d.data() })); publish(); }, err => console.error("Following listener:", err)),
+      onSnapshot(collection(db, "users", targetUid, "friends"), snap => { friends = snap.docs.map(d => ({ uid: d.id, ...d.data() })); publish(); }, err => console.error("Friends listener:", err))
+    ];
+    return () => unsubs.forEach(unsub => unsub());
+  }, [activePage, user?.uid, viewingPublicProfile?.uid, viewingPublicProfile?.id]);
+
+  // Backfill the Messages inbox for friendships created before inbox entries existed.
+  useEffect(() => {
+    if (!user?.uid) return;
+    let cancelled = false;
+    async function repairExistingFriendInboxes() {
+      try {
+        const friendSnap = await getDocs(collection(db, "users", user.uid, "friends"));
+        for (const friendDoc of friendSnap.docs) {
+          if (cancelled) return;
+          const friendUid = friendDoc.id;
+          const ownInboxRef = doc(db, "users", user.uid, "conversations", friendUid);
+          const ownInboxSnap = await getDoc(ownInboxRef);
+          const otherInboxRef = doc(db, "users", friendUid, "conversations", user.uid);
+          const otherInboxSnap = await getDoc(otherInboxRef);
+          if (ownInboxSnap.exists() && otherInboxSnap.exists()) continue;
+          const publicSnap = await getDoc(doc(db, "publicProfiles", friendUid));
+          const publicData = publicSnap.exists() ? publicSnap.data() : friendDoc.data();
+          const ownProfile = profile || {};
+          const conversationId = [user.uid, friendUid].sort().join("_");
+          const batch = writeBatch(db);
+          if (!ownInboxSnap.exists()) batch.set(ownInboxRef, { uid: friendUid, displayName: publicData.displayName || publicData.username || "TrenchTalk member", username: publicData.username || "", avatarUrl: publicData.avatarUrl || "", conversationId, createdAt: serverTimestamp(), updatedAt: serverTimestamp(), lastMessage: "" });
+          if (!otherInboxSnap.exists()) batch.set(otherInboxRef, { uid: user.uid, displayName: ownProfile.displayName || user.displayName || "TrenchTalk member", username: ownProfile.username || "", avatarUrl: ownProfile.avatarUrl || user.photoURL || "", conversationId, createdAt: serverTimestamp(), updatedAt: serverTimestamp(), lastMessage: "" });
+          await batch.commit();
+        }
+      } catch (error) { console.error("Could not repair existing friend inboxes:", error); }
+    }
+    repairExistingFriendInboxes();
+    return () => { cancelled = true; };
+  }, [user?.uid]);
+
   // Firebase authentication.
 
   useEffect(() => {
@@ -958,9 +1014,7 @@ const [createMenuOpen, setCreateMenuOpen] = useState(false);
           // The document contains presentation fields only, never email or role.
           if (loadedProfile) {
             const publicRef = doc(db, "publicProfiles", currentUser.uid);
-            const publicSnapshot = await getDoc(publicRef);
-            if (!publicSnapshot.exists()) {
-              const publicFields = [
+            const publicFields = [
                 "displayName", "username", "bio", "avatarUrl", "bannerUrl",
                 "accentColor", "cardColor", "borderColor", "nameColor", "nameSize",
                 "fontFamily", "avatarShape", "avatarSize", "avatarBorderColor",
@@ -972,16 +1026,15 @@ const [createMenuOpen, setCreateMenuOpen] = useState(false);
                   .filter((field) => loadedProfile[field] !== undefined)
                   .map((field) => [field, loadedProfile[field]])
               );
-              await setDoc(publicRef, {
-                uid: currentUser.uid,
-                username: loadedProfile.username || loadedProfile.usernameLower || "",
-                displayName: loadedProfile.displayName || currentUser.displayName || loadedProfile.username || "TrenchTalk member",
-                bio: loadedProfile.bio || "",
-                avatarUrl: loadedProfile.avatarUrl || currentUser.photoURL || "",
-                ...publicProfile,
-                updatedAt: serverTimestamp()
-              }, { merge: true });
-            }
+            await setDoc(publicRef, {
+              uid: currentUser.uid,
+              username: loadedProfile.username || loadedProfile.usernameLower || "",
+              displayName: loadedProfile.displayName || currentUser.displayName || loadedProfile.username || "TrenchTalk member",
+              bio: loadedProfile.bio || "",
+              avatarUrl: loadedProfile.avatarUrl || currentUser.photoURL || "",
+              ...publicProfile,
+              updatedAt: serverTimestamp()
+            }, { merge: true });
           }
 
           setProfile(loadedProfile);
@@ -1434,7 +1487,7 @@ const [createMenuOpen, setCreateMenuOpen] = useState(false);
           // Hard cap the number of documents read per collection load.
           const collectionQuery = query(
             collection(db, collectionName),
-            limit(50)
+            limit(250)
           );
 
           const snapshot = await getDocs(collectionQuery);
@@ -2405,6 +2458,8 @@ useEffect(() => {
               onSelectAccount={selectRememberedAccount}
               onFriendRequestDecision={handleFriendRequestDecision}
               friendRequests={friendRequests}
+              relationshipStats={relationshipStats}
+              friends={profileFriends}
             />
           )}
 
@@ -2419,6 +2474,8 @@ useEffect(() => {
               socialState={socialState}
               onFollow={(follow) => handleFollow(viewingPublicProfile, follow)}
               onFriendRequest={() => handleFriendRequest(viewingPublicProfile)}
+              relationshipStats={relationshipStats}
+              friends={profileFriends}
             />
           )}
 

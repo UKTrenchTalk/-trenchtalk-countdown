@@ -4167,3 +4167,13 @@ html, body, #root { min-height: 100%; background: var(--background); }
 .tt-message-contact-copy small { font-size:13px; margin-top:3px; }
 .tt-message-contact-status { color:var(--accent, #789c35); font-size:10px; font-weight:800; letter-spacing:.14em; }
 @media (max-width:600px) { .tt-message-contact { padding:13px; gap:11px; } .tt-message-contact-status { display:none; } }
+
+
+/* Social relationship counts and friends tab */
+.tt-profile-friends-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;padding:20px 0}
+.tt-profile-friend-card{display:flex;align-items:center;gap:12px;min-width:0;padding:13px;border:1px solid var(--border);border-radius:10px;background:var(--surface)}
+.tt-profile-friend-avatar{width:42px;height:42px;flex:0 0 42px;display:grid;place-items:center;overflow:hidden;border-radius:50%;background:var(--surface-dark);color:var(--forest-dark);font-weight:800}
+.tt-profile-friend-avatar img{width:100%;height:100%;object-fit:cover}
+.tt-profile-friend-card>div:last-child{min-width:0;display:flex;flex-direction:column;gap:4px}
+.tt-profile-friend-card strong{overflow:hidden;color:var(--forest-dark);font-size:13px;text-overflow:ellipsis;white-space:nowrap}
+.tt-profile-friend-card span{color:var(--muted);font-size:11px}
