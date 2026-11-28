@@ -29,6 +29,7 @@ function fileKind(file) {
 export default function Messages({ user, profile, contacts = [] }) {
   const [activeUid, setActiveUid] = useState("");
   const [messages, setMessages] = useState([]);
+  const [conversationReady, setConversationReady] = useState(false);
   const [draft, setDraft] = useState("");
   const [replyTo, setReplyTo] = useState(null);
   const [editingId, setEditingId] = useState("");
@@ -52,8 +53,45 @@ export default function Messages({ user, profile, contacts = [] }) {
     if (activeUid && !contacts.some(c => c.uid === activeUid)) setActiveUid(contacts[0]?.uid || "");
   }, [contacts, activeUid]);
 
+  // Watch the parent conversation first. A brand-new conversation has no
+  // messages/typing subcollections yet, so those listeners must wait until the
+  // parent document exists.
   useEffect(() => {
-    if (!conversationId || !user?.uid) { setMessages([]); return; }
+    setMessages([]);
+    setTypingUsers([]);
+    setConversationReady(false);
+    setError("");
+    if (!conversationId || !user?.uid) return;
+
+    const conversationRef = doc(db, "conversations", conversationId);
+    const unsubscribe = onSnapshot(conversationRef, snapshot => {
+      if (!snapshot.exists()) {
+        setConversationReady(false);
+        setMessages([]);
+        setTypingUsers([]);
+        return;
+      }
+      const participants = snapshot.data()?.participants || [];
+      if (!participants.includes(user.uid) || !participants.includes(activeUid)) {
+        setConversationReady(false);
+        setError("You do not have access to this conversation.");
+        return;
+      }
+      setConversationReady(true);
+      setError("");
+    }, err => {
+      console.error("Conversation listener failed:", err);
+      setConversationReady(false);
+      setError(`Could not open this conversation: ${err.code || err.message}`);
+    });
+    return unsubscribe;
+  }, [conversationId, user?.uid, activeUid]);
+
+  useEffect(() => {
+    if (!conversationId || !user?.uid || !conversationReady) {
+      setMessages([]);
+      return;
+    }
     const messagesRef = collection(db, "conversations", conversationId, "messages");
     const q = query(messagesRef, orderBy("createdAt", "asc"), limit(200));
     const unsubscribe = onSnapshot(q, snapshot => {
@@ -61,45 +99,80 @@ export default function Messages({ user, profile, contacts = [] }) {
       snapshot.docs.forEach(messageDoc => {
         const data = messageDoc.data();
         if (data.senderUid !== user.uid && !data.readBy?.includes(user.uid)) {
-          updateDoc(messageDoc.ref, { readBy: [...(data.readBy || []), user.uid], readAt: serverTimestamp() }).catch(() => {});
+          updateDoc(messageDoc.ref, { readBy: [...(data.readBy || []), user.uid], readAt: serverTimestamp() }).catch(err => {
+            console.warn("Could not update message read receipt:", err);
+          });
         }
       });
-    }, err => { console.error("Message listener failed:", err); setError("Could not load this conversation. Check Firestore rules."); });
+    }, err => {
+      console.error("Message listener failed:", err);
+      setError(`Could not load messages: ${err.code || err.message}`);
+    });
     return unsubscribe;
-  }, [conversationId, user?.uid]);
+  }, [conversationId, user?.uid, conversationReady]);
 
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" }); }, [messages.length, activeUid]);
 
   useEffect(() => {
-    if (!conversationId || !user?.uid) { setTypingUsers([]); return; }
+    if (!conversationId || !user?.uid || !conversationReady) {
+      setTypingUsers([]);
+      return;
+    }
     const typingRef = collection(db, "conversations", conversationId, "typing");
     const unsubscribe = onSnapshot(typingRef, snap => {
       const now = Date.now();
       setTypingUsers(snap.docs.map(d => ({ uid: d.id, ...d.data() })).filter(t => t.uid !== user.uid && t.updatedAt?.toMillis && now - t.updatedAt.toMillis() < 6000));
-    }, () => {});
+    }, err => {
+      console.warn("Typing listener failed:", err);
+    });
     return unsubscribe;
-  }, [conversationId, user?.uid]);
+  }, [conversationId, user?.uid, conversationReady]);
 
   useEffect(() => () => clearTimeout(typingTimer.current), []);
 
   const ensureConversation = useCallback(async () => {
+    if (!user?.uid || !activeUid) throw new Error("Choose a friend first.");
     const id = [user.uid, activeUid].sort().join("_");
     const refDoc = doc(db, "conversations", id);
     const existing = await getDoc(refDoc);
-    if (!existing.exists()) {
-      const [myFriend, theirFriend] = await Promise.all([
-        getDoc(doc(db, "users", user.uid, "friends", activeUid)),
-        getDoc(doc(db, "users", activeUid, "friends", user.uid))
-      ]);
-      if (!myFriend.exists() || !theirFriend.exists()) throw new Error("You can only message accepted friends.");
-      await setDoc(refDoc, { participants: [user.uid, activeUid].sort(), createdAt: serverTimestamp(), updatedAt: serverTimestamp(), lastMessage: "" });
+
+    if (existing.exists()) {
+      const participants = existing.data()?.participants || [];
+      if (!participants.includes(user.uid) || !participants.includes(activeUid)) {
+        throw new Error("This conversation does not belong to these two accounts.");
+      }
+      return id;
+    }
+
+    const [myFriend, theirFriend] = await Promise.all([
+      getDoc(doc(db, "users", user.uid, "friends", activeUid)),
+      getDoc(doc(db, "users", activeUid, "friends", user.uid))
+    ]);
+    if (!myFriend.exists() || !theirFriend.exists()) {
+      throw new Error("You can only message accepted friends.");
+    }
+
+    try {
+      await setDoc(refDoc, {
+        participants: [user.uid, activeUid].sort(),
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+        lastMessage: ""
+      });
+    } catch (createError) {
+      // Another tab/device may have created it between getDoc and setDoc.
+      const raced = await getDoc(refDoc);
+      const participants = raced.exists() ? raced.data()?.participants || [] : [];
+      if (!participants.includes(user.uid) || !participants.includes(activeUid)) {
+        throw createError;
+      }
     }
     return id;
   }, [user?.uid, activeUid]);
 
   async function updateTyping(value) {
     setDraft(value);
-    if (!conversationId || !user?.uid) return;
+    if (!conversationId || !user?.uid || !conversationReady) return;
     const typingRef = doc(db, "conversations", conversationId, "typing", user.uid);
     try {
       if (value.trim()) await setDoc(typingRef, { uid: user.uid, displayName: profile?.displayName || user.displayName || "Someone", updatedAt: serverTimestamp() });
