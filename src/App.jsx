@@ -4,7 +4,6 @@ import { onAuthStateChanged, signOut, signInWithEmailAndPassword, signInWithPopu
 
 import { collection, doc, getDoc, getDocs, limit, query, setDoc, deleteDoc, serverTimestamp, writeBatch, onSnapshot } from "firebase/firestore";
 import Messages from "./components/Messages.jsx";
-import Messages from "./components/Messages.jsx";
 
 import { auth, db, googleProvider } from "./firebase.js";
 
