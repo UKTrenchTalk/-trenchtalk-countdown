@@ -956,11 +956,12 @@ const [createMenuOpen, setCreateMenuOpen] = useState(false);
     return () => unsubs.forEach(unsub => unsub());
   }, [activePage, user?.uid, viewingPublicProfile?.uid, viewingPublicProfile?.id]);
 
-  // Backfill the Messages inbox for friendships created before inbox entries existed.
+  // Backfill only the signed-in user's own Messages inbox. Never read or
+  // write another user's private inbox from this client-side repair task.
   useEffect(() => {
     if (!user?.uid) return;
     let cancelled = false;
-    async function repairExistingFriendInboxes() {
+    async function repairOwnFriendInbox() {
       try {
         const friendSnap = await getDocs(collection(db, "users", user.uid, "friends"));
         for (const friendDoc of friendSnap.docs) {
@@ -968,21 +969,27 @@ const [createMenuOpen, setCreateMenuOpen] = useState(false);
           const friendUid = friendDoc.id;
           const ownInboxRef = doc(db, "users", user.uid, "conversations", friendUid);
           const ownInboxSnap = await getDoc(ownInboxRef);
-          const otherInboxRef = doc(db, "users", friendUid, "conversations", user.uid);
-          const otherInboxSnap = await getDoc(otherInboxRef);
-          if (ownInboxSnap.exists() && otherInboxSnap.exists()) continue;
+          if (ownInboxSnap.exists()) continue;
+
           const publicSnap = await getDoc(doc(db, "publicProfiles", friendUid));
           const publicData = publicSnap.exists() ? publicSnap.data() : friendDoc.data();
-          const ownProfile = profile || {};
           const conversationId = [user.uid, friendUid].sort().join("_");
-          const batch = writeBatch(db);
-          if (!ownInboxSnap.exists()) batch.set(ownInboxRef, { uid: friendUid, displayName: publicData.displayName || publicData.username || "TrenchTalk member", username: publicData.username || "", avatarUrl: publicData.avatarUrl || "", conversationId, createdAt: serverTimestamp(), updatedAt: serverTimestamp(), lastMessage: "" });
-          if (!otherInboxSnap.exists()) batch.set(otherInboxRef, { uid: user.uid, displayName: ownProfile.displayName || user.displayName || "TrenchTalk member", username: ownProfile.username || "", avatarUrl: ownProfile.avatarUrl || user.photoURL || "", conversationId, createdAt: serverTimestamp(), updatedAt: serverTimestamp(), lastMessage: "" });
-          await batch.commit();
+          await setDoc(ownInboxRef, {
+            uid: friendUid,
+            displayName: publicData.displayName || publicData.username || "TrenchTalk member",
+            username: publicData.username || "",
+            avatarUrl: publicData.avatarUrl || "",
+            conversationId,
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp(),
+            lastMessage: ""
+          });
         }
-      } catch (error) { console.error("Could not repair existing friend inboxes:", error); }
+      } catch (error) {
+        console.error("Could not repair own friend inbox:", error);
+      }
     }
-    repairExistingFriendInboxes();
+    repairOwnFriendInbox();
     return () => { cancelled = true; };
   }, [user?.uid]);
 
