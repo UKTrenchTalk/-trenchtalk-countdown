@@ -3989,116 +3989,125 @@ html, body, #root { min-height: 100%; background: var(--background); }
 .ttpe-switch-label { flex: 0 0 auto; margin-left: 8px; color: #c5ff4a; font-size: 10px; font-weight: 800; }
 
 
-/* =========================================================
-   SAVED ACCOUNTS + EXPLORE PEOPLE CARD FIXES
-   ========================================================= */
-.ttpe-saved-accounts {
-  display: flex;
-  flex-direction: column;
-  gap: 7px;
-  margin: 10px 0 8px;
+/* Explore people cards: compact, consistent discovery tiles. */
+.tt-discovery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 320px));
+  gap: 16px;
+  align-items: stretch;
 }
-.ttpe-saved-account {
-  appearance: none;
-  width: 100%;
-  min-width: 0;
+.tt-discovery-card.tt-person-card {
+  box-sizing: border-box;
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 9px 10px;
-  border: 1px solid transparent;
-  border-radius: 10px;
-  background: transparent;
-  color: var(--text);
-  text-align: left;
-  cursor: pointer;
-}
-.ttpe-saved-account:hover { background: rgba(52,77,53,.07); }
-.ttpe-saved-account.is-active { background: rgba(52,77,53,.09); }
-.ttpe-saved-account-avatar {
-  width: 42px; height: 42px; flex: 0 0 42px;
-  display: flex; align-items: center; justify-content: center;
-  overflow: hidden; border-radius: 50%;
-  background: var(--forest); color: #fff; font-weight: 800;
-}
-.ttpe-saved-account-avatar img,
-.tt-account-saved-avatar img {
-  display: block; width: 100%; height: 100%; object-fit: cover;
-}
-.ttpe-saved-account-copy {
-  min-width: 0; flex: 1; display: flex; flex-direction: column; gap: 3px;
-}
-.ttpe-saved-account-copy strong,
-.ttpe-saved-account-copy small {
-  display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-}
-.ttpe-saved-account-copy strong { font-size: 12px; }
-.ttpe-saved-account-copy small { color: var(--muted); font-size: 11px; }
-.ttpe-saved-account-remove {
-  flex: 0 0 auto; padding: 2px 5px; color: #c44b3e; font-size: 20px; line-height: 1;
-}
-.tt-account-saved-avatar { overflow: hidden; }
-.tt-discovery-grid {
-  display: grid !important;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr));
-  align-items: start;
   gap: 16px;
   width: 100%;
-}
-.tt-discovery-grid .tt-person-card {
-  display: flex !important;
-  align-items: center;
-  gap: 14px;
-  width: 100%;
   min-width: 0;
-  min-height: 104px;
-  max-width: 100%;
-  padding: 18px;
-  overflow: hidden;
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  background: var(--surface);
-  color: var(--text);
-  cursor: pointer;
+  min-height: 116px;
+  padding: 18px 20px;
+  border: 1px solid var(--border, #bac8ae);
+  border-radius: 18px;
+  background: #e5eadc;
+  color: #17291c;
   text-align: left;
+  cursor: pointer;
+  transition: transform .16s ease, box-shadow .16s ease, border-color .16s ease;
 }
-.tt-person-card .tt-discovery-avatar {
-  width: 58px !important;
-  height: 58px !important;
-  min-width: 58px !important;
-  max-width: 58px !important;
-  flex: 0 0 58px !important;
-  display: flex !important;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden !important;
-  border-radius: 50%;
-  background: var(--forest);
-  color: #fff;
-  font-size: 20px;
-  font-weight: 800;
+.tt-discovery-card.tt-person-card:hover,
+.tt-discovery-card.tt-person-card:focus-visible {
+  transform: translateY(-2px);
+  border-color: #8eaa55;
+  box-shadow: 0 10px 26px rgba(23,41,28,.10);
+  outline: none;
 }
-.tt-person-card .tt-discovery-avatar img {
-  display: block !important;
-  width: 100% !important;
-  height: 100% !important;
-  max-width: none !important;
-  object-fit: cover !important;
-  border-radius: inherit;
-}
-.tt-person-card .tt-discovery-copy {
-  min-width: 0;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+.tt-discovery-avatar {
+  flex: 0 0 64px;
+  width: 64px;
+  height: 64px;
+  display: grid;
+  place-items: center;
   overflow: hidden;
+  border-radius: 50%;
+  background: #294a32;
+  color: #f3f6ed;
+  font-size: 23px;
+  font-weight: 700;
 }
-.tt-person-card .tt-discovery-copy strong,
-.tt-person-card .tt-discovery-copy span {
-  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+.tt-discovery-avatar img { display:block; width:100%; height:100%; object-fit:cover; }
+.tt-discovery-copy {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-width: 0;
+  gap: 5px;
 }
-.tt-person-card .tt-discovery-copy p {
-  display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical;
-  overflow: hidden; margin: 3px 0 0;
+.tt-discovery-copy strong {
+  overflow: hidden;
+  color: #17291c;
+  font-size: 17px;
+  font-weight: 750;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.tt-discovery-copy > span {
+  color: #71816d;
+  font-size: 14px;
+  line-height: 1.3;
+}
+.tt-discovery-copy p {
+  display: -webkit-box;
+  overflow: hidden;
+  margin: 2px 0 0;
+  color: #405344;
+  font-size: 13px;
+  line-height: 1.4;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+
+/* A public profile is a view inside the main app, not the account settings page. */
+.tt-public-view {
+  width: min(100%, 1050px);
+  margin: 0 auto;
+  padding: 34px clamp(18px, 4vw, 48px) 70px;
+  color: var(--text, #17291c);
+}
+.tt-public-view-heading {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  margin-bottom:22px;
+}
+.tt-public-back {
+  border:1px solid #c2cdb8;
+  border-radius:10px;
+  padding:10px 15px;
+  background:#e5eadc;
+  color:#294a32;
+  font:inherit;
+  font-weight:700;
+  cursor:pointer;
+}
+.tt-public-view .tt-public-profile-card {
+  width:100%;
+  overflow:hidden;
+  border:1px solid var(--profile-border, #bac8ae);
+  border-radius:20px;
+  background:var(--profile-card, #e4eadc);
+  box-shadow:0 12px 32px rgba(23,41,28,.06);
+}
+.tt-public-view .tt-public-profile-banner { min-height:130px; max-height:360px; background-size:cover; background-repeat:no-repeat; }
+.tt-public-view .tt-public-profile-content { min-width:0; }
+.tt-public-view .tt-public-profile-identity { min-width:0; }
+.tt-public-view .tt-public-profile-identity h2 { overflow-wrap:anywhere; }
+.tt-public-view .tt-public-profile-identity p { overflow-wrap:anywhere; }
+@media (max-width: 750px) {
+  .tt-discovery-grid { grid-template-columns:minmax(0,1fr); }
+  .tt-discovery-card.tt-person-card { min-height:100px; padding:15px; }
+  .tt-discovery-avatar { flex-basis:56px; width:56px; height:56px; }
+  .tt-public-view { padding:22px 16px 55px; }
+  .tt-public-view-heading { align-items:flex-start; flex-direction:column-reverse; }
 }
