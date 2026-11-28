@@ -650,6 +650,7 @@ const [createMenuOpen, setCreateMenuOpen] = useState(false);
   const [accountError, setAccountError] = useState("");
   const [socialState, setSocialState] = useState({ following: false, friendStatus: "none", busy: false, error: "" });
   const [friendRequests, setFriendRequests] = useState([]);
+  const [messageContacts, setMessageContacts] = useState([]);
 
 
   const [trendingTokens, setTrendingTokens] = useState([]);
@@ -877,6 +878,30 @@ const [createMenuOpen, setCreateMenuOpen] = useState(false);
       const theirs = { uid: user.uid, displayName: profile?.displayName || user.displayName || "Member", username: profile?.username || "", avatarUrl: profile?.avatarUrl || "", createdAt: serverTimestamp() };
       batch.set(doc(db, "users", user.uid, "friends", other), mine);
       batch.set(doc(db, "users", other, "friends", user.uid), theirs);
+
+      // Discord-style DM list entry: accepting a request creates a conversation
+      // contact for both users immediately, even before either sends a message.
+      const conversationId = [user.uid, other].sort().join("_");
+      batch.set(doc(db, "users", user.uid, "conversations", other), {
+        uid: other,
+        displayName: request.fromName || "Member",
+        username: request.fromUsername || "",
+        avatarUrl: request.fromAvatarUrl || "",
+        conversationId,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+        lastMessage: ""
+      });
+      batch.set(doc(db, "users", other, "conversations", user.uid), {
+        uid: user.uid,
+        displayName: profile?.displayName || user.displayName || "Member",
+        username: profile?.username || "",
+        avatarUrl: profile?.avatarUrl || "",
+        conversationId,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+        lastMessage: ""
+      });
     }
     try { await batch.commit(); setFriendRequests(current => current.filter(item => item.uid !== other)); }
     catch (error) { console.error("Friend request decision failed:", error); }
@@ -888,6 +913,18 @@ const [createMenuOpen, setCreateMenuOpen] = useState(false);
     const unsubscribe = onSnapshot(requestsRef,
       snapshot => setFriendRequests(snapshot.docs.map(item => ({ uid: item.id, ...item.data() }))),
       error => console.error("Could not listen for friend requests:", error)
+    );
+    return unsubscribe;
+  }, [user?.uid]);
+
+  // Live Messages list. Accepted friends are inserted here automatically.
+  useEffect(() => {
+    if (!user?.uid) { setMessageContacts([]); return; }
+    const conversationsRef = collection(db, "users", user.uid, "conversations");
+    const unsubscribe = onSnapshot(conversationsRef,
+      snapshot => setMessageContacts(snapshot.docs.map(item => ({ uid: item.id, ...item.data() }))
+        .sort((a, b) => (b.updatedAt?.toMillis?.() || 0) - (a.updatedAt?.toMillis?.() || 0))),
+      error => console.error("Could not listen for message contacts:", error)
     );
     return unsubscribe;
   }, [user?.uid]);
@@ -916,6 +953,37 @@ const [createMenuOpen, setCreateMenuOpen] = useState(false);
 
 
           const loadedProfile = snapshot.exists() ? snapshot.data() : null;
+
+          // Backfill public directory entries for accounts created before this fix.
+          // The document contains presentation fields only, never email or role.
+          if (loadedProfile) {
+            const publicRef = doc(db, "publicProfiles", currentUser.uid);
+            const publicSnapshot = await getDoc(publicRef);
+            if (!publicSnapshot.exists()) {
+              const publicFields = [
+                "displayName", "username", "bio", "avatarUrl", "bannerUrl",
+                "accentColor", "cardColor", "borderColor", "nameColor", "nameSize",
+                "fontFamily", "avatarShape", "avatarSize", "avatarBorderColor",
+                "bannerHeight", "bannerPosition", "profileTheme", "profileLayout",
+                "decoration", "badgeText", "website", "twitter", "telegram"
+              ];
+              const publicProfile = Object.fromEntries(
+                publicFields
+                  .filter((field) => loadedProfile[field] !== undefined)
+                  .map((field) => [field, loadedProfile[field]])
+              );
+              await setDoc(publicRef, {
+                uid: currentUser.uid,
+                username: loadedProfile.username || loadedProfile.usernameLower || "",
+                displayName: loadedProfile.displayName || currentUser.displayName || loadedProfile.username || "TrenchTalk member",
+                bio: loadedProfile.bio || "",
+                avatarUrl: loadedProfile.avatarUrl || currentUser.photoURL || "",
+                ...publicProfile,
+                updatedAt: serverTimestamp()
+              }, { merge: true });
+            }
+          }
+
           setProfile(loadedProfile);
           setSavedAccounts((previous) => {
             const current = previous.find((item) => item.uid === currentUser.uid) || {};
@@ -2203,37 +2271,37 @@ useEffect(() => {
           {/* MESSAGES */}
 
           {activePage === "messages" && (
-
             <section className="tt-standard-page">
-
               <div className="tt-page-heading">
-
                 <div>
-
                   <span className="tt-eyebrow">YOUR CONVERSATIONS</span>
-
                   <h1>Messages</h1>
-
-                  <p>Keep in touch with your community.</p>
-
+                  <p>People you become friends with are added here automatically.</p>
                 </div>
-
               </div>
 
-
-
-              <EmptyState
-
-                icon="✉"
-
-                title="No messages yet."
-
-                description="Your conversations will appear here."
-
-              />
-
+              {messageContacts.length === 0 ? (
+                <EmptyState
+                  icon="✉"
+                  title="No conversations yet."
+                  description="Accept a friend request and that person will appear here automatically."
+                />
+              ) : (
+                <div className="tt-message-contact-list">
+                  {messageContacts.map((contact) => (
+                    <article className="tt-message-contact" key={contact.uid}>
+                      <Avatar letter={(contact.displayName || contact.username || "M").slice(0, 1).toUpperCase()} imageUrl={contact.avatarUrl} />
+                      <div className="tt-message-contact-copy">
+                        <strong>{contact.displayName || contact.username || "TrenchTalk member"}</strong>
+                        <span>{contact.username ? `@${contact.username}` : "Friend"}</span>
+                        <small>{contact.lastMessage || "You are now friends. Start a conversation soon."}</small>
+                      </div>
+                      <span className="tt-message-contact-status">FRIEND</span>
+                    </article>
+                  ))}
+                </div>
+              )}
             </section>
-
           )}
 
 

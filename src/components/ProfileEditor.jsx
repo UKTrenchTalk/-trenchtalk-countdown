@@ -163,6 +163,25 @@ export default function ProfileEditor({
         { merge: true }
       );
 
+      // Keep the public directory copy in sync. Never publish private user fields.
+      const publicFields = [
+        "displayName", "username", "bio", "avatarUrl", "bannerUrl",
+        "accentColor", "cardColor", "borderColor", "nameColor", "nameSize",
+        "fontFamily", "avatarShape", "avatarSize", "avatarBorderColor",
+        "bannerHeight", "bannerPosition", "profileTheme", "profileLayout",
+        "decoration", "badgeText", "website", "twitter", "telegram"
+      ];
+      const publicProfile = Object.fromEntries(
+        publicFields
+          .filter((field) => updatedProfile[field] !== undefined)
+          .map((field) => [field, updatedProfile[field]])
+      );
+      await setDoc(
+        doc(db, "publicProfiles", user.uid),
+        { uid: user.uid, ...publicProfile, updatedAt: serverTimestamp() },
+        { merge: true }
+      );
+
       // Update the main React profile state immediately.
       onProfileUpdated?.({
         ...(profile || {}),

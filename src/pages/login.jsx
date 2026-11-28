@@ -87,6 +87,7 @@ export default function Login() {
     const username = validation.username;
     const usernameRef = doc(db, "usernames", username);
     const userRef = doc(db, "users", user.uid);
+    const publicProfileRef = doc(db, "publicProfiles", user.uid);
 
     await runTransaction(db, async (transaction) => {
       const usernameSnapshot = await transaction.get(usernameRef);
@@ -114,6 +115,17 @@ export default function Login() {
         bio: "",
         role: "user",
         createdAt: serverTimestamp()
+      });
+
+      // Publish a minimal, whitelisted profile immediately at registration.
+      transaction.set(publicProfileRef, {
+        uid: user.uid,
+        username,
+        displayName: username,
+        bio: "",
+        avatarUrl: user.photoURL || "",
+        bannerUrl: "",
+        updatedAt: serverTimestamp()
       });
     });
 
